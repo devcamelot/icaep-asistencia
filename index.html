@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICAEP Camelot — Asistencia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy: #0f1f3d;
+  --navy2: #1a3260;
+  --gold: #c9a84c;
+  --gold2: #e8c97a;
+  --cream: #f7f3ec;
+  --white: #ffffff;
+  --gray: #6b7280;
+  --lightgray: #e5e7eb;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --radius: 10px;
+  --shadow: 0 4px 24px rgba(15,31,61,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Lato', sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+/* LOGIN */
+#loginScreen {
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.login-box {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%; max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.login-logo { text-align: center; margin-bottom: 2rem; }
+.login-logo h1 { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--navy); letter-spacing: 1px; }
+.login-logo p { font-size: 0.8rem; color: var(--gray); margin-top: 4px; letter-spacing: 2px; text-transform: uppercase; }
+.cross-icon { font-size: 2.5rem; color: var(--gold); margin-bottom: 0.5rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--lightgray);
+  border-radius: var(--radius); font-family: 'Lato', sans-serif; font-size: 0.95rem;
+  color: var(--navy); background: var(--white); transition: border 0.2s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: var(--gold);
+}
+.btn { width: 100%; padding: 12px; border: none; border-radius: var(--radius); font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: var(--navy); color: var(--white); }
+.btn-primary:hover { background: var(--navy2); }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold:hover { background: var(--gold2); }
+.btn-sm { width: auto; padding: 7px 16px; font-size: 0.85rem; border-radius: 8px; }
+.btn-outline { background: transparent; border: 1.5px solid var(--navy); color: var(--navy); }
+.btn-outline:hover { background: var(--navy); color: var(--white); }
+.btn-danger { background: var(--danger); color: var(--white); }
+.error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 8px; text-align: center; }
+
+/* APP SHELL */
+#appShell { display: none; min-height: 100vh; flex-direction: column; }
+header {
+  background: var(--navy);
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.header-title { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1rem; letter-spacing: 1px; }
+.header-user { color: var(--cream); font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
+.header-user button { background: transparent; border: 1px solid rgba(201,168,76,0.4); color: var(--gold); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
+
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--lightgray);
+  display: flex; overflow-x: auto;
+  padding: 0 1rem;
+}
+nav button {
+  padding: 14px 18px; border: none; background: transparent;
+  color: var(--gray); font-family: 'Lato', sans-serif; font-size: 0.85rem;
+  font-weight: 700; cursor: pointer; white-space: nowrap;
+  border-bottom: 3px solid transparent; transition: all 0.2s;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+nav button.active { color: var(--navy); border-bottom-color: var(--gold); }
+nav button:hover { color: var(--navy); }
+
+main { flex: 1; padding: 1.5rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+/* SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+.section-header { margin-bottom: 1.5rem; }
+.section-header h2 { font-family: 'Cinzel', serif; font-size: 1.3rem; color: var(--navy); }
+.section-header p { color: var(--gray); font-size: 0.9rem; margin-top: 4px; }
+
+/* CARDS */
+.card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 1.25rem; box-shadow: var(--shadow);
+  border: 1px solid rgba(201,168,76,0.15);
+}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: var(--navy); border-radius: var(--radius); padding: 1.1rem; color: var(--white); }
+.stat-card .label { font-size: 0.72rem; color: var(--gold2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.stat-card .value { font-size: 2rem; font-weight: 700; line-height: 1; }
+.stat-card .sub { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+
+/* ASISTENCIA FORM */
+.service-selector { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.2rem; }
+.service-btn {
+  padding: 14px 8px; border: 2px solid var(--lightgray); border-radius: var(--radius);
+  background: var(--white); cursor: pointer; text-align: center;
+  font-family: 'Lato', sans-serif; transition: all 0.2s;
+}
+.service-btn .day { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); }
+.service-btn .name { font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-top: 3px; }
+.service-btn.selected { border-color: var(--gold); background: #fdf8ee; }
+
+.members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin: 1rem 0; }
+.member-card {
+  border: 2px solid var(--lightgray); border-radius: var(--radius);
+  padding: 12px; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 10px;
+}
+.member-card:hover { border-color: var(--gold); }
+.member-card.present { border-color: var(--success); background: #f0fdf4; }
+.member-card.present .check { background: var(--success); }
+.member-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--navy); color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
+}
+.member-info .name { font-size: 0.85rem; font-weight: 700; color: var(--navy); }
+.member-info .min { font-size: 0.72rem; color: var(--gray); }
+.check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--lightgray); margin-left: auto; flex-shrink: 0; transition: all 0.2s; }
+
+.cena-toggle {
+  display: flex; align-items: center; gap: 10px;
+  background: #fdf8ee; border: 1px solid var(--gold);
+  border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem;
+  font-size: 0.88rem; color: var(--navy);
+}
+.toggle-sw { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle-sw input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: var(--lightgray); border-radius: 22px; cursor: pointer; transition: 0.3s; }
+.slider:before { content:''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+input:checked + .slider { background: var(--gold); }
+input:checked + .slider:before { transform: translateX(18px); }
+
+/* TABLA */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th { background: var(--navy); color: var(--gold); padding: 10px 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--lightgray); color: var(--navy); }
+tr:hover td { background: #fafaf7; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+.badge-jovenes { background: #dbeafe; color: #1e40af; }
+.badge-caballeros { background: #dcfce7; color: #166534; }
+.badge-damas { background: #fce7f3; color: #9d174d; }
+.badge-general { background: var(--lightgray); color: var(--gray); }
+.badge-si { background: #dcfce7; color: #166534; }
+.badge-no { background: #fee2e2; color: #991b1b; }
+
+/* DASHBOARD */
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+.chart-card { background: var(--white); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); border: 1px solid rgba(201,168,76,0.15); }
+.chart-card h3 { font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 1rem; }
+.period-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.period-tab { padding: 6px 14px; border: 1.5px solid var(--lightgray); border-radius: 20px; background: transparent; font-family: 'Lato', sans-serif; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; color: var(--gray); }
+.period-tab.active { background: var(--navy); color: var(--gold); border-color: var(--navy); }
+.date-range { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.date-range label { font-size: 0.8rem; color: var(--gray); }
+.date-range input { padding: 6px 10px; border: 1.5px solid var(--lightgray); border-radius: 8px; font-size: 0.8rem; color: var(--navy); }
+
+/* MIEMBROS */
+.miembros-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px; }
+.search-box { padding: 8px 14px; border: 1.5px solid var(--lightgray); border-radius: 8px; font-size: 0.9rem; width: 220px; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,31,61,0.6); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: 14px; padding: 2rem; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--navy); }
+.modal-actions { display: flex; gap: 10px; margin-top: 1.2rem; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--navy); color: var(--white); padding: 12px 20px; border-radius: 10px; font-size: 0.9rem; z-index: 300; transform: translateY(100px); opacity: 0; transition: all 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 4px solid var(--gold); }
+
+@media(max-width:600px) {
+  main { padding: 1rem; }
+  .service-selector { grid-template-columns: repeat(3,1fr); }
+  .members-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="cross-icon">✝</div>
+      <h1>ICAEP Camelot</h1>
+      <p>Sistema de Asistencia</p>
+    </div>
+    <div class="form-group">
+      <label>Usuario</label>
+      <input type="text" id="loginUser" placeholder="tu@email.com" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">Ingresar</button>
+    <p class="error-msg" id="loginError"></p>
+    <p style="text-align:center;font-size:0.75rem;color:var(--gray);margin-top:1rem;">
+      Demo: admin / admin123
+    </p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <header>
+    <span class="header-title">✝ ICAEP Camelot</span>
+    <div class="header-user">
+      <span id="headerUsername"></span>
+      <button onclick="doLogout()">Salir</button>
+    </div>
+  </header>
+  <nav>
+    <button class="active" onclick="showSection('dashboard',this)">Dashboard</button>
+    <button onclick="showSection('asistencia',this)">Registrar</button>
+    <button onclick="showSection('historial',this)">Historial</button>
+    <button onclick="showSection('miembros',this)">Miembros</button>
+  </nav>
+  <main>
+
+    <!-- DASHBOARD -->
+    <div id="sec-dashboard" class="section active">
+      <div class="section-header">
+        <h2>Dashboard</h2>
+        <p>Resumen de asistencia e indicadores</p>
+      </div>
+      <div class="period-tabs">
+        <button class="period-tab active" onclick="setDashPeriod('week',this)">Semana</button>
+        <button class="period-tab" onclick="setDashPeriod('month',this)">Mes</button>
+        <button class="period-tab" onclick="setDashPeriod('quarter',this)">Trimestre</button>
+        <button class="period-tab" onclick="setDashPeriod('year',this)">Año</button>
+        <button class="period-tab" onclick="setDashPeriod('all',this)">Todo</button>
+      </div>
+      <div class="date-range">
+        <label>Desde <input type="date" id="dashFrom" onchange="setDashRange()"></label>
+        <label>Hasta <input type="date" id="dashTo" onchange="setDashRange()"></label>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Asistencia por Ministerio</h3>
+          <div style="position:relative;height:240px;"><canvas id="chartMin"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Santa Cena por Ministerio</h3>
+          <div style="position:relative;height:240px;"><canvas id="chartCena"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Asistencia por Servicio</h3>
+          <div style="position:relative;height:240px;"><canvas id="chartServ"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Tendencia de Asistencia</h3>
+          <div style="position:relative;height:240px;"><canvas id="chartTrend"></canvas></div>
+        </div>
+      </div>
+      <div style="text-align:right;margin-top:1rem;">
+        <button class="btn btn-gold btn-sm" onclick="exportExcel()">Exportar Excel</button>
+      </div>
+    </div>
+
+    <!-- REGISTRAR ASISTENCIA -->
+    <div id="sec-asistencia" class="section">
+      <div class="section-header">
+        <h2>Registrar Asistencia</h2>
+        <p id="fechaHoy"></p>
+      </div>
+      <div class="card">
+        <div class="form-group">
+          <label>Fecha del servicio</label>
+          <input type="date" id="servFecha">
+        </div>
+        <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Tipo de Servicio</label>
+        <div class="service-selector">
+          <div class="service-btn" onclick="selectService('Miercoles',this)">
+            <div class="day">Miér</div>
+            <div class="name">Miércoles</div>
+          </div>
+          <div class="service-btn" onclick="selectService('Jueves',this)">
+            <div class="day">Jue</div>
+            <div class="name">Jueves</div>
+          </div>
+          <div class="service-btn selected" onclick="selectService('Domingo',this)">
+            <div class="day">Dom</div>
+            <div class="name">Domingo</div>
+          </div>
+        </div>
+
+        <div class="cena-toggle" id="cenaToggleWrap">
+          <label class="toggle-sw">
+            <input type="checkbox" id="cenaCheck">
+            <span class="slider"></span>
+          </label>
+          <span>¿Se toma Santa Cena hoy? <span id="cenaLabel" style="color:var(--gold);font-weight:700;"></span></span>
+        </div>
+
+        <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Seleccionar Presentes</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" onclick="selectAll(true)">Todos</button>
+          <button class="btn btn-sm btn-outline" onclick="selectAll(false)">Ninguno</button>
+          <input class="search-box" style="width:180px;padding:6px 12px" placeholder="Buscar..." oninput="filterMembers(this.value)">
+        </div>
+        <div class="members-grid" id="membersGrid"></div>
+        <div style="margin-top:1.2rem;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" style="flex:1;min-width:140px" onclick="guardarAsistencia()">Guardar Asistencia</button>
+          <button class="btn btn-gold btn-sm" onclick="exportExcel()">Exportar Excel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div id="sec-historial" class="section">
+      <div class="section-header">
+        <h2>Historial</h2>
+        <p>Todos los registros de asistencia</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+          <input type="date" id="filtFecha" class="search-box" style="width:160px" onchange="renderHistorial()">
+          <select id="filtServicio" class="search-box" style="width:150px" onchange="renderHistorial()">
+            <option value="">Todos los servicios</option>
+            <option>Miercoles</option>
+            <option>Jueves</option>
+            <option>Domingo</option>
+          </select>
+          <select id="filtMinisterio" class="search-box" style="width:150px" onchange="renderHistorial()">
+            <option value="">Todos los ministerios</option>
+            <option>Jovenes</option>
+            <option>Caballeros</option>
+            <option>Damas</option>
+          </select>
+          <button class="btn btn-gold btn-sm" onclick="exportExcel()">Exportar Excel</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Servicio</th><th>Miembro</th><th>Ministerio</th><th>Santa Cena</th></tr></thead>
+            <tbody id="historialBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIEMBROS -->
+    <div id="sec-miembros" class="section">
+      <div class="section-header">
+        <h2>Miembros</h2>
+      </div>
+      <div class="miembros-header">
+        <input class="search-box" placeholder="Buscar miembro..." oninput="filterMiembrosTable(this.value)">
+        <button class="btn btn-primary btn-sm" onclick="openModal('addMember')">+ Agregar</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Ministerio</th><th>Tipo</th><th>Bautizado</th><th>Punto</th><th></th></tr></thead>
+            <tbody id="miembrosBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL AGREGAR MIEMBRO -->
+<div class="modal-overlay" id="modalAddMember">
+  <div class="modal">
+    <h3>Agregar Miembro</h3>
+    <div class="form-group"><label>Nombre</label><input type="text" id="mNombre"></div>
+    <div class="form-group"><label>Apellido</label><input type="text" id="mApellido"></div>
+    <div class="form-group">
+      <label>Ministerio</label>
+      <select id="mMinisterio">
+        <option>Jovenes</option><option>Caballeros</option><option>Damas</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tipo</label>
+      <select id="mTipo"><option>Miembro Activo</option><option>Simpatizante</option></select>
+    </div>
+    <div class="form-group">
+      <label>Bautizado</label>
+      <select id="mBautizado"><option>SI</option><option>NO</option></select>
+    </div>
+    <div class="form-group">
+      <label>Punto de Crecimiento</label>
+      <select id="mPunto"><option>CENTRAL</option><option>SAN VICENTE</option><option>N/A</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveMember()">Guardar</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('addMember')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== DATA =====================
+const USERS = [
+  { user: 'admin', pass: 'admin123', nombre: 'Administrador' },
+  { user: 'lider1', pass: 'lider123', nombre: 'Líder 1' }
+];
+
+let DB = {
+  miembros: [
+    {id:'fb6dacf7',nombre:'Juan',apellido:'Torres',bautizado:'SI',punto:'N/A',tipo:'Miembro Activo',ministerio:'Jovenes'},
+    {id:'ea96eb73',nombre:'Juan',apellido:'Martinez',bautizado:'SI',punto:'N/A',tipo:'Miembro Activo',ministerio:'Caballeros'},
+    {id:'c9fc7899',nombre:'Coro',apellido:'Guerra',bautizado:'NO',punto:'SAN VICENTE',tipo:'Simpatizante',ministerio:'Damas'},
+    {id:'fdc7e942',nombre:'Dario',apellido:'Padilla',bautizado:'SI',punto:'CENTRAL',tipo:'Miembro Activo',ministerio:'Caballeros'},
+    {id:'5f0bc635',nombre:'Alberto',apellido:'Ortega',bautizado:'SI',punto:'CENTRAL',tipo:'Miembro Activo',ministerio:'Caballeros'},
+    {id:'7ebb9d82',nombre:'Jhoselin',apellido:'Arrieta',bautizado:'SI',punto:'CENTRAL',tipo:'Miembro Activo',ministerio:'Damas'},
+    {id:'a2265fd2',nombre:'Sandra',apellido:'Ordoñez',bautizado:'NO',punto:'CENTRAL',tipo:'Simpatizante',ministerio:'Damas'},
+    {id:'5f3099b9',nombre:'Roiman',apellido:'Perez',bautizado:'SI',punto:'CENTRAL',tipo:'Miembro Activo',ministerio:'Jovenes'},
+    {id:'fd5b0f91',nombre:'Juan',apellido:'Atencio',bautizado:'SI',punto:'CENTRAL',tipo:'Miembro Activo',ministerio:'Jovenes'},
+    {id:'22f2fef6',nombre:'Yurleidys',apellido:'Cantillo',bautizado:'SI',punto:'SAN VICENTE',tipo:'Miembro Activo',ministerio:'Damas'}
+  ],
+  asistencia: [
+    {id:'r1',fecha:'2026-01-21',miembro:'fb6dacf7',servicio:'Miercoles',cena:false},
+    {id:'r2',fecha:'2026-01-21',miembro:'5f3099b9',servicio:'Miercoles',cena:false},
+    {id:'r3',fecha:'2026-01-21',miembro:'fd5b0f91',servicio:'Miercoles',cena:false},
+    {id:'r4',fecha:'2026-01-21',miembro:'c9fc7899',servicio:'Miercoles',cena:false},
+    {id:'r5',fecha:'2026-01-21',miembro:'7ebb9d82',servicio:'Miercoles',cena:false},
+    {id:'r6',fecha:'2026-01-21',miembro:'a2265fd2',servicio:'Miercoles',cena:false},
+    {id:'r7',fecha:'2026-01-21',miembro:'22f2fef6',servicio:'Miercoles',cena:false},
+    {id:'r8',fecha:'2026-01-21',miembro:'ea96eb73',servicio:'Miercoles',cena:false},
+    {id:'r9',fecha:'2026-01-21',miembro:'fdc7e942',servicio:'Miercoles',cena:false},
+    {id:'r10',fecha:'2026-01-21',miembro:'5f0bc635',servicio:'Miercoles',cena:false},
+    {id:'r11',fecha:'2026-01-22',miembro:'fb6dacf7',servicio:'Jueves',cena:false},
+    {id:'r12',fecha:'2026-01-22',miembro:'ea96eb73',servicio:'Jueves',cena:false},
+    {id:'r13',fecha:'2026-01-22',miembro:'c9fc7899',servicio:'Jueves',cena:false},
+    {id:'r14',fecha:'2026-01-22',miembro:'fdc7e942',servicio:'Jueves',cena:false},
+    {id:'r15',fecha:'2026-01-22',miembro:'5f0bc635',servicio:'Jueves',cena:false},
+    {id:'r16',fecha:'2026-01-22',miembro:'a2265fd2',servicio:'Jueves',cena:false},
+    {id:'r17',fecha:'2026-01-22',miembro:'7ebb9d82',servicio:'Jueves',cena:false},
+    {id:'r18',fecha:'2026-01-27',miembro:'fb6dacf7',servicio:'Domingo',cena:true},
+    {id:'r19',fecha:'2026-01-27',miembro:'ea96eb73',servicio:'Domingo',cena:true},
+    {id:'r20',fecha:'2026-01-27',miembro:'c9fc7899',servicio:'Domingo',cena:true},
+    {id:'r21',fecha:'2026-01-27',miembro:'fdc7e942',servicio:'Domingo',cena:true},
+    {id:'r22',fecha:'2026-01-27',miembro:'5f0bc635',servicio:'Domingo',cena:true},
+    {id:'r23',fecha:'2026-01-27',miembro:'7ebb9d82',servicio:'Domingo',cena:false},
+    {id:'r24',fecha:'2026-01-27',miembro:'a2265fd2',servicio:'Domingo',cena:false},
+    {id:'r25',fecha:'2026-01-27',miembro:'5f3099b9',servicio:'Domingo',cena:true},
+    {id:'r26',fecha:'2026-01-27',miembro:'fd5b0f91',servicio:'Domingo',cena:true},
+    {id:'r27',fecha:'2026-01-27',miembro:'22f2fef6',servicio:'Domingo',cena:false},
+    {id:'r28',fecha:'2026-05-23',miembro:'fb6dacf7',servicio:'Domingo',cena:false},
+    {id:'r29',fecha:'2026-05-23',miembro:'ea96eb73',servicio:'Domingo',cena:false}
+  ]
+};
+
+let currentUser = null;
+let selectedService = 'Domingo';
+let presentMembers = new Set();
+let dashPeriod = 'month';
+let dashFrom = null, dashTo = null;
+let charts = {};
+
+// ===================== AUTH =====================
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const found = USERS.find(x => x.user === u && x.pass === p);
+  if (!found) { document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos'; return; }
+  currentUser = found;
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'flex';
+  document.getElementById('headerUsername').textContent = found.nombre;
+  initApp();
+}
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'none';
+}
+
+// ===================== INIT =====================
+function initApp() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('servFecha').value = today;
+  document.getElementById('fechaHoy').textContent = formatDate(today);
+  checkCenaAuto();
+  renderMembersGrid();
+  renderMiembrosTable();
+  renderHistorial();
+  renderDashboard();
+  saveDB();
+}
+
+function saveDB() {
+  try { localStorage.setItem('icaep_db', JSON.stringify(DB)); } catch(e){}
+}
+function loadDB() {
+  try {
+    const d = localStorage.getItem('icaep_db');
+    if(d) DB = JSON.parse(d);
+  } catch(e){}
+}
+loadDB();
+
+// ===================== NAV =====================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='historial') renderHistorial();
+  if(id==='miembros') renderMiembrosTable();
+}
+
+// ===================== ASISTENCIA =====================
+function selectService(s, el) {
+  selectedService = s;
+  document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  checkCenaAuto();
+}
+
+function checkCenaAuto() {
+  const fecha = document.getElementById('servFecha').value;
+  if(!fecha) return;
+  const d = new Date(fecha+'T12:00:00');
+  const isPrimerDomingo = d.getDay()===0 && d.getDate()<=7;
+  const isDomingo = selectedService==='Domingo';
+  const chk = document.getElementById('cenaCheck');
+  chk.checked = isPrimerDomingo && isDomingo;
+  document.getElementById('cenaLabel').textContent = chk.checked ? '(1er domingo del mes)' : '';
+}
+
+document.getElementById('servFecha').addEventListener('change', checkCenaAuto);
+document.getElementById('cenaCheck').addEventListener('change', function(){
+  document.getElementById('cenaLabel').textContent = '';
+});
+
+function renderMembersGrid(filter='') {
+  const grid = document.getElementById('membersGrid');
+  const members = DB.miembros.filter(m =>
+    (m.nombre+' '+m.apellido).toLowerCase().includes(filter.toLowerCase())
+  );
+  grid.innerHTML = members.map(m => {
+    const initials = m.nombre[0]+(m.apellido[0]||'');
+    const isPresent = presentMembers.has(m.id);
+    return `<div class="member-card ${isPresent?'present':''}" onclick="toggleMember('${m.id}',this)" data-id="${m.id}">
+      <div class="member-avatar">${initials}</div>
+      <div class="member-info">
+        <div class="name">${m.nombre}</div>
+        <div class="min">${m.ministerio}</div>
+      </div>
+      <div class="check"></div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMember(id, el) {
+  if(presentMembers.has(id)) { presentMembers.delete(id); el.classList.remove('present'); }
+  else { presentMembers.add(id); el.classList.add('present'); }
+}
+
+function selectAll(val) {
+  if(val) DB.miembros.forEach(m => presentMembers.add(m.id));
+  else presentMembers.clear();
+  renderMembersGrid();
+}
+
+function filterMembers(v) { renderMembersGrid(v); }
+
+function guardarAsistencia() {
+  if(presentMembers.size===0) { showToast('Selecciona al menos un miembro'); return; }
+  const fecha = document.getElementById('servFecha').value;
+  const cena = document.getElementById('cenaCheck').checked;
+  const existing = DB.asistencia.filter(a => a.fecha===fecha && a.servicio===selectedService).map(a=>a.miembro);
+  let nuevos = 0;
+  presentMembers.forEach(mid => {
+    if(!existing.includes(mid)) {
+      DB.asistencia.push({ id:'r'+Date.now()+Math.random(), fecha, miembro:mid, servicio:selectedService, cena });
+      nuevos++;
+    }
+  });
+  saveDB();
+  presentMembers.clear();
+  renderMembersGrid();
+  showToast(`✓ ${nuevos} registros guardados`, 'success');
+}
+
+// ===================== HISTORIAL =====================
+function renderHistorial() {
+  const filtFecha = document.getElementById('filtFecha').value;
+  const filtServ = document.getElementById('filtServicio').value;
+  const filtMin = document.getElementById('filtMinisterio').value;
+  let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(filtFecha) rows = rows.filter(r=>r.fecha===filtFecha);
+  if(filtServ) rows = rows.filter(r=>r.servicio===filtServ);
+  if(filtMin) rows = rows.filter(r=>{ const m=DB.miembros.find(x=>x.id===r.miembro); return m&&m.ministerio===filtMin; });
+  const body = document.getElementById('historialBody');
+  body.innerHTML = rows.map(r => {
+    const m = DB.miembros.find(x=>x.id===r.miembro);
+    const nombre = m ? m.nombre+' '+m.apellido : r.miembro;
+    const min = m ? m.ministerio : '—';
+    return `<tr>
+      <td>${formatDate(r.fecha)}</td>
+      <td>${r.servicio}</td>
+      <td>${nombre}</td>
+      <td><span class="badge badge-${min.toLowerCase()}">${min}</span></td>
+      <td><span class="badge ${r.cena?'badge-si':'badge-no'}">${r.cena?'Sí':'No'}</span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
+}
+
+// ===================== MIEMBROS =====================
+function renderMiembrosTable(filter='') {
+  const body = document.getElementById('miembrosBody');
+  const list = DB.miembros.filter(m=>(m.nombre+' '+m.apellido).toLowerCase().includes(filter.toLowerCase()));
+  body.innerHTML = list.map(m=>`<tr>
+    <td><strong>${m.nombre} ${m.apellido}</strong></td>
+    <td><span class="badge badge-${m.ministerio.toLowerCase()}">${m.ministerio}</span></td>
+    <td>${m.tipo}</td>
+    <td><span class="badge ${m.bautizado==='SI'?'badge-si':'badge-no'}">${m.bautizado}</span></td>
+    <td>${m.punto}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">Eliminar</button></td>
+  </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin miembros</td></tr>';
+}
+
+function filterMiembrosTable(v) { renderMiembrosTable(v); }
+
+function openModal(id) { document.getElementById('modal'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('open'); }
+function closeModal(id) { document.getElementById('modal'+id.charAt(0).toUpperCase()+id.slice(1)).classList.remove('open'); }
+
+function saveMember() {
+  const n = document.getElementById('mNombre').value.trim();
+  const a = document.getElementById('mApellido').value.trim();
+  if(!n||!a) { showToast('Nombre y apellido son requeridos'); return; }
+  DB.miembros.push({
+    id: 'u'+Date.now(),
+    nombre:n, apellido:a,
+    ministerio: document.getElementById('mMinisterio').value,
+    tipo: document.getElementById('mTipo').value,
+    bautizado: document.getElementById('mBautizado').value,
+    punto: document.getElementById('mPunto').value
+  });
+  saveDB();
+  closeModal('addMember');
+  renderMiembrosTable();
+  renderMembersGrid();
+  showToast('✓ Miembro agregado', 'success');
+  ['mNombre','mApellido'].forEach(id=>document.getElementById(id).value='');
+}
+
+function deleteMember(id) {
+  if(!confirm('¿Eliminar este miembro?')) return;
+  DB.miembros = DB.miembros.filter(m=>m.id!==id);
+  DB.asistencia = DB.asistencia.filter(a=>a.miembro!==id);
+  saveDB();
+  renderMiembrosTable();
+  renderMembersGrid();
+  showToast('Miembro eliminado');
+}
+
+// ===================== DASHBOARD =====================
+function getFilteredAsistencia() {
+  const today = new Date('2026-05-23');
+  let rows = [...DB.asistencia];
+  if(dashFrom||dashTo) {
+    rows = rows.filter(r=>{
+      const d=new Date(r.fecha);
+      return (!dashFrom||d>=new Date(dashFrom))&&(!dashTo||d<=new Date(dashTo));
+    });
+  } else {
+    rows = rows.filter(r=>{
+      const d=new Date(r.fecha);
+      if(dashPeriod==='week') return (today-d)/(86400000)<=7;
+      if(dashPeriod==='month') return d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear();
+      if(dashPeriod==='quarter') return Math.floor(d.getMonth()/3)===Math.floor(today.getMonth()/3)&&d.getFullYear()===today.getFullYear();
+      if(dashPeriod==='year') return d.getFullYear()===today.getFullYear();
+      return true;
+    });
+  }
+  return rows;
+}
+
+function setDashPeriod(p, btn) {
+  dashPeriod=p; dashFrom=null; dashTo=null;
+  document.getElementById('dashFrom').value='';
+  document.getElementById('dashTo').value='';
+  document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+function setDashRange() {
+  dashFrom=document.getElementById('dashFrom').value||null;
+  dashTo=document.getElementById('dashTo').value||null;
+  document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
+  renderDashboard();
+}
+
+const COLORS_MIN = { Jovenes:'#378ADD', Caballeros:'#1D9E75', Damas:'#D4537E', General:'#888780' };
+const COLORS_SERV = { Miercoles:'#c9a84c', Jueves:'#0f1f3d', Domingo:'#378ADD' };
+
+function renderDashboard() {
+  const rows = getFilteredAsistencia();
+  const memberMap = {};
+  DB.miembros.forEach(m=>memberMap[m.id]=m.ministerio);
+
+  const byMin={}, byCena={}, byServ={}, byDate={};
+  rows.forEach(r=>{
+    const min=memberMap[r.miembro]||'General';
+    byMin[min]=(byMin[min]||0)+1;
+    if(r.cena) byCena[min]=(byCena[min]||0)+1;
+    byServ[r.servicio]=(byServ[r.servicio]||0)+1;
+    byDate[r.fecha]=(byDate[r.fecha]||0)+1;
+  });
+
+  // Stats
+  const totalCena = Object.values(byCena).reduce((a,b)=>a+b,0);
+  const fechasUnicas = Object.keys(byDate).length;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="label">Total Asistencias</div><div class="value">${rows.length}</div><div class="sub">registros</div></div>
+    <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">personas tomaron</div></div>
+    <div class="stat-card"><div class="label">Servicios</div><div class="value">${fechasUnicas}</div><div class="sub">en el período</div></div>
+    <div class="stat-card"><div class="label">Miembros</div><div class="value">${DB.miembros.length}</div><div class="sub">registrados</div></div>
+  `;
+
+  const minLabels = Object.keys(byMin);
+  const servLabels = ['Miercoles','Jueves','Domingo'];
+  const dateLabels = Object.keys(byDate).sort();
+
+  destroyChart('chartMin');
+  charts.chartMin = new Chart(document.getElementById('chartMin'),{
+    type:'bar',
+    data:{labels:minLabels,datasets:[{label:'Asistencias',data:minLabels.map(l=>byMin[l]||0),backgroundColor:minLabels.map(l=>COLORS_MIN[l]||'#888'),borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#6b7280'}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}}
+  });
+
+  destroyChart('chartCena');
+  const cenaLabels = Object.keys(byCena);
+  if(cenaLabels.length>0) {
+    charts.chartCena = new Chart(document.getElementById('chartCena'),{
+      type:'doughnut',
+      data:{labels:cenaLabels,datasets:[{data:cenaLabels.map(l=>byCena[l]),backgroundColor:cenaLabels.map(l=>COLORS_MIN[l]||'#888'),borderWidth:3}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}}}
+    });
+  } else {
+    document.getElementById('chartCena').parentElement.innerHTML='<p style="text-align:center;color:var(--gray);padding:4rem 0;font-size:0.9rem">Sin datos de Santa Cena en este período</p>';
+  }
+
+  destroyChart('chartServ');
+  charts.chartServ = new Chart(document.getElementById('chartServ'),{
+    type:'bar',
+    data:{labels:servLabels,datasets:[{label:'Asistencias',data:servLabels.map(l=>byServ[l]||0),backgroundColor:servLabels.map(l=>COLORS_SERV[l]),borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#6b7280'}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}}
+  });
+
+  destroyChart('chartTrend');
+  charts.chartTrend = new Chart(document.getElementById('chartTrend'),{
+    type:'line',
+    data:{labels:dateLabels.map(d=>formatDateShort(d)),datasets:[{label:'Asistencias',data:dateLabels.map(d=>byDate[d]),borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#c9a84c',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#6b7280'}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}}
+  });
+}
+
+function destroyChart(id) {
+  if(charts[id]) { charts[id].destroy(); delete charts[id]; }
+  const canvas = document.getElementById(id);
+  if(canvas && canvas.parentElement && !canvas.parentElement.querySelector('canvas')) {
+    canvas.parentElement.innerHTML = `<div style="position:relative;height:240px;"><canvas id="${id}"></canvas></div>`;
+  } else if(canvas) {
+    canvas.parentElement.innerHTML = `<canvas id="${id}"></canvas>`;
+  }
+}
+
+// ===================== EXPORT =====================
+function exportExcel() {
+  const memberMap={};
+  DB.miembros.forEach(m=>memberMap[m.id]={nombre:m.nombre+' '+m.apellido,ministerio:m.ministerio});
+  const data = DB.asistencia.map(r=>({
+    'Fecha': r.fecha,
+    'Servicio': r.servicio,
+    'Nombre': memberMap[r.miembro]?.nombre||r.miembro,
+    'Ministerio': memberMap[r.miembro]?.ministerio||'—',
+    'Santa Cena': r.cena?'SI':'NO'
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
+  const wsMiembros = XLSX.utils.json_to_sheet(DB.miembros.map(m=>({
+    Nombre:m.nombre, Apellido:m.apellido, Ministerio:m.ministerio,
+    Tipo:m.tipo, Bautizado:m.bautizado, Punto:m.punto
+  })));
+  XLSX.utils.book_append_sheet(wb, wsMiembros, 'Miembros');
+  XLSX.writeFile(wb, 'ICAEP_Asistencia.xlsx');
+  showToast('✓ Excel exportado', 'success');
+}
+
+// ===================== UTILS =====================
+function formatDate(d) {
+  if(!d) return '';
+  const [y,m,day]=d.split('-');
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${day} ${months[parseInt(m)-1]} ${y}`;
+}
+function formatDateShort(d) {
+  if(!d) return '';
+  const [y,m,day]=d.split('-');
+  return `${day}/${m}`;
+}
+
+function showToast(msg, type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type==='success'?'success':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
