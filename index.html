@@ -28,6 +28,8 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--navy);min
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);}
 .login-box .form-group label{color:var(--gold2);}
 .login-box .form-group input{border-color:rgba(255,255,255,0.3);}
+.login-pass-toggle{display:flex;align-items:center;gap:8px;margin-top:-4px;margin-bottom:1rem;color:var(--gold2);font-size:0.8rem;}
+.login-pass-toggle input{accent-color:var(--gold);}
 .btn{padding:10px 18px;border:none;border-radius:var(--radius);font-family:'Lato',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
 .btn-block{width:100%;padding:12px;}
 .btn-primary{background:var(--navy);color:var(--white);}
@@ -148,6 +150,10 @@ tr:hover td{background:#fafaf7;}
       <label>Contraseña</label>
       <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
     </div>
+    <label class="login-pass-toggle" for="showLoginPass">
+      <input type="checkbox" id="showLoginPass" onchange="toggleLoginPassword()">
+      <span>Mostrar contraseña</span>
+    </label>
     <button class="btn btn-primary btn-block" onclick="doLogin()">Ingresar</button>
     <p class="error-msg" id="loginError"></p>
   </div>
@@ -530,6 +536,12 @@ function doLogout(){
   currentUser=null;
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('appShell').style.display='none';
+}
+
+function toggleLoginPassword(){
+  const passInput = document.getElementById('loginPass');
+  const show = document.getElementById('showLoginPass').checked;
+  passInput.type = show ? 'text' : 'password';
 }
 
 // ============================================================
