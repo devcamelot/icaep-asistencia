@@ -413,7 +413,6 @@ tr:hover td{background:#fafaf7;}
 
 <div class="modal-overlay" id="modalChart">
   <div class="modal">
-    <h3 id="modalChartTitle" style="margin-bottom:0.7rem;">Grafico</h3>
     <div id="modalChartBody">
       <canvas id="modalChartCanvas"></canvas>
     </div>
@@ -1221,7 +1220,6 @@ function openChartModal(chartId, title){
     showToast('No hay datos para ampliar este grafico','error');
     return;
   }
-  document.getElementById('modalChartTitle').textContent = title;
   document.getElementById('modalChart').classList.add('open');
 
   if(modalChart){ modalChart.destroy(); modalChart = null; }
