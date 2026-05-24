@@ -63,6 +63,7 @@ main{flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%;}
 .section{display:none;}
 .section.active{display:block;}
 .section-header{margin-bottom:1.5rem;}
+.section-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
 .section-header h2{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--navy);}
 .section-header p{color:var(--gray);font-size:0.9rem;margin-top:4px;}
 .card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(201,168,76,0.15);}
@@ -191,7 +192,12 @@ tr:hover td{background:#fafaf7;}
 
     <!-- DASHBOARD -->
     <div id="sec-dashboard" class="section active">
-      <div class="section-header"><h2>Dashboard</h2><p>Resumen general de asistencia</p></div>
+      <div class="section-header section-head-row">
+        <div><h2>Dashboard</h2><p>Resumen general de asistencia</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('dashboard')" title="Refrescar datos" aria-label="Refrescar datos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
       <div class="period-tabs">
         <button class="period-tab active" onclick="setDashPeriod('week',this)">Semana</button>
         <button class="period-tab" onclick="setDashPeriod('month',this)">Mes</button>
@@ -257,7 +263,12 @@ tr:hover td{background:#fafaf7;}
 
     <!-- HISTORIAL -->
     <div id="sec-historial" class="section">
-      <div class="section-header"><h2>Historial</h2><p>Todos los registros de asistencia</p></div>
+      <div class="section-header section-head-row">
+        <div><h2>Historial</h2><p>Todos los registros de asistencia</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('historial')" title="Refrescar datos" aria-label="Refrescar datos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
       <div class="card">
         <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
           <input type="date" id="filtFecha" class="search-box" style="width:155px" onchange="renderHistorial()">
@@ -298,7 +309,12 @@ tr:hover td{background:#fafaf7;}
 
     <!-- MIEMBROS -->
     <div id="sec-miembros" class="section">
-      <div class="section-header"><h2>Miembros</h2></div>
+      <div class="section-header section-head-row">
+        <div><h2>Miembros</h2></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('miembros')" title="Refrescar datos" aria-label="Refrescar datos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
       <div class="toolbar">
         <input class="search-box" placeholder="Buscar miembro..." oninput="filterMiembrosTable(this.value)">
         <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Agregar</button>
@@ -315,7 +331,11 @@ tr:hover td{background:#fafaf7;}
 
     <!-- USUARIOS (solo admin) -->
     <div id="sec-usuarios" class="section">
-      <div class="section-header"><h2>Usuarios</h2><p>Gestión de acceso al sistema</p></div>
+      <div class="section-header section-head-row"><div><h2>Usuarios</h2><p>Gestión de acceso al sistema</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('usuarios')" title="Refrescar datos" aria-label="Refrescar datos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
       <div class="toolbar">
         <input class="search-box" placeholder="Buscar usuario..." oninput="filterUsuariosTable(this.value)">
         <button class="btn btn-primary btn-sm" onclick="openModal('addUser')">+ Agregar Usuario</button>
@@ -332,7 +352,11 @@ tr:hover td{background:#fafaf7;}
 
     <!-- LOG (solo admin) -->
     <div id="sec-log" class="section">
-      <div class="section-header"><h2>Log del Sistema</h2><p>Registro de todas las acciones</p></div>
+      <div class="section-header section-head-row"><div><h2>Log del Sistema</h2><p>Registro de todas las acciones</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('log')" title="Refrescar datos" aria-label="Refrescar datos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
       <div class="toolbar">
         <select class="search-box" style="width:180px" onchange="renderLog(this.value)">
           <option value="">Todas las acciones</option>
@@ -639,6 +663,15 @@ async function syncAndRender(section){
   if(section==='dashboard') renderDashboard();
   if(section==='historial') renderHistorial();
   if(section==='miembros')  renderMiembrosTable();
+  if(section==='usuarios')  renderUsuariosTable();
+  if(section==='log')       renderLog();
+}
+
+async function refreshSectionData(section){
+  showLoader('Actualizando datos...');
+  await syncAndRender(section);
+  hideLoader();
+  showToast('Datos actualizados','success');
 }
 
 // ============================================================
