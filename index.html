@@ -16,7 +16,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--navy);min-height:100vh;}
-#loginScreen{min-height:100vh;background:var(--white);display:flex;align-items:center;justify-content:center;padding:1rem;}
+#loginScreen{min-height:100vh;background:#F7F3EC;display:flex;align-items:center;justify-content:center;padding:1rem;}
 .login-box{background:var(--navy);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
 .login-logo{text-align:center;margin-bottom:2rem;}
 .login-logo h1{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--white);letter-spacing:1px;}
@@ -516,7 +516,8 @@ async function doLogin(){
   addLog('login',`Inicio de sesión: ${found.nombre} (${found.rol})`,'info');
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='flex';
-  document.getElementById('headerUsername').textContent=found.nombre+' · '+found.rol;
+  const roleText = found.rol==='Lider' ? `Lider de ${found.ministerio||'Ministerio'}` : found.rol;
+  document.getElementById('headerUsername').textContent = `${found.nombre} · ${roleText}`;
   document.getElementById('navUsuarios').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navLog').style.display = found.rol==='Admin'?'':'none';
   initApp();
