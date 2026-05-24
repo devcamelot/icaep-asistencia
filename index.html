@@ -1230,7 +1230,7 @@ function openChartModal(chartId, title){
   options.maintainAspectRatio = false;
   options.plugins = options.plugins || {};
   options.plugins.legend = options.plugins.legend || {};
-  options.plugins.legend.display = true;
+  options.plugins.legend.display = false;
   modalChart = new Chart(canvas, { type: src.config.type, data, options });
 }
 
