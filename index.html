@@ -948,7 +948,7 @@ function openEditMember(id){
 }
 
 function normalizeCedulaValue(v=''){
-  return String(v).trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  return String(v).trim().replace(/\D/g,'');
 }
 
 function toTitleCaseName(v=''){
@@ -960,22 +960,25 @@ function toTitleCaseName(v=''){
 }
 
 async function saveMember(){
-  const cedula = document.getElementById('mCedula').value.trim();
+  const cedulaInput = document.getElementById('mCedula').value;
+  const cedula = normalizeCedulaValue(cedulaInput);
   const n = toTitleCaseName(document.getElementById('mNombre').value);
   const a = toTitleCaseName(document.getElementById('mApellido').value);
   if(!n||!a){ showToast('Nombre y apellido requeridos','error'); return; }
-
-  const cedulaNorm = normalizeCedulaValue(cedula);
-  if(cedulaNorm){
-    const cedulaExistente = DB.miembros.some(m =>
-      normalizeCedulaValue(m.cedula||'')===cedulaNorm && m.id!==editMemberId
-    );
-    if(cedulaExistente){
-      alert('La cédula ya existe en la base de datos.');
-      return;
-    }
+  if(!cedula){
+    alert('La cédula es obligatoria y debe contener solo números.');
+    return;
   }
 
+  const cedulaExistente = DB.miembros.some(m =>
+    normalizeCedulaValue(m.cedula||'')===cedula && m.id!==editMemberId
+  );
+  if(cedulaExistente){
+    alert('La cédula ya existe en la base de datos.');
+    return;
+  }
+
+  document.getElementById('mCedula').value = cedula;
   document.getElementById('mNombre').value = n;
   document.getElementById('mApellido').value = a;
   const ministerio = document.getElementById('mMinisterio').value;
