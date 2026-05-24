@@ -122,6 +122,8 @@ tr:hover td{background:#fafaf7;}
 .modal{background:var(--white);border-radius:14px;padding:2rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto;}
 .modal h3{font-family:'Cinzel',serif;font-size:1.1rem;margin-bottom:1.2rem;color:var(--navy);}
 .modal-actions{display:flex;gap:10px;margin-top:1.2rem;}
+#modalChart .modal{max-width:980px;width:95vw;padding:1.25rem;}
+#modalChartBody{height:68vh;min-height:360px;}
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);color:var(--white);padding:12px 20px;border-radius:10px;font-size:0.9rem;z-index:300;transform:translateY(100px);opacity:0;transition:all 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.2);max-width:320px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.success{border-left:4px solid var(--gold);}
@@ -409,6 +411,18 @@ tr:hover td{background:#fafaf7;}
   </div>
 </div>
 
+<div class="modal-overlay" id="modalChart">
+  <div class="modal">
+    <h3 id="modalChartTitle" style="margin-bottom:0.7rem;">Grafico</h3>
+    <div id="modalChartBody">
+      <canvas id="modalChartCanvas"></canvas>
+    </div>
+    <div class="modal-actions" style="justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeChartModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -577,6 +591,7 @@ let presentMembers = new Set();
 let dashPeriod = 'month';
 let dashFrom = null, dashTo = null;
 let charts = {};
+let modalChart = null;
 let editUserId = null;
 
 function initApp(){
@@ -597,6 +612,7 @@ function initApp(){
   renderHistorial();
   renderUsuariosTable();
   renderDashboard();
+  bindDashboardChartClicks();
 }
 
 function showSection(id,btn){
@@ -682,7 +698,7 @@ function renderMembersGrid(filter=''){
     (m.nombre+' '+m.apellido).toLowerCase().includes(filter.toLowerCase())
   );
   const fecha = document.getElementById('servFecha').value;
-  const alreadySet = getAlreadyPresent(fecha, selectedService);
+  const alreadySet = getAlreadyPresent(fecha);
 
   const srv = SERVICES.find(s=>s.id===selectedService);
   const label = currentUser.rol==='Lider' ? `· ${currentUser.ministerio}` :
@@ -706,9 +722,9 @@ function renderMembersGrid(filter=''){
   }).join('') || '<p style="color:var(--gray);font-size:0.9rem;padding:1rem 0">Sin miembros para mostrar</p>';
 }
 
-function getAlreadyPresent(fecha, servicio){
+function getAlreadyPresent(fecha){
   const set = new Set();
-  DB.asistencia.filter(a=>a.fecha===fecha && a.servicio===servicio).forEach(a=>set.add(a.miembro));
+  DB.asistencia.filter(a=>a.fecha===fecha).forEach(a=>set.add(a.miembro));
   return set;
 }
 
@@ -720,20 +736,20 @@ function toggleMember(id,el){
 
 function checkDuplicates(){
   const fecha = document.getElementById('servFecha').value;
-  const already = getAlreadyPresent(fecha, selectedService);
+  const already = getAlreadyPresent(fecha);
   const overlap = [...presentMembers].filter(id=>already.has(id));
   const wrap = document.getElementById('duplicateWarn');
   if(overlap.length>0){
     const names = overlap.map(id=>{const m=DB.miembros.find(x=>x.id===id);return m?m.nombre+' '+m.apellido:id;});
     wrap.style.display='block';
-    wrap.innerHTML=`⚠️ Estas personas ya tienen asistencia registrada en este servicio: <strong>${names.join(', ')}</strong>. No se duplicarán.`;
+    wrap.innerHTML=`⚠️ Estas personas ya tienen asistencia registrada en este dia: <strong>${names.join(', ')}</strong>. No se duplicaran.`;
   } else { wrap.style.display='none'; }
 }
 
 function selectAll(val){
   const members = getVisibleMembers();
   const fecha = document.getElementById('servFecha').value;
-  const already = getAlreadyPresent(fecha, selectedService);
+  const already = getAlreadyPresent(fecha);
   if(val) members.forEach(m=>{ if(!already.has(m.id)) presentMembers.add(m.id); });
   else presentMembers.clear();
   renderMembersGrid();
@@ -750,7 +766,7 @@ async function guardarAsistencia(){
   }
   const fecha = document.getElementById('servFecha').value;
   const cena  = document.getElementById('cenaCheck').checked;
-  const already = getAlreadyPresent(fecha, selectedService);
+  const already = getAlreadyPresent(fecha);
   const servNombre = selectedService==='Extra'
     ? 'Extra: '+document.getElementById('extraNombre').value.trim()
     : selectedService;
@@ -1181,6 +1197,48 @@ function renderDashboard(){
   }
   dChart('chartServ','bar',{labels:servL,datasets:[{data:servL.map(l=>byServ[l]||0),backgroundColor:servL.map(l=>CSERV[l]||'#888'),borderRadius:6}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
   dChart('chartTrend','line',{labels:dateL.map(d=>formatDateShort(d)),datasets:[{data:dateL.map(d=>byDate[d]),borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#c9a84c',pointRadius:4}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280'}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
+  bindDashboardChartClicks();
+}
+
+function bindDashboardChartClicks(){
+  const list = [
+    {id:'chartMin', title:'Asistencia por Ministerio'},
+    {id:'chartCena', title:'Santa Cena por Ministerio'},
+    {id:'chartServ', title:'Asistencia por Servicio'},
+    {id:'chartTrend', title:'Tendencia de Asistencia'}
+  ];
+  list.forEach(item=>{
+    const canvas = document.getElementById(item.id);
+    if(!canvas) return;
+    canvas.style.cursor = 'zoom-in';
+    canvas.onclick = () => openChartModal(item.id, item.title);
+  });
+}
+
+function openChartModal(chartId, title){
+  const src = charts[chartId];
+  if(!src){
+    showToast('No hay datos para ampliar este grafico','error');
+    return;
+  }
+  document.getElementById('modalChartTitle').textContent = title;
+  document.getElementById('modalChart').classList.add('open');
+
+  if(modalChart){ modalChart.destroy(); modalChart = null; }
+  const canvas = document.getElementById('modalChartCanvas');
+  const data = JSON.parse(JSON.stringify(src.config.data));
+  const options = JSON.parse(JSON.stringify(src.config.options || {}));
+  options.responsive = true;
+  options.maintainAspectRatio = false;
+  options.plugins = options.plugins || {};
+  options.plugins.legend = options.plugins.legend || {};
+  options.plugins.legend.display = true;
+  modalChart = new Chart(canvas, { type: src.config.type, data, options });
+}
+
+function closeChartModal(){
+  document.getElementById('modalChart').classList.remove('open');
+  if(modalChart){ modalChart.destroy(); modalChart = null; }
 }
 
 function dChart(id,type,data,extraOptions={}){
@@ -1225,7 +1283,11 @@ function showToast(msg,type=''){
 }
 
 document.querySelectorAll('.modal-overlay').forEach(m=>{
-  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+  m.addEventListener('click',e=>{
+    if(e.target!==m) return;
+    if(m.id==='modalChart') closeChartModal();
+    else m.classList.remove('open');
+  });
 });
 </script>
 </body>
