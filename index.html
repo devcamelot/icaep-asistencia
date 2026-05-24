@@ -132,7 +132,7 @@ tr:hover td{background:#fafaf7;}
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="cross-icon">✝</div>
+      <img src="logo_iglesia.png" alt="ICAEP" style="width:90px;height:90px;object-fit:contain;margin-bottom:0.5rem;filter:invert(1) sepia(1) saturate(3) hue-rotate(5deg) brightness(0.85);">
       <h1>ICAEP Camelot</h1>
       <p>Sistema de Asistencia</p>
     </div>
@@ -151,7 +151,7 @@ tr:hover td{background:#fafaf7;}
 
 <div id="appShell">
   <header>
-    <span class="header-title">✝ ICAEP Camelot</span>
+    <span class="header-title"><img src="logo_iglesia.png" alt="ICAEP" style="height:32px;vertical-align:middle;margin-right:8px;filter:invert(1) sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2);"> ICAEP Camelot</span>
     <div class="header-user">
       <span id="headerUsername"></span>
       <button onclick="doLogout()">Salir</button>
@@ -238,27 +238,34 @@ tr:hover td{background:#fafaf7;}
       <div class="section-header"><h2>Historial</h2><p>Todos los registros de asistencia</p></div>
       <div class="card">
         <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
-          <input type="date" id="filtFecha" class="search-box" style="width:160px" onchange="renderHistorial()">
-          <select id="filtServicio" class="search-box" style="width:160px" onchange="renderHistorial()">
+          <input type="date" id="filtFecha" class="search-box" style="width:155px" onchange="renderHistorial()">
+          <input type="text" id="filtMiembro" class="search-box" style="width:170px" placeholder="Miembro o cédula..." oninput="renderHistorial()">
+          <select id="filtServicio" class="search-box" style="width:155px" onchange="renderHistorial()">
             <option value="">Todos los servicios</option>
             <option>Domingo 1ra</option><option>Domingo 2da</option>
             <option>Miercoles</option><option>Jueves</option>
             <option>Sabado Jovenes</option><option>Sabado Adolescentes</option>
             <option>Extra</option>
           </select>
-          <select id="filtMinisterio" class="search-box" style="width:160px" onchange="renderHistorial()">
+          <select id="filtMinisterio" class="search-box" style="width:155px" onchange="renderHistorial()">
             <option value="">Todos los ministerios</option>
             <option>Jovenes</option><option>Caballeros</option>
             <option>Damas</option><option>Adolescentes</option>
           </select>
-          <button class="btn btn-gold btn-sm" onclick="exportExcel()">Exportar Excel</button>
+          <select id="filtBautizado" class="search-box" style="width:145px" onchange="renderHistorial()">
+            <option value="">Bautizados / Todos</option>
+            <option value="SI">Solo Bautizados</option>
+            <option value="NO">Solo No Bautizados</option>
+          </select>
+          <button class="btn btn-gold btn-sm" onclick="exportExcelHistorial()">Exportar Excel</button>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Servicio</th><th>Miembro</th><th>Ministerio</th><th>Santa Cena</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Miembro</th><th>Ministerio</th><th>Servicio</th><th>Santa Cena</th></tr></thead>
             <tbody id="historialBody"></tbody>
           </table>
         </div>
+        <div id="historialTotal" style="text-align:right;padding:10px 0;font-size:0.85rem;color:var(--gray);font-weight:700;"></div>
       </div>
     </div>
 
@@ -332,7 +339,7 @@ tr:hover td{background:#fafaf7;}
       <select id="mBautizado"><option>SI</option><option>NO</option></select>
     </div>
     <div class="form-group"><label>Punto de Crecimiento</label>
-      <select id="mPunto"><option>CENTRAL</option><option>SAN VICENTE</option><option>N/A</option></select>
+      <select id="mPunto"><option>CENTRAL</option><option>SAN VICENTE</option><option>ICIEDA CIUDAD CAMELOT</option><option>N/A</option></select>
     </div>
     <div class="modal-actions">
       <button class="btn btn-primary" style="flex:1" onclick="saveMember()">Guardar</button>
@@ -558,11 +565,25 @@ function showSection(id,btn){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='dashboard') renderDashboard();
-  if(id==='historial') renderHistorial();
-  if(id==='miembros') renderMiembrosTable();
-  if(id==='usuarios') renderUsuariosTable();
-  if(id==='log') renderLog();
+  // Reload from API on every tab change
+  if(id==='dashboard') { syncAndRender('dashboard'); }
+  if(id==='historial') { syncAndRender('historial'); }
+  if(id==='miembros')  { syncAndRender('miembros'); }
+  if(id==='usuarios')  { renderUsuariosTable(); }
+  if(id==='log')       { renderLog(); }
+}
+
+async function syncAndRender(section){
+  if(API_URL !== 'TU_URL_APPS_SCRIPT_AQUI'){
+    try{
+      const res = await fetch(`${API_URL}?action=getAll`);
+      const data = await res.json();
+      if(!data.error){ const n=normalizeSheet(data); DB.miembros=n.miembros; DB.asistencia=n.asistencia; DB.usuarios=n.usuarios; if(n.log.length) DB.log=n.log; }
+    }catch(e){}
+  }
+  if(section==='dashboard') renderDashboard();
+  if(section==='historial') renderHistorial();
+  if(section==='miembros')  renderMiembrosTable();
 }
 
 // ============================================================
@@ -723,13 +744,21 @@ async function guardarAsistencia(){
 // HISTORIAL
 // ============================================================
 function renderHistorial(){
-  const filtFecha = document.getElementById('filtFecha').value;
-  const filtServ  = document.getElementById('filtServicio').value;
-  const filtMin   = document.getElementById('filtMinisterio').value;
+  const filtFecha   = document.getElementById('filtFecha').value;
+  const filtMiembro = (document.getElementById('filtMiembro').value||'').toLowerCase();
+  const filtServ    = document.getElementById('filtServicio').value;
+  const filtMin     = document.getElementById('filtMinisterio').value;
+  const filtBaut    = document.getElementById('filtBautizado').value;
   let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  if(filtFecha) rows=rows.filter(r=>r.fecha===filtFecha);
-  if(filtServ)  rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
-  if(filtMin)   rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
+  if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
+  if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
+  if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
+  if(filtBaut)    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.bautizado===filtBaut;});
+  if(filtMiembro) rows=rows.filter(r=>{
+    const m=DB.miembros.find(x=>x.id===r.miembro);
+    if(!m) return false;
+    return (m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').toLowerCase().includes(filtMiembro);
+  });
   const body=document.getElementById('historialBody');
   body.innerHTML=rows.map(r=>{
     const m=DB.miembros.find(x=>x.id===r.miembro);
@@ -737,12 +766,37 @@ function renderHistorial(){
     const min=m?m.ministerio:'—';
     return `<tr>
       <td>${formatDate(r.fecha)}</td>
-      <td>${r.servicio}</td>
       <td>${nombre}</td>
       <td><span class="badge badge-${min.toLowerCase()}">${min}</span></td>
+      <td>${r.servicio}</td>
       <td><span class="badge badge-${r.cena}">${r.cena?'Sí':'No'}</span></td>
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
+  document.getElementById('historialTotal').textContent = `Total: ${rows.length} registro${rows.length!==1?'s':''}`;
+}
+
+function exportExcelHistorial(){
+  const filtFecha   = document.getElementById('filtFecha').value;
+  const filtMiembro = (document.getElementById('filtMiembro').value||'').toLowerCase();
+  const filtServ    = document.getElementById('filtServicio').value;
+  const filtMin     = document.getElementById('filtMinisterio').value;
+  const filtBaut    = document.getElementById('filtBautizado').value;
+  let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
+  if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
+  if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
+  if(filtBaut)    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.bautizado===filtBaut;});
+  if(filtMiembro) rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);if(!m)return false;return(m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').includes(filtMiembro);});
+  const data=rows.map(r=>{
+    const m=DB.miembros.find(x=>x.id===r.miembro);
+    return {'Fecha':r.fecha,'Miembro':m?m.nombre+' '+m.apellido:r.miembro,'Cédula':m?m.cedula||'':'','Ministerio':m?m.ministerio:'—','Servicio':r.servicio,'Santa Cena':r.cena?'SI':'NO'};
+  });
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Historial');
+  XLSX.writeFile(wb,'ICAEP_Historial.xlsx');
+  addLog('asistencia',`${currentUser.nombre} exportó Historial Excel`,'info');
+  showToast('✓ Excel exportado','success');
 }
 
 // ============================================================
@@ -781,7 +835,15 @@ function openAddMember(){
   editMemberId = null;
   document.getElementById('modalMemberTitle').textContent = 'Agregar Miembro';
   ['mCedula','mNombre','mApellido'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('mMinisterio').value='Jovenes';
+  // Lock ministerio for leaders
+  const mSel = document.getElementById('mMinisterio');
+  if(currentUser.rol==='Lider'){
+    mSel.value = currentUser.ministerio;
+    mSel.disabled = true;
+  } else {
+    mSel.disabled = false;
+    mSel.value = 'Jovenes';
+  }
   document.getElementById('mTipo').value='Miembro Activo';
   document.getElementById('mBautizado').value='SI';
   document.getElementById('mPunto').value='CENTRAL';
@@ -796,7 +858,9 @@ function openEditMember(id){
   document.getElementById('mCedula').value = m.cedula||'';
   document.getElementById('mNombre').value = m.nombre;
   document.getElementById('mApellido').value = m.apellido;
-  document.getElementById('mMinisterio').value = m.ministerio;
+  const mSel = document.getElementById('mMinisterio');
+  mSel.value = m.ministerio;
+  mSel.disabled = currentUser.rol==='Lider';
   document.getElementById('mTipo').value = m.tipo;
   document.getElementById('mBautizado').value = m.bautizado;
   document.getElementById('mPunto').value = m.punto;
@@ -966,9 +1030,12 @@ document.querySelector('[onclick="openModal(\'addUser\')"]') &&
 // ============================================================
 // LOG
 // ============================================================
-function addLog(tipo,msg,level='info'){
-  DB.log.unshift({id:'l'+Date.now(),ts:new Date().toISOString(),tipo,msg,level,user:currentUser?currentUser.nombre:'sistema'});
+async function addLog(tipo,msg,level='info'){
+  const entry={id:'l'+Date.now()+Math.random().toString(36).slice(2),ts:new Date().toISOString(),tipo,msg,level,user:currentUser?currentUser.nombre:'sistema'};
+  DB.log.unshift(entry);
   if(DB.log.length>500) DB.log=DB.log.slice(0,500);
+  // Persist to Sheets
+  await apiAdd('LOG',{ID:entry.id,Timestamp:entry.ts,Tipo:tipo,Mensaje:msg,Usuario:entry.user});
 }
 
 function renderLog(filter=''){
@@ -1049,7 +1116,7 @@ function renderDashboard(){
     <div class="stat-card"><div class="label">Total Asistencias</div><div class="value">${rows.length}</div><div class="sub">registros</div></div>
     <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">personas tomaron</div></div>
     <div class="stat-card"><div class="label">Servicios</div><div class="value">${fechasUnicas}</div><div class="sub">en el período</div></div>
-    <div class="stat-card"><div class="label">Miembros</div><div class="value">${DB.miembros.length}</div><div class="sub">registrados</div></div>
+    <div class="stat-card" onclick="document.querySelector('nav button:nth-child(4)').click()" style="cursor:pointer;border:2px solid var(--gold);"><div class="label">Miembros ↗</div><div class="value">${DB.miembros.filter(m=>m.activo!==false).length}</div><div class="sub">activos registrados</div></div>
   `;
   const minL=Object.keys(byMin);
   const servL=Object.keys(byServ);
