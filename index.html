@@ -46,6 +46,8 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--navy);min
 .btn-outline:hover{background:var(--navy);color:var(--white);}
 .btn-danger{background:var(--danger);color:var(--white);}
 .btn-warn{background:var(--warn);color:var(--white);}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 10px;}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 .error-msg{color:var(--danger);font-size:0.85rem;margin-top:8px;text-align:center;}
 #appShell{display:none;min-height:100vh;flex-direction:column;}
 header{background:var(--navy);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
@@ -277,8 +279,12 @@ tr:hover td{background:#fafaf7;}
             <option value="SI">Solo Bautizados</option>
             <option value="NO">Solo No Bautizados</option>
           </select>
-          <button class="btn btn-outline btn-sm" onclick="clearHistorialFilters()">Limpiar filtros</button>
-          <button class="btn btn-gold btn-sm" onclick="exportExcelHistorial()">Exportar Excel</button>
+          <button class="btn btn-outline btn-sm btn-icon" onclick="clearHistorialFilters()" title="Limpiar filtros" aria-label="Limpiar filtros">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
+          </button>
+          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelHistorial()" title="Exportar Excel" aria-label="Exportar Excel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
+          </button>
         </div>
         <div class="table-wrap">
           <table>
