@@ -556,6 +556,13 @@ function initApp(){
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('servFecha').value = today;
   document.getElementById('fechaHoy').textContent = formatDate(today);
+  if(currentUser && currentUser.rol==='Lider'){
+    const filtMinSel = document.getElementById('filtMinisterio');
+    filtMinSel.value = currentUser.ministerio;
+    filtMinSel.disabled = true;
+  } else {
+    document.getElementById('filtMinisterio').disabled = false;
+  }
   renderServiceButtons();
   checkCenaAuto();
   renderMembersGrid();
@@ -755,6 +762,12 @@ function renderHistorial(){
   const filtMin     = document.getElementById('filtMinisterio').value;
   const filtBaut    = document.getElementById('filtBautizado').value;
   let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(currentUser && currentUser.rol==='Lider'){
+    rows = rows.filter(r=>{
+      const m=DB.miembros.find(x=>x.id===r.miembro);
+      return m && m.ministerio===currentUser.ministerio;
+    });
+  }
   if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
@@ -787,6 +800,9 @@ function exportExcelHistorial(){
   const filtMin     = document.getElementById('filtMinisterio').value;
   const filtBaut    = document.getElementById('filtBautizado').value;
   let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(currentUser && currentUser.rol==='Lider'){
+    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===currentUser.ministerio;});
+  }
   if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
@@ -810,9 +826,12 @@ function exportExcelHistorial(){
 let editMemberId = null;
 
 function renderMiembrosTable(filter=''){
-  const list = DB.miembros.filter(m =>
+  let list = DB.miembros.filter(m =>
     ((m.nombre+' '+m.apellido+' '+(m.cedula||'')).toLowerCase().includes(filter.toLowerCase()))
   );
+  if(currentUser && currentUser.rol==='Lider'){
+    list = list.filter(m=>m.ministerio===currentUser.ministerio);
+  }
   const isAdmin = currentUser && currentUser.rol==='Admin';
   document.getElementById('miembrosBody').innerHTML = list.map(m => {
     const activo = m.activo !== false;
