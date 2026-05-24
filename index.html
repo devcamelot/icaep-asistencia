@@ -409,11 +409,11 @@ tr:hover td{background:#fafaf7;}
 <div class="modal-overlay" id="modalConfirm">
   <div class="modal" style="max-width:380px;text-align:center;">
     <div style="font-size:2rem;margin-bottom:1rem;">⚠️</div>
-    <h3 style="margin-bottom:0.8rem;">Confirmar acción</h3>
+    <h3 id="confirmTitle" style="margin-bottom:0.8rem;">Confirmar acción</h3>
     <p id="confirmMsg" style="color:var(--gray);font-size:0.9rem;margin-bottom:1.5rem;line-height:1.5;"></p>
     <div class="modal-actions">
-      <button class="btn btn-danger" style="flex:1" onclick="doConfirm()">Sí, confirmar</button>
-      <button class="btn btn-outline" style="flex:1" onclick="cancelConfirm()">Cancelar</button>
+      <button class="btn btn-danger" id="confirmOkBtn" style="flex:1" onclick="doConfirm()">Sí, confirmar</button>
+      <button class="btn btn-outline" id="confirmCancelBtn" style="flex:1" onclick="cancelConfirm()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -966,7 +966,7 @@ async function saveMember(){
   const a = toTitleCaseName(document.getElementById('mApellido').value);
   if(!n||!a){ showToast('Nombre y apellido requeridos','error'); return; }
   if(!cedula){
-    alert('La cédula es obligatoria y debe contener solo números.');
+    showAlertModal('La cédula es obligatoria y debe contener solo números.', 'Dato requerido');
     return;
   }
 
@@ -974,7 +974,7 @@ async function saveMember(){
     normalizeCedulaValue(m.cedula||'')===cedula && m.id!==editMemberId
   );
   if(cedulaExistente){
-    alert('La cédula ya existe en la base de datos.');
+    showAlertModal('La cédula ya existe en la base de datos.', 'Cédula duplicada');
     return;
   }
 
@@ -1007,13 +1007,37 @@ async function saveMember(){
 
 // Modal de confirmación reutilizable
 let _confirmCallback = null;
+let _confirmMode = 'confirm';
 function showConfirm(msg, onConfirm){
+  _confirmMode = 'confirm';
   _confirmCallback = onConfirm;
+  document.getElementById('confirmTitle').textContent = 'Confirmar acción';
   document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmOkBtn').textContent = 'Sí, confirmar';
+  document.getElementById('confirmCancelBtn').style.display = '';
+  document.getElementById('confirmOkBtn').classList.remove('btn-primary');
+  document.getElementById('confirmOkBtn').classList.add('btn-danger');
   document.getElementById('modalConfirm').classList.add('open');
 }
+
+function showAlertModal(msg, title='Aviso'){
+  _confirmMode = 'alert';
+  _confirmCallback = null;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmOkBtn').textContent = 'Entendido';
+  document.getElementById('confirmCancelBtn').style.display = 'none';
+  document.getElementById('confirmOkBtn').classList.remove('btn-danger');
+  document.getElementById('confirmOkBtn').classList.add('btn-primary');
+  document.getElementById('modalConfirm').classList.add('open');
+}
+
 function doConfirm(){ 
   document.getElementById('modalConfirm').classList.remove('open');
+  if(_confirmMode==='alert'){
+    _confirmCallback = null;
+    return;
+  }
   if(_confirmCallback) _confirmCallback();
   _confirmCallback = null;
 }
