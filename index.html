@@ -277,6 +277,7 @@ tr:hover td{background:#fafaf7;}
             <option value="SI">Solo Bautizados</option>
             <option value="NO">Solo No Bautizados</option>
           </select>
+          <button class="btn btn-outline btn-sm" onclick="clearHistorialFilters()">Limpiar filtros</button>
           <button class="btn btn-gold btn-sm" onclick="exportExcelHistorial()">Exportar Excel</button>
         </div>
         <div class="table-wrap">
@@ -597,13 +598,7 @@ function initApp(){
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('servFecha').value = today;
   document.getElementById('fechaHoy').textContent = formatDate(today);
-  if(currentUser && currentUser.rol==='Lider'){
-    const filtMinSel = document.getElementById('filtMinisterio');
-    filtMinSel.value = currentUser.ministerio;
-    filtMinSel.disabled = true;
-  } else {
-    document.getElementById('filtMinisterio').disabled = false;
-  }
+  clearHistorialFilters(true);
   renderServiceButtons();
   checkCenaAuto();
   renderMembersGrid();
@@ -833,6 +828,19 @@ function renderHistorial(){
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
   document.getElementById('historialTotal').textContent = `Total: ${rows.length} registro${rows.length!==1?'s':''}`;
+}
+
+function clearHistorialFilters(isInit=false){
+  document.getElementById('filtFecha').value = '';
+  document.getElementById('filtMiembro').value = '';
+  document.getElementById('filtServicio').value = '';
+  document.getElementById('filtBautizado').value = '';
+
+  const filtMinSel = document.getElementById('filtMinisterio');
+  filtMinSel.value = '';
+  filtMinSel.disabled = !!(currentUser && currentUser.rol==='Lider');
+
+  if(!isInit) renderHistorial();
 }
 
 function exportExcelHistorial(){
