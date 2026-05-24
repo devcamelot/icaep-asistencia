@@ -947,11 +947,37 @@ function openEditMember(id){
   openModal('addMember');
 }
 
+function normalizeCedulaValue(v=''){
+  return String(v).trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+function toTitleCaseName(v=''){
+  return String(v)
+    .trim()
+    .replace(/\s+/g,' ')
+    .toLowerCase()
+    .replace(/(^|[\s-])([a-záéíóúñ])/g,(m,p1,p2)=>p1+p2.toUpperCase());
+}
+
 async function saveMember(){
   const cedula = document.getElementById('mCedula').value.trim();
-  const n = document.getElementById('mNombre').value.trim();
-  const a = document.getElementById('mApellido').value.trim();
+  const n = toTitleCaseName(document.getElementById('mNombre').value);
+  const a = toTitleCaseName(document.getElementById('mApellido').value);
   if(!n||!a){ showToast('Nombre y apellido requeridos','error'); return; }
+
+  const cedulaNorm = normalizeCedulaValue(cedula);
+  if(cedulaNorm){
+    const cedulaExistente = DB.miembros.some(m =>
+      normalizeCedulaValue(m.cedula||'')===cedulaNorm && m.id!==editMemberId
+    );
+    if(cedulaExistente){
+      alert('La cédula ya existe en la base de datos.');
+      return;
+    }
+  }
+
+  document.getElementById('mNombre').value = n;
+  document.getElementById('mApellido').value = a;
   const ministerio = document.getElementById('mMinisterio').value;
   const tipo = document.getElementById('mTipo').value;
   const bautizado = document.getElementById('mBautizado').value;
@@ -1065,11 +1091,12 @@ function editUser(id){
 
 async function saveUser(){
   const email=document.getElementById('uEmail').value.trim().toLowerCase();
-  const nombre=document.getElementById('uNombre').value.trim();
+  const nombre=toTitleCaseName(document.getElementById('uNombre').value);
   const pass=document.getElementById('uPass').value;
   const rol=document.getElementById('uRol').value;
   const ministerio=rol==='Lider'?document.getElementById('uMinisterio').value:'';
   if(!email||!nombre){showToast('Email y nombre requeridos','error');return;}
+  document.getElementById('uNombre').value = nombre;
   const exists=DB.usuarios.find(u=>u.email===email&&u.id!==editUserId);
   if(exists){showToast('Ya existe un usuario con ese email','error');return;}
   showLoader('Guardando usuario...');
