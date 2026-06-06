@@ -454,65 +454,11 @@ tr.egreso-row td{color:var(--danger);}
     <div id="sec-eventos" class="section">
       <div class="section-header section-head-row">
         <div><h2>Eventos</h2><p>Bautizos, presentaciones y matrimonios</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('eventos')" title="Refrescar" aria-label="Refrescar">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
-        </button>
-      </div>
-      <div class="sub-tabs">
-        <button class="sub-tab active" onclick="setEventoTab('bautizo',this)">Bautizos</button>
-        <button class="sub-tab" onclick="setEventoTab('presentacion',this)">Presentaciones</button>
-        <button class="sub-tab" onclick="setEventoTab('matrimonio',this)">Matrimonios</button>
-      </div>
-      <!-- Bautizo -->
-      <div id="evBautizoForm" class="card" style="margin-bottom:1.2rem;">
-        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Bautizo</h3>
-        <div class="events-grid">
-          <div class="form-group" style="margin:0;"><label>Fecha</label><input type="date" id="evBFecha"></div>
-          <div class="form-group" style="margin:0;"><label>Cédula</label><input type="text" id="evBCedula"></div>
-          <div class="form-group" style="margin:0;"><label>Nombre</label><input type="text" id="evBNombre"></div>
-          <div class="form-group" style="margin:0;"><label>Apellido</label><input type="text" id="evBApellido"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
-          <button id="evBSaveBtn" class="btn btn-primary" onclick="guardarEvento('bautizo')">Guardar Bautizo</button>
-          <button id="evBCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditEvento('bautizo')">Cancelar</button>
-        </div>
-      </div>
-      <!-- Presentación -->
-      <div id="evPresentacionForm" class="card" style="margin-bottom:1.2rem;display:none;">
-        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Presentación</h3>
-        <div class="events-grid">
-          <div class="form-group" style="margin:0;"><label>Nombre bebé</label><input type="text" id="evPNombreBebe"></div>
-          <div class="form-group" style="margin:0;"><label>Apellido bebé</label><input type="text" id="evPApellidoBebe"></div>
-          <div class="form-group" style="margin:0;"><label>Fecha</label><input type="date" id="evPFecha"></div>
-          <div class="form-group" style="margin:0;"><label>Nombre papá</label><input type="text" id="evPNombrePapa"></div>
-          <div class="form-group" style="margin:0;"><label>Nombre mamá</label><input type="text" id="evPNombreMama"></div>
-          <div class="form-group" style="margin:0;"><label>¿Cuántos testigos?</label>
-            <input type="number" id="evPTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('P')">
-          </div>
-        </div>
-        <div id="evPTestigosFields" style="margin-top:1rem;"></div>
-        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
-          <button id="evPSaveBtn" class="btn btn-primary" onclick="guardarEvento('presentacion')">Guardar Presentación</button>
-          <button id="evPCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditEvento('presentacion')">Cancelar</button>
-        </div>
-      </div>
-      <!-- Matrimonio -->
-      <div id="evMatrimonioForm" class="card" style="margin-bottom:1.2rem;display:none;">
-        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Matrimonio</h3>
-        <div class="events-grid">
-          <div class="form-group" style="margin:0;"><label>Fecha boda</label><input type="date" id="evMFecha"></div>
-          <div class="form-group" style="margin:0;"><label>Nombre esposo</label><input type="text" id="evMNombreEsposo"></div>
-          <div class="form-group" style="margin:0;"><label>Apellido esposo</label><input type="text" id="evMApellidoEsposo"></div>
-          <div class="form-group" style="margin:0;"><label>Nombre esposa</label><input type="text" id="evMNombreEsposa"></div>
-          <div class="form-group" style="margin:0;"><label>Apellido esposa</label><input type="text" id="evMApellidoEsposa"></div>
-          <div class="form-group" style="margin:0;"><label>¿Cuántos testigos?</label>
-            <input type="number" id="evMTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('M')">
-          </div>
-        </div>
-        <div id="evMTestigosFields" style="margin-top:1rem;"></div>
-        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
-          <button id="evMSaveBtn" class="btn btn-primary" onclick="guardarEvento('matrimonio')">Guardar Matrimonio</button>
-          <button id="evMCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditEvento('matrimonio')">Cancelar</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="openAddEvento()">+ Nuevo Evento</button>
+          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('eventos')" title="Refrescar" aria-label="Refrescar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+          </button>
         </div>
       </div>
       <!-- Lista de eventos -->
@@ -528,6 +474,10 @@ tr.egreso-row td{color:var(--danger);}
           <button class="btn btn-outline btn-sm btn-icon" onclick="document.getElementById('filtEventoFecha').value='';renderEventosList();" title="Limpiar fecha">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
           </button>
+          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelEventos()" title="Exportar Excel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
+            &nbsp;Exportar Excel
+          </button>
         </div>
         <div class="table-wrap">
           <table>
@@ -542,25 +492,11 @@ tr.egreso-row td{color:var(--danger);}
     <div id="sec-contabilidad" class="section">
       <div class="section-header section-head-row">
         <div><h2>Contabilidad</h2><p>Gestión financiera de la iglesia</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('contabilidad')" title="Refrescar" aria-label="Refrescar">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
-        </button>
-      </div>
-      <!-- Formulario nuevo movimiento -->
-      <div class="card" style="margin-bottom:1.5rem;">
-        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Movimiento</h3>
-        <div class="events-grid">
-          <div class="form-group" style="margin:0;"><label>Fecha</label><input type="date" id="contFecha"></div>
-          <div class="form-group" style="margin:0;"><label>Tipo</label>
-            <select id="contTipo"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
-          </div>
-          <div class="form-group" style="margin:0;"><label>Descripción</label><input type="text" id="contDesc" placeholder="Ej: Diezmos, Ofrendas..."></div>
-          <div class="form-group" style="margin:0;"><label>Monto</label><input type="number" id="contMonto" min="0" step="0.01" placeholder="0.00"></div>
-          <div class="form-group" style="margin:0;"><label>Observación</label><input type="text" id="contObs" placeholder="Opcional"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
-          <button id="contSaveBtn" class="btn btn-primary" onclick="guardarContabilidad()">Registrar</button>
-          <button id="contCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditCont()">Cancelar</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="openAddCont()">+ Nuevo Movimiento</button>
+          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('contabilidad')" title="Refrescar" aria-label="Refrescar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+          </button>
         </div>
       </div>
       <!-- Filtros de período -->
@@ -679,6 +615,74 @@ tr.egreso-row td{color:var(--danger);}
     </div>
     <div class="modal-actions" style="justify-content:flex-end;">
       <button class="btn btn-outline" onclick="closeChartModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO/EDITAR EVENTO -->
+<div class="modal-overlay" id="modalAddEvento">
+  <div class="modal" style="max-width:600px;">
+    <h3 id="modalEventoTitle">Registrar Evento</h3>
+    <div class="sub-tabs" id="modalEventoTabs" style="margin-bottom:1.2rem;">
+      <button class="sub-tab active" onclick="setModalEventoTab('bautizo',this)">Bautizo</button>
+      <button class="sub-tab" onclick="setModalEventoTab('presentacion',this)">Presentación</button>
+      <button class="sub-tab" onclick="setModalEventoTab('matrimonio',this)">Matrimonio</button>
+    </div>
+    <div id="evBautizoForm">
+      <div class="events-grid">
+        <div class="form-group"><label>Fecha</label><input type="date" id="evBFecha"></div>
+        <div class="form-group"><label>Cédula</label><input type="text" id="evBCedula"></div>
+        <div class="form-group"><label>Nombre</label><input type="text" id="evBNombre"></div>
+        <div class="form-group"><label>Apellido</label><input type="text" id="evBApellido"></div>
+      </div>
+    </div>
+    <div id="evPresentacionForm" style="display:none;">
+      <div class="events-grid">
+        <div class="form-group"><label>Nombre bebé</label><input type="text" id="evPNombreBebe"></div>
+        <div class="form-group"><label>Apellido bebé</label><input type="text" id="evPApellidoBebe"></div>
+        <div class="form-group"><label>Fecha</label><input type="date" id="evPFecha"></div>
+        <div class="form-group"><label>Nombre papá</label><input type="text" id="evPNombrePapa"></div>
+        <div class="form-group"><label>Nombre mamá</label><input type="text" id="evPNombreMama"></div>
+        <div class="form-group"><label>¿Cuántos testigos?</label>
+          <input type="number" id="evPTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('P')">
+        </div>
+      </div>
+      <div id="evPTestigosFields" style="margin-top:1rem;"></div>
+    </div>
+    <div id="evMatrimonioForm" style="display:none;">
+      <div class="events-grid">
+        <div class="form-group"><label>Fecha boda</label><input type="date" id="evMFecha"></div>
+        <div class="form-group"><label>Nombre esposo</label><input type="text" id="evMNombreEsposo"></div>
+        <div class="form-group"><label>Apellido esposo</label><input type="text" id="evMApellidoEsposo"></div>
+        <div class="form-group"><label>Nombre esposa</label><input type="text" id="evMNombreEsposa"></div>
+        <div class="form-group"><label>Apellido esposa</label><input type="text" id="evMApellidoEsposa"></div>
+        <div class="form-group"><label>¿Cuántos testigos?</label>
+          <input type="number" id="evMTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('M')">
+        </div>
+      </div>
+      <div id="evMTestigosFields" style="margin-top:1rem;"></div>
+    </div>
+    <div class="modal-actions">
+      <button id="evSaveBtn" class="btn btn-primary" style="flex:1" onclick="guardarEvento(currentEventoTab)">Guardar</button>
+      <button class="btn btn-outline" style="flex:1" onclick="cancelEditEvento()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO/EDITAR MOVIMIENTO CONTABILIDAD -->
+<div class="modal-overlay" id="modalAddCont">
+  <div class="modal">
+    <h3 id="modalContTitle">Registrar Movimiento</h3>
+    <div class="form-group"><label>Fecha</label><input type="date" id="contFecha"></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="contTipo"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
+    </div>
+    <div class="form-group"><label>Descripción</label><input type="text" id="contDesc" placeholder="Ej: Diezmos, Ofrendas..."></div>
+    <div class="form-group"><label>Monto</label><input type="number" id="contMonto" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="form-group"><label>Observación</label><input type="text" id="contObs" placeholder="Opcional"></div>
+    <div class="modal-actions">
+      <button id="contSaveBtn" class="btn btn-primary" style="flex:1" onclick="guardarContabilidad()">Registrar</button>
+      <button class="btn btn-outline" style="flex:1" onclick="cancelEditCont()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1716,6 +1720,8 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{
     if(e.target!==m) return;
     if(m.id==='modalChart') closeChartModal();
+    else if(m.id==='modalAddEvento'){ editEventoId=null; m.classList.remove('open'); }
+    else if(m.id==='modalAddCont'){ editContId=null; m.classList.remove('open'); }
     else m.classList.remove('open');
   });
 });
@@ -1927,16 +1933,26 @@ async function guardarSantaCena(){
 let currentEventoTab = 'bautizo';
 let editEventoId = null;
 
-function setEventoTab(tab, btn){
+function setModalEventoTab(tab, btn){
   currentEventoTab = tab;
-  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('evBautizoForm').style.display     = tab==='bautizo'      ? 'block' : 'none';
-  document.getElementById('evPresentacionForm').style.display = tab==='presentacion' ? 'block' : 'none';
-  document.getElementById('evMatrimonioForm').style.display   = tab==='matrimonio'   ? 'block' : 'none';
+  document.querySelectorAll('#modalEventoTabs .sub-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('evBautizoForm').style.display      = tab==='bautizo'      ? 'block' : 'none';
+  document.getElementById('evPresentacionForm').style.display  = tab==='presentacion' ? 'block' : 'none';
+  document.getElementById('evMatrimonioForm').style.display    = tab==='matrimonio'   ? 'block' : 'none';
   if(tab==='presentacion') renderTestigosFields('P');
   if(tab==='matrimonio')   renderTestigosFields('M');
-  renderEventosList();
+}
+
+function openAddEvento(tipo='bautizo'){
+  editEventoId = null;
+  document.getElementById('modalEventoTitle').textContent = 'Registrar Evento';
+  document.getElementById('evSaveBtn').textContent = 'Guardar';
+  document.getElementById('modalEventoTabs').style.display = '';
+  const tabBtn = document.querySelector(`#modalEventoTabs .sub-tab[onclick*="'${tipo}'"]`);
+  setModalEventoTab(tipo, tabBtn);
+  clearEventoForm(tipo);
+  document.getElementById('modalAddEvento').classList.add('open');
 }
 
 function renderTestigosFields(prefix){
@@ -2013,11 +2029,8 @@ async function guardarEvento(tipo){
   hideLoader();
   saveDB();
   editEventoId = null;
-  const p={bautizo:'B',presentacion:'P',matrimonio:'M'}[tipo];
-  const lbl={bautizo:'Guardar Bautizo',presentacion:'Guardar Presentación',matrimonio:'Guardar Matrimonio'};
-  const sb=document.getElementById(`ev${p}SaveBtn`); const cb=document.getElementById(`ev${p}CancelBtn`);
-  if(sb) sb.textContent=lbl[tipo]; if(cb) cb.style.display='none';
   clearEventoForm(tipo);
+  document.getElementById('modalAddEvento').classList.remove('open');
   renderEventosList();
 }
 
@@ -2037,19 +2050,18 @@ function editEvento(id){
   const e = DB.eventos.find(x=>x.id===id);
   if(!e) return;
   editEventoId = id;
+  currentEventoTab = e.tipo;
+  document.getElementById('modalEventoTitle').textContent = 'Editar Evento';
+  document.getElementById('evSaveBtn').textContent = 'Actualizar';
+  document.getElementById('modalEventoTabs').style.display = 'none';
   document.getElementById('evBautizoForm').style.display      = e.tipo==='bautizo'      ? 'block' : 'none';
   document.getElementById('evPresentacionForm').style.display  = e.tipo==='presentacion' ? 'block' : 'none';
   document.getElementById('evMatrimonioForm').style.display    = e.tipo==='matrimonio'   ? 'block' : 'none';
-  document.querySelectorAll('#sec-eventos .sub-tab').forEach(b=>{
-    b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${e.tipo}'`));
-  });
   if(e.tipo==='bautizo'){
     document.getElementById('evBFecha').value    = e.fecha;
     document.getElementById('evBCedula').value   = e.datos.cedula||'';
     document.getElementById('evBNombre').value   = e.datos.nombre||'';
     document.getElementById('evBApellido').value = e.datos.apellido||'';
-    document.getElementById('evBSaveBtn').textContent = 'Actualizar Bautizo';
-    document.getElementById('evBCancelBtn').style.display = '';
   } else if(e.tipo==='presentacion'){
     document.getElementById('evPFecha').value        = e.fecha;
     document.getElementById('evPNombreBebe').value   = e.datos.nombre_bebe||'';
@@ -2060,8 +2072,6 @@ function editEvento(id){
     document.getElementById('evPTestigos').value = tsP.length;
     renderTestigosFields('P');
     tsP.forEach((t,i)=>{ const tn=document.getElementById(`evPT${i+1}Nombre`); const ta=document.getElementById(`evPT${i+1}Apellido`); if(tn) tn.value=t.nombre||''; if(ta) ta.value=t.apellido||''; });
-    document.getElementById('evPSaveBtn').textContent = 'Actualizar Presentación';
-    document.getElementById('evPCancelBtn').style.display = '';
   } else if(e.tipo==='matrimonio'){
     document.getElementById('evMFecha').value          = e.fecha;
     document.getElementById('evMNombreEsposo').value   = e.datos.nombre_esposo||'';
@@ -2072,19 +2082,13 @@ function editEvento(id){
     document.getElementById('evMTestigos').value = tsM.length;
     renderTestigosFields('M');
     tsM.forEach((t,i)=>{ const tn=document.getElementById(`evMT${i+1}Nombre`); const ta=document.getElementById(`evMT${i+1}Apellido`); if(tn) tn.value=t.nombre||''; if(ta) ta.value=t.apellido||''; });
-    document.getElementById('evMSaveBtn').textContent = 'Actualizar Matrimonio';
-    document.getElementById('evMCancelBtn').style.display = '';
   }
-  document.getElementById('sec-eventos').scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('modalAddEvento').classList.add('open');
 }
 
-function cancelEditEvento(tipo){
+function cancelEditEvento(){
   editEventoId = null;
-  const p={bautizo:'B',presentacion:'P',matrimonio:'M'}[tipo];
-  const lbl={bautizo:'Guardar Bautizo',presentacion:'Guardar Presentación',matrimonio:'Guardar Matrimonio'};
-  const sb=document.getElementById(`ev${p}SaveBtn`); const cb=document.getElementById(`ev${p}CancelBtn`);
-  if(sb) sb.textContent=lbl[tipo]; if(cb) cb.style.display='none';
-  clearEventoForm(tipo);
+  document.getElementById('modalAddEvento').classList.remove('open');
 }
 
 function deleteEvento(id){
@@ -2127,6 +2131,32 @@ function renderEventosList(){
       </td>
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin eventos registrados</td></tr>';
+}
+
+function exportExcelEventos(){
+  const filtTipo  = document.getElementById('filtEventoTipo')?.value || '';
+  const filtFecha = document.getElementById('filtEventoFecha')?.value || '';
+  let list = [...DB.eventos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(filtTipo)  list = list.filter(e=>e.tipo===filtTipo);
+  if(filtFecha) list = list.filter(e=>e.fecha===filtFecha);
+  const labels = {bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
+  const data = list.map(e=>{
+    let detalle = '';
+    if(e.tipo==='bautizo')
+      detalle = `${e.datos.nombre||''} ${e.datos.apellido||''} — Cédula: ${e.datos.cedula||'—'}`;
+    else if(e.tipo==='presentacion')
+      detalle = `${e.datos.nombre_bebe||''} ${e.datos.apellido_bebe||''} — Papá: ${e.datos.nombre_papa||'—'}, Mamá: ${e.datos.nombre_mama||'—'}`;
+    else if(e.tipo==='matrimonio')
+      detalle = `${e.datos.nombre_esposo||''} ${e.datos.apellido_esposo||''} ♥ ${e.datos.nombre_esposa||''} ${e.datos.apellido_esposa||''}`;
+    return { 'Fecha': e.fecha, 'Tipo': labels[e.tipo]||e.tipo, 'Detalle': detalle, 'Registrado por': e.registrado_por };
+  });
+  if(data.length === 0){ showToast('Sin eventos para exportar','error'); return; }
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Eventos');
+  XLSX.writeFile(wb, 'ICAEP_Eventos.xlsx');
+  addLog('evento',`${currentUser.nombre} exportó Eventos Excel`,'info');
+  showToast('✓ Excel exportado','success');
 }
 
 // ============================================================
@@ -2196,11 +2226,7 @@ async function guardarContabilidad(){
   hideLoader();
   saveDB();
   editContId = null;
-  document.getElementById('contDesc').value='';
-  document.getElementById('contMonto').value='';
-  document.getElementById('contObs').value='';
-  document.getElementById('contSaveBtn').textContent='Registrar';
-  document.getElementById('contCancelBtn').style.display='none';
+  document.getElementById('modalAddCont').classList.remove('open');
   renderContabilidad();
 }
 
@@ -2278,27 +2304,35 @@ function exportExcelContabilidad(){
   showToast('✓ Excel exportado','success');
 }
 
+function openAddCont(){
+  editContId = null;
+  document.getElementById('modalContTitle').textContent = 'Registrar Movimiento';
+  document.getElementById('contSaveBtn').textContent = 'Registrar';
+  document.getElementById('contFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('contTipo').value  = 'Ingreso';
+  document.getElementById('contDesc').value  = '';
+  document.getElementById('contMonto').value = '';
+  document.getElementById('contObs').value   = '';
+  document.getElementById('modalAddCont').classList.add('open');
+}
+
 function editCont(id){
   const r = DB.contabilidad.find(x=>x.id===id);
   if(!r) return;
   editContId = id;
+  document.getElementById('modalContTitle').textContent = 'Editar Movimiento';
+  document.getElementById('contSaveBtn').textContent = 'Actualizar';
   document.getElementById('contFecha').value  = r.fecha;
   document.getElementById('contTipo').value   = r.tipo;
   document.getElementById('contDesc').value   = r.descripcion;
   document.getElementById('contMonto').value  = r.monto;
   document.getElementById('contObs').value    = r.observacion||'';
-  document.getElementById('contSaveBtn').textContent = 'Actualizar';
-  document.getElementById('contCancelBtn').style.display = '';
-  document.getElementById('contSaveBtn').scrollIntoView({behavior:'smooth', block:'center'});
+  document.getElementById('modalAddCont').classList.add('open');
 }
 
 function cancelEditCont(){
   editContId = null;
-  document.getElementById('contDesc').value  = '';
-  document.getElementById('contMonto').value = '';
-  document.getElementById('contObs').value   = '';
-  document.getElementById('contSaveBtn').textContent = 'Registrar';
-  document.getElementById('contCancelBtn').style.display = 'none';
+  document.getElementById('modalAddCont').classList.remove('open');
 }
 
 function deleteCont(id){
