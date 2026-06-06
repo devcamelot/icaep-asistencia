@@ -139,6 +139,23 @@ tr:hover td{background:#fafaf7;}
 .log-dot.error{background:var(--danger);}
 .already-badge{font-size:0.65rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;margin-left:4px;}
 @media(max-width:600px){main{padding:1rem;}.members-grid{grid-template-columns:repeat(2,1fr);}}
+/* ---- Nuevos estilos ---- */
+.sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;}
+.sub-tab{padding:8px 18px;border:1.5px solid var(--lightgray);border-radius:8px;background:transparent;font-family:'Lato',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;color:var(--gray);}
+.sub-tab.active{background:var(--navy);color:var(--gold);border-color:var(--navy);}
+.member-card.cena-si{border-color:var(--success)!important;background:#f0fdf4!important;}
+.member-card.cena-no{border-color:var(--danger)!important;background:#fef2f2!important;}
+.member-card.cena-lock{opacity:0.85;cursor:default;}
+.visitor-form{background:#f7f3ec;border:1.5px solid var(--gold);border-radius:var(--radius);padding:1rem;margin-top:0.6rem;}
+.fin-card{background:var(--navy);border-radius:var(--radius);padding:1.1rem;color:var(--white);}
+.fin-card .label{font-size:0.72rem;color:var(--gold2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.fin-card .value{font-size:1.8rem;font-weight:700;line-height:1;}
+.badge-ingreso{background:#dcfce7;color:#166534;}
+.badge-egreso{background:#fee2e2;color:#991b1b;}
+tr.ingreso-row td{color:var(--success);}
+tr.egreso-row td{color:var(--danger);}
+.events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1rem;}
+.visitante-badge{font-size:0.62rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;margin-left:4px;}
 </style>
 </head>
 <body>
@@ -183,9 +200,12 @@ tr:hover td{background:#fafaf7;}
   <nav id="mainNav">
     <button class="active" onclick="showSection('dashboard',this)">Dashboard</button>
     <button onclick="showSection('asistencia',this)">Registrar</button>
+    <button onclick="showSection('santacena',this)">Santa Cena</button>
     <button onclick="showSection('historial',this)">Historial</button>
     <button onclick="showSection('miembros',this)">Miembros</button>
     <button id="navUsuarios" onclick="showSection('usuarios',this)" style="display:none">Usuarios</button>
+    <button id="navEventos" onclick="showSection('eventos',this)" style="display:none">Eventos</button>
+    <button id="navContabilidad" onclick="showSection('contabilidad',this)" style="display:none">Contabilidad</button>
     <button id="navLog" onclick="showSection('log',this)" style="display:none">Log</button>
   </nav>
   <main>
@@ -239,9 +259,9 @@ tr:hover td{background:#fafaf7;}
           </div>
         </div>
 
-        <div class="cena-toggle" id="cenaToggleWrap">
-          <label class="toggle-sw"><input type="checkbox" id="cenaCheck"><span class="slider"></span></label>
-          <span>¿Santa Cena? <span id="cenaLabel" style="color:var(--gold);font-weight:700;"></span></span>
+        <div id="minFilterWrap" style="display:none;margin-bottom:1rem;">
+          <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Filtrar por Ministerio</label>
+          <div id="minFilterBtns" class="period-tabs"></div>
         </div>
 
         <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">
@@ -254,6 +274,34 @@ tr:hover td{background:#fafaf7;}
         </div>
         <div class="members-grid" id="membersGrid"></div>
         <div id="duplicateWarn" style="display:none;background:#fffbeb;border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:0.85rem;color:#92400e;"></div>
+
+        <!-- VISITANTES -->
+        <div style="margin-top:1.4rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+            <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);">
+              Visitantes <span id="visitantesLabel" style="color:var(--gold);"></span>
+            </label>
+            <button class="btn btn-sm btn-outline" onclick="toggleVisitorForm()">+ Visitante</button>
+          </div>
+          <div id="visitorForm" class="visitor-form" style="display:none;">
+            <div class="events-grid">
+              <div class="form-group" style="margin:0;"><label>Nombre</label><input type="text" id="visNombre"></div>
+              <div class="form-group" style="margin:0;"><label>Apellido</label><input type="text" id="visApellido"></div>
+              <div class="form-group" style="margin:0;"><label>Ministerio</label>
+                <select id="visMinisterio">
+                  <option>Jovenes</option><option>Caballeros</option>
+                  <option>Damas</option><option>Adolescentes</option><option>General</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:0.8rem;display:flex;gap:8px;">
+              <button class="btn btn-primary btn-sm" onclick="guardarVisitante()">Agregar</button>
+              <button class="btn btn-outline btn-sm" onclick="toggleVisitorForm()">Cancelar</button>
+            </div>
+          </div>
+          <div id="visitantesList"></div>
+        </div>
+
         <div style="margin-top:1.2rem;display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn btn-primary" style="flex:1;min-width:140px" onclick="guardarAsistencia()">Guardar Asistencia</button>
           <button class="btn btn-gold" onclick="exportExcel()">Exportar Excel</button>
@@ -370,6 +418,173 @@ tr:hover td{background:#fafaf7;}
       <div class="card" id="logContainer" style="padding:0;max-height:600px;overflow-y:auto;"></div>
     </div>
 
+    <!-- SANTA CENA -->
+    <div id="sec-santacena" class="section">
+      <div class="section-header section-head-row">
+        <div><h2>Santa Cena</h2><p>Registro de participantes en la Santa Cena</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('santacena')" title="Refrescar" aria-label="Refrescar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.2rem;">
+          <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+            <label>Fecha del 1er Domingo</label>
+            <input type="date" id="scFecha" onchange="renderSantaCena()">
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="setSCPrimerDomingo()">1er Dom. actual</button>
+        </div>
+        <div class="stats-grid" id="scStats" style="margin-bottom:1.2rem;"></div>
+        <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.8rem;">
+          <span style="display:inline-block;width:12px;height:12px;background:var(--success);border-radius:3px;margin-right:4px;"></span>Verde = tomó Santa Cena &nbsp;
+          <span style="display:inline-block;width:12px;height:12px;background:var(--danger);border-radius:3px;margin-right:4px;"></span>Rojo = asistió pero no marcado &nbsp;
+          Normal = no hay registro de asistencia
+        </p>
+        <div class="members-grid" id="scMembersGrid"></div>
+        <div style="margin-top:1.2rem;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" style="flex:1;min-width:140px" onclick="guardarSantaCena()">Guardar Santa Cena</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENTOS (solo Admin) -->
+    <div id="sec-eventos" class="section">
+      <div class="section-header section-head-row">
+        <div><h2>Eventos</h2><p>Bautizos, presentaciones y matrimonios</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('eventos')" title="Refrescar" aria-label="Refrescar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="setEventoTab('bautizo',this)">Bautizos</button>
+        <button class="sub-tab" onclick="setEventoTab('presentacion',this)">Presentaciones</button>
+        <button class="sub-tab" onclick="setEventoTab('matrimonio',this)">Matrimonios</button>
+      </div>
+      <!-- Bautizo -->
+      <div id="evBautizoForm" class="card" style="margin-bottom:1.2rem;">
+        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Bautizo</h3>
+        <div class="events-grid">
+          <div class="form-group" style="margin:0;"><label>Fecha</label><input type="date" id="evBFecha"></div>
+          <div class="form-group" style="margin:0;"><label>Cédula</label><input type="text" id="evBCedula"></div>
+          <div class="form-group" style="margin:0;"><label>Nombre</label><input type="text" id="evBNombre"></div>
+          <div class="form-group" style="margin:0;"><label>Apellido</label><input type="text" id="evBApellido"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarEvento('bautizo')">Guardar Bautizo</button>
+      </div>
+      <!-- Presentación -->
+      <div id="evPresentacionForm" class="card" style="margin-bottom:1.2rem;display:none;">
+        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Presentación</h3>
+        <div class="events-grid">
+          <div class="form-group" style="margin:0;"><label>Nombre bebé</label><input type="text" id="evPNombreBebe"></div>
+          <div class="form-group" style="margin:0;"><label>Apellido bebé</label><input type="text" id="evPApellidoBebe"></div>
+          <div class="form-group" style="margin:0;"><label>Fecha</label><input type="date" id="evPFecha"></div>
+          <div class="form-group" style="margin:0;"><label>Nombre papá</label><input type="text" id="evPNombrePapa"></div>
+          <div class="form-group" style="margin:0;"><label>Nombre mamá</label><input type="text" id="evPNombreMama"></div>
+          <div class="form-group" style="margin:0;"><label>¿Cuántos testigos?</label>
+            <input type="number" id="evPTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('P')">
+          </div>
+        </div>
+        <div id="evPTestigosFields" style="margin-top:1rem;"></div>
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarEvento('presentacion')">Guardar Presentación</button>
+      </div>
+      <!-- Matrimonio -->
+      <div id="evMatrimonioForm" class="card" style="margin-bottom:1.2rem;display:none;">
+        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Matrimonio</h3>
+        <div class="events-grid">
+          <div class="form-group" style="margin:0;"><label>Fecha boda</label><input type="date" id="evMFecha"></div>
+          <div class="form-group" style="margin:0;"><label>Nombre esposo</label><input type="text" id="evMNombreEsposo"></div>
+          <div class="form-group" style="margin:0;"><label>Apellido esposo</label><input type="text" id="evMApellidoEsposo"></div>
+          <div class="form-group" style="margin:0;"><label>Nombre esposa</label><input type="text" id="evMNombreEsposa"></div>
+          <div class="form-group" style="margin:0;"><label>Apellido esposa</label><input type="text" id="evMApellidoEsposa"></div>
+          <div class="form-group" style="margin:0;"><label>¿Cuántos testigos?</label>
+            <input type="number" id="evMTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('M')">
+          </div>
+        </div>
+        <div id="evMTestigosFields" style="margin-top:1rem;"></div>
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarEvento('matrimonio')">Guardar Matrimonio</button>
+      </div>
+      <!-- Lista de eventos -->
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+          <select id="filtEventoTipo" class="search-box" style="width:180px" onchange="renderEventosList()">
+            <option value="">Todos los eventos</option>
+            <option value="bautizo">Bautizos</option>
+            <option value="presentacion">Presentaciones</option>
+            <option value="matrimonio">Matrimonios</option>
+          </select>
+          <input type="date" id="filtEventoFecha" class="search-box" style="width:155px" onchange="renderEventosList()">
+          <button class="btn btn-outline btn-sm btn-icon" onclick="document.getElementById('filtEventoFecha').value='';renderEventosList();" title="Limpiar fecha">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th>Registrado por</th></tr></thead>
+            <tbody id="eventosBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTABILIDAD (solo Admin) -->
+    <div id="sec-contabilidad" class="section">
+      <div class="section-header section-head-row">
+        <div><h2>Contabilidad</h2><p>Gestión financiera de la iglesia</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('contabilidad')" title="Refrescar" aria-label="Refrescar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
+      <!-- Formulario nuevo movimiento -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h3 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:1rem;color:var(--navy);">Registrar Movimiento</h3>
+        <div class="events-grid">
+          <div class="form-group" style="margin:0;"><label>Fecha</label><input type="date" id="contFecha"></div>
+          <div class="form-group" style="margin:0;"><label>Tipo</label>
+            <select id="contTipo"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
+          </div>
+          <div class="form-group" style="margin:0;"><label>Descripción</label><input type="text" id="contDesc" placeholder="Ej: Diezmos, Ofrendas..."></div>
+          <div class="form-group" style="margin:0;"><label>Monto</label><input type="number" id="contMonto" min="0" step="0.01" placeholder="0.00"></div>
+          <div class="form-group" style="margin:0;"><label>Observación</label><input type="text" id="contObs" placeholder="Opcional"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarContabilidad()">Registrar</button>
+      </div>
+      <!-- Filtros de período -->
+      <div class="period-tabs" id="contPeriodTabs">
+        <button class="period-tab active" onclick="setContPeriod('week',this)">Semana</button>
+        <button class="period-tab" onclick="setContPeriod('month',this)">Mes</button>
+        <button class="period-tab" onclick="setContPeriod('quarter',this)">Trimestre</button>
+        <button class="period-tab" onclick="setContPeriod('year',this)">Año</button>
+        <button class="period-tab" onclick="setContPeriod('all',this)">Todo</button>
+      </div>
+      <div class="date-range">
+        <label>Desde <input type="date" id="contFrom" onchange="setContRange()"></label>
+        <label>Hasta <input type="date" id="contTo" onchange="setContRange()"></label>
+      </div>
+      <!-- Tarjetas resumen -->
+      <div class="stats-grid" id="contStats" style="margin-bottom:1.5rem;"></div>
+      <!-- Gráfico -->
+      <div class="chart-card" style="margin-bottom:1.5rem;">
+        <h3>Ingresos vs Egresos por Mes</h3>
+        <div style="position:relative;height:240px;"><canvas id="chartCont"></canvas></div>
+      </div>
+      <!-- Tabla -->
+      <div class="card">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelContabilidad()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
+            &nbsp;Exportar Excel
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Observación</th><th>Por</th></tr></thead>
+            <tbody id="contabilidadBody"></tbody>
+          </table>
+        </div>
+        <div id="contTotal" style="text-align:right;padding:10px 0;font-size:0.85rem;color:var(--gray);font-weight:700;"></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -465,7 +680,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxo0QvDU14xDPLmrmblDQrS
 // ============================================================
 // BASE DE DATOS (en memoria, sincronizada con Sheets)
 // ============================================================
-let DB = { usuarios:[], miembros:[], asistencia:[], log:[] };
+let DB = { usuarios:[], miembros:[], asistencia:[], log:[], santa_cena:[], visitantes:[], eventos:[], contabilidad:[] };
 let DB_READY = false;
 
 // Muestra pantalla de carga
@@ -502,6 +717,30 @@ function normalizeSheet(data){
       id: String(r.ID), ts: String(r.Timestamp||''),
       tipo: String(r.Tipo||''), msg: String(r.Mensaje||''),
       level: 'info', user: String(r.Usuario||'')
+    })),
+    santa_cena: (data.SANTA_CENA||[]).filter(r=>r.ID).map(r=>({
+      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
+      miembro: String(r.ID_Miembro||''), nombre_visitante: String(r.Nombre_Visitante||''),
+      asistio: String(r.Asistio).toLowerCase()==='true',
+      registrado_por: String(r.Registrado_Por||''), ts: String(r.Timestamp||'')
+    })),
+    visitantes: (data.VISITANTES||[]).filter(r=>r.ID).map(r=>({
+      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
+      nombre: String(r.Nombre||''), apellido: String(r.Apellido||''),
+      ministerio: String(r.Ministerio||''), servicio: String(r.Servicio||''),
+      registrado_por: String(r.Registrado_Por||'')
+    })),
+    eventos: (data.EVENTOS||[]).filter(r=>r.ID).map(r=>({
+      id: String(r.ID), tipo: String(r.Tipo||'').toLowerCase(),
+      fecha: String(r.Fecha||'').split('T')[0],
+      datos: (()=>{try{return JSON.parse(String(r.Datos_JSON||'{}'));}catch(e){return {};} })(),
+      registrado_por: String(r.Registrado_Por||''), ts: String(r.Timestamp||'')
+    })),
+    contabilidad: (data.CONTABILIDAD||[]).filter(r=>r.ID).map(r=>({
+      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
+      tipo: String(r.Tipo||''), descripcion: String(r.Descripcion||''),
+      monto: parseFloat(r.Monto)||0, observacion: String(r.Observacion||''),
+      registrado_por: String(r.Registrado_Por||'')
     }))
   };
 }
@@ -577,6 +816,8 @@ async function doLogin(){
   const roleText = found.rol==='Lider' ? `Lider de ${found.ministerio||'Ministerio'}` : found.rol;
   document.getElementById('headerUsername').textContent = `${found.nombre} · ${roleText}`;
   document.getElementById('navUsuarios').style.display = found.rol==='Admin'?'':'none';
+  document.getElementById('navEventos').style.display = found.rol==='Admin'?'':'none';
+  document.getElementById('navContabilidad').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navLog').style.display = found.rol==='Admin'?'':'none';
   initApp();
 }
@@ -617,6 +858,7 @@ const SERVICES = [
 ];
 
 let selectedService = 'Domingo 1ra';
+let memberMinFilter = '';
 let presentMembers = new Set();
 let dashPeriod = 'month';
 let dashFrom = null, dashTo = null;
@@ -628,14 +870,20 @@ function initApp(){
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('servFecha').value = today;
   document.getElementById('fechaHoy').textContent = formatDate(today);
+  document.getElementById('contFecha').value = today;
+  document.getElementById('scFecha').value = getMostRecentPrimerDomingo();
   clearHistorialFilters(true);
   renderServiceButtons();
-  checkCenaAuto();
+  renderMinFilterButtons();
   renderMembersGrid();
+  renderVisitantesList();
   renderMiembrosTable();
   renderHistorial();
   renderUsuariosTable();
   renderDashboard();
+  renderSantaCena();
+  renderTestigosFields('P');
+  renderTestigosFields('M');
   bindDashboardChartClicks();
 }
 
@@ -644,12 +892,14 @@ function showSection(id,btn){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
-  // Reload from API on every tab change
-  if(id==='dashboard') { syncAndRender('dashboard'); }
-  if(id==='historial') { syncAndRender('historial'); }
-  if(id==='miembros')  { syncAndRender('miembros'); }
-  if(id==='usuarios')  { renderUsuariosTable(); }
-  if(id==='log')       { renderLog(); }
+  if(id==='dashboard')    { syncAndRender('dashboard'); }
+  if(id==='historial')    { syncAndRender('historial'); }
+  if(id==='miembros')     { syncAndRender('miembros'); }
+  if(id==='usuarios')     { renderUsuariosTable(); }
+  if(id==='log')          { renderLog(); }
+  if(id==='santacena')    { syncAndRender('santacena'); }
+  if(id==='eventos')      { syncAndRender('eventos'); }
+  if(id==='contabilidad') { syncAndRender('contabilidad'); }
 }
 
 async function syncAndRender(section){
@@ -657,14 +907,23 @@ async function syncAndRender(section){
     try{
       const res = await fetch(`${API_URL}?action=getAll`);
       const data = await res.json();
-      if(!data.error){ const n=normalizeSheet(data); DB.miembros=n.miembros; DB.asistencia=n.asistencia; DB.usuarios=n.usuarios; if(n.log.length) DB.log=n.log; }
+      if(!data.error){
+        const n=normalizeSheet(data);
+        DB.miembros=n.miembros; DB.asistencia=n.asistencia; DB.usuarios=n.usuarios;
+        if(n.log.length) DB.log=n.log;
+        DB.santa_cena=n.santa_cena; DB.visitantes=n.visitantes;
+        DB.eventos=n.eventos; DB.contabilidad=n.contabilidad;
+      }
     }catch(e){}
   }
-  if(section==='dashboard') renderDashboard();
-  if(section==='historial') renderHistorial();
-  if(section==='miembros')  renderMiembrosTable();
-  if(section==='usuarios')  renderUsuariosTable();
-  if(section==='log')       renderLog();
+  if(section==='dashboard')     renderDashboard();
+  if(section==='historial')     renderHistorial();
+  if(section==='miembros')      renderMiembrosTable();
+  if(section==='usuarios')      renderUsuariosTable();
+  if(section==='log')           renderLog();
+  if(section==='santacena')     renderSantaCena();
+  if(section==='eventos')       renderEventosList();
+  if(section==='contabilidad')  renderContabilidad();
 }
 
 async function refreshSectionData(section){
@@ -677,9 +936,24 @@ async function refreshSectionData(section){
 // ============================================================
 // SERVICIOS
 // ============================================================
+const LIDER_SERVICES = {
+  'Caballeros':    ['Miercoles'],
+  'Damas':         ['Jueves'],
+  'Jovenes':       ['Sabado Jovenes'],
+  'Adolescentes':  ['Sabado Adolescentes']
+};
+
 function renderServiceButtons(){
   const grid = document.getElementById('serviceGrid');
-  grid.innerHTML = SERVICES.map(s=>`
+  let services = SERVICES;
+  if(currentUser && currentUser.rol === 'Lider'){
+    const allowed = LIDER_SERVICES[currentUser.ministerio] || SERVICES.map(s=>s.id);
+    services = SERVICES.filter(s => allowed.includes(s.id));
+    if(services.length > 0 && !services.find(s=>s.id===selectedService)){
+      selectedService = services[0].id;
+    }
+  }
+  grid.innerHTML = services.map(s=>`
     <div class="service-btn ${s.id===selectedService?'selected':''}" onclick="selectService('${s.id}',this)">
       <div class="day">${s.day}</div>
       <div class="name">${s.name}</div>
@@ -688,28 +962,38 @@ function renderServiceButtons(){
 
 function selectService(id,el){
   selectedService = id;
+  memberMinFilter = '';
   document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('extraServiceWrap').style.display = id==='Extra'?'block':'none';
-  checkCenaAuto();
+  renderMinFilterButtons();
   renderMembersGrid();
+  renderVisitantesList();
   checkDuplicates();
+}
+
+function renderMinFilterButtons(){
+  const wrap = document.getElementById('minFilterWrap');
+  if(!currentUser || currentUser.rol !== 'Admin'){ wrap.style.display='none'; return; }
+  const srv = SERVICES.find(s=>s.id===selectedService);
+  if(srv && srv.ministerios){ wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  const ministries = [...new Set(DB.miembros.filter(m=>m.activo!==false).map(m=>m.ministerio))].sort();
+  document.getElementById('minFilterBtns').innerHTML =
+    `<button class="period-tab ${memberMinFilter===''?'active':''}" onclick="setMinFilter('',this)">Todos</button>` +
+    ministries.map(m=>`<button class="period-tab ${memberMinFilter===m?'active':''}" onclick="setMinFilter('${m}',this)">${m}</button>`).join('');
+}
+
+function setMinFilter(min, btn){
+  memberMinFilter = min;
+  document.querySelectorAll('#minFilterBtns .period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMembersGrid();
 }
 
 function onFechaChange(){
-  checkCenaAuto();
   checkDuplicates();
-}
-
-function checkCenaAuto(){
-  const fecha = document.getElementById('servFecha').value;
-  if(!fecha) return;
-  const d = new Date(fecha+'T12:00:00');
-  const isPrimerDomingo = d.getDay()===0 && d.getDate()<=7;
-  const isDomingo = selectedService.startsWith('Domingo');
-  const chk = document.getElementById('cenaCheck');
-  chk.checked = isPrimerDomingo && isDomingo;
-  document.getElementById('cenaLabel').textContent = chk.checked?'(1er domingo del mes)':'';
+  renderVisitantesList();
 }
 
 // ============================================================
@@ -717,11 +1001,13 @@ function checkCenaAuto(){
 // ============================================================
 function getVisibleMembers(){
   const srv = SERVICES.find(s=>s.id===selectedService);
-  let members = DB.miembros.filter(m => m.activo !== false); // solo activos
+  let members = DB.miembros.filter(m => m.activo !== false);
   if(currentUser.rol==='Lider'){
     members = members.filter(m=>m.ministerio===currentUser.ministerio);
   } else if(srv && srv.ministerios){
     members = members.filter(m=>srv.ministerios.includes(m.ministerio));
+  } else if(memberMinFilter){
+    members = members.filter(m=>m.ministerio===memberMinFilter);
   }
   return members;
 }
@@ -735,7 +1021,8 @@ function renderMembersGrid(filter=''){
 
   const srv = SERVICES.find(s=>s.id===selectedService);
   const label = currentUser.rol==='Lider' ? `· ${currentUser.ministerio}` :
-    (srv && srv.ministerios ? `· ${srv.ministerios.join(', ')}` : '');
+    (srv && srv.ministerios ? `· ${srv.ministerios.join(', ')}` :
+    (memberMinFilter ? `· ${memberMinFilter}` : ''));
   document.getElementById('filterMinLabel').textContent = label;
 
   document.getElementById('membersGrid').innerHTML = members.map(m=>{
@@ -798,7 +1085,7 @@ async function guardarAsistencia(){
     if(!nombre){ showToast('Escribe el nombre del evento extra','error'); return; }
   }
   const fecha = document.getElementById('servFecha').value;
-  const cena  = document.getElementById('cenaCheck').checked;
+  const cena  = false; // Santa Cena se registra en su propia sección
   const already = getAlreadyPresent(fecha);
   const servNombre = selectedService==='Extra'
     ? 'Extra: '+document.getElementById('extraNombre').value.trim()
@@ -837,24 +1124,43 @@ function renderHistorial(){
   const filtServ    = document.getElementById('filtServicio').value;
   const filtMin     = document.getElementById('filtMinisterio').value;
   const filtBaut    = document.getElementById('filtBautizado').value;
-  let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+
+  // Filas de miembros
+  let rows = [...DB.asistencia].map(r=>({...r, esVisitante:false}));
   if(currentUser && currentUser.rol==='Lider'){
-    rows = rows.filter(r=>{
-      const m=DB.miembros.find(x=>x.id===r.miembro);
-      return m && m.ministerio===currentUser.ministerio;
-    });
+    rows = rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===currentUser.ministerio;});
   }
   if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
   if(filtBaut)    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.bautizado===filtBaut;});
-  if(filtMiembro) rows=rows.filter(r=>{
-    const m=DB.miembros.find(x=>x.id===r.miembro);
-    if(!m) return false;
-    return (m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').toLowerCase().includes(filtMiembro);
-  });
+  if(filtMiembro) rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);if(!m)return false;return(m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').toLowerCase().includes(filtMiembro);});
+
+  // Filas de visitantes
+  let visRows = [...DB.visitantes].map(v=>({
+    esVisitante:true, fecha:v.fecha, nombre:v.nombre+' '+v.apellido,
+    ministerio:v.ministerio, servicio:v.servicio, id:v.id
+  }));
+  if(currentUser && currentUser.rol==='Lider') visRows=visRows.filter(r=>r.ministerio===currentUser.ministerio);
+  if(filtFecha)   visRows=visRows.filter(r=>r.fecha===filtFecha);
+  if(filtServ)    visRows=visRows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
+  if(filtMin)     visRows=visRows.filter(r=>r.ministerio===filtMin);
+  if(filtBaut)    visRows=[]; // visitantes no tienen dato de bautismo
+  if(filtMiembro) visRows=visRows.filter(r=>r.nombre.toLowerCase().includes(filtMiembro));
+
+  const allRows = [...rows, ...visRows].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+
   const body=document.getElementById('historialBody');
-  body.innerHTML=rows.map(r=>{
+  body.innerHTML=allRows.map(r=>{
+    if(r.esVisitante){
+      return `<tr>
+        <td>${formatDate(r.fecha)}</td>
+        <td>${r.nombre}<span class="visitante-badge">Visitante</span></td>
+        <td><span class="badge badge-${r.ministerio.toLowerCase()}">${r.ministerio}</span></td>
+        <td>${r.servicio}</td>
+        <td><span class="badge badge-general">—</span></td>
+      </tr>`;
+    }
     const m=DB.miembros.find(x=>x.id===r.miembro);
     const nombre=m?m.nombre+' '+m.apellido:r.miembro;
     const min=m?m.ministerio:'—';
@@ -866,7 +1172,7 @@ function renderHistorial(){
       <td><span class="badge badge-${r.cena}">${r.cena?'Sí':'No'}</span></td>
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
-  document.getElementById('historialTotal').textContent = `Total: ${rows.length} registro${rows.length!==1?'s':''}`;
+  document.getElementById('historialTotal').textContent = `Total: ${allRows.length} registro${allRows.length!==1?'s':''}`;
 }
 
 function clearHistorialFilters(isInit=false){
@@ -1388,6 +1694,427 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
     else m.classList.remove('open');
   });
 });
+
+// ============================================================
+// VISITANTES
+// ============================================================
+function toggleVisitorForm(){
+  const f = document.getElementById('visitorForm');
+  const open = f.style.display === 'none' || f.style.display === '';
+  f.style.display = open ? 'block' : 'none';
+  if(open){
+    document.getElementById('visNombre').value = '';
+    document.getElementById('visApellido').value = '';
+    document.getElementById('visNombre').focus();
+  }
+}
+
+async function guardarVisitante(){
+  const nombre   = toTitleCaseName(document.getElementById('visNombre').value);
+  const apellido = toTitleCaseName(document.getElementById('visApellido').value);
+  const ministerio = document.getElementById('visMinisterio').value;
+  if(!nombre || !apellido){ showToast('Nombre y apellido requeridos','error'); return; }
+  const fecha = document.getElementById('servFecha').value;
+  if(!fecha){ showToast('Selecciona una fecha de servicio','error'); return; }
+  const servicio = selectedService === 'Extra'
+    ? 'Extra: ' + (document.getElementById('extraNombre').value.trim() || '')
+    : selectedService;
+  const id = 'v' + Date.now() + Math.random().toString(36).slice(2);
+  const vis = { id, fecha, nombre, apellido, ministerio, servicio, registrado_por: currentUser.nombre };
+  showLoader('Registrando visitante...');
+  DB.visitantes.push(vis);
+  await apiAdd('VISITANTES', { ID:id, Fecha:fecha, Nombre:nombre, Apellido:apellido, Ministerio:ministerio, Servicio:servicio, Registrado_Por:currentUser.nombre });
+  hideLoader();
+  addLog('asistencia',`${currentUser.nombre} registró visitante: ${nombre} ${apellido} (${servicio})`,'info');
+  saveDB();
+  toggleVisitorForm();
+  renderVisitantesList();
+  showToast(`✓ Visitante ${nombre} ${apellido} registrado`,'success');
+}
+
+function renderVisitantesList(){
+  const fecha = document.getElementById('servFecha')?.value || '';
+  const servicio = selectedService === 'Extra'
+    ? 'Extra: ' + (document.getElementById('extraNombre')?.value?.trim() || '')
+    : selectedService;
+  const list = DB.visitantes.filter(v => v.fecha === fecha && v.servicio === servicio);
+  const lbl = document.getElementById('visitantesLabel');
+  if(lbl) lbl.textContent = list.length > 0 ? `(${list.length})` : '';
+  const container = document.getElementById('visitantesList');
+  if(!container) return;
+  container.innerHTML = list.length > 0
+    ? `<div class="members-grid" style="margin-top:0.6rem;">${list.map(v=>`
+        <div class="member-card present">
+          <div class="member-avatar">${v.nombre[0]}${v.apellido[0]||''}</div>
+          <div class="member-info">
+            <div class="mname">${v.nombre} ${v.apellido}</div>
+            <div class="mmin">${v.ministerio} · Visitante</div>
+          </div>
+          <div class="check" style="background:var(--gold);border-color:var(--gold);"></div>
+        </div>`).join('')}</div>`
+    : '';
+}
+
+// ============================================================
+// SANTA CENA
+// ============================================================
+let scPresentes = new Set();
+
+function getPrimerDomingo(year, month){
+  const d = new Date(year, month, 1);
+  const dow = d.getDay(); // 0=domingo
+  const diff = dow === 0 ? 0 : 7 - dow;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().split('T')[0];
+}
+
+function getMostRecentPrimerDomingo(){
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  let pd = getPrimerDomingo(now.getFullYear(), now.getMonth());
+  if(pd > todayStr){
+    const prev = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    pd = getPrimerDomingo(prevYear, prev);
+  }
+  return pd;
+}
+
+function setSCPrimerDomingo(){
+  document.getElementById('scFecha').value = getMostRecentPrimerDomingo();
+  renderSantaCena();
+}
+
+function toggleSCMember(id, el){
+  const yaEnBD = el.dataset.locked === 'true';
+  if(yaEnBD) return; // no se puede desmarcar lo ya guardado
+  if(scPresentes.has(id)){
+    scPresentes.delete(id);
+    el.classList.remove('cena-si');
+    el.querySelector('.check').style.cssText = '';
+  } else {
+    scPresentes.add(id);
+    el.classList.add('cena-si');
+    el.querySelector('.check').style.cssText = 'background:var(--success);border-color:var(--success);';
+  }
+}
+
+function renderSantaCena(){
+  const fecha = document.getElementById('scFecha')?.value || '';
+  const asistieronFecha = new Set(
+    DB.asistencia.filter(a => a.fecha === fecha).map(a => a.miembro)
+  );
+  const yaRegistradosSC = new Set(
+    DB.santa_cena.filter(sc => sc.fecha === fecha && sc.miembro).map(sc => sc.miembro)
+  );
+  scPresentes = new Set([...yaRegistradosSC]);
+
+  const bautizados = DB.miembros.filter(m => m.activo !== false && m.bautizado === 'SI');
+  const totalAsistieron = bautizados.filter(m => asistieronFecha.has(m.id)).length;
+
+  const statsEl = document.getElementById('scStats');
+  if(statsEl) statsEl.innerHTML = `
+    <div class="stat-card"><div class="label">Bautizados activos</div><div class="value">${bautizados.length}</div></div>
+    <div class="stat-card"><div class="label">Asistieron</div><div class="value">${totalAsistieron}</div></div>
+    <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${yaRegistradosSC.size}</div></div>
+  `;
+
+  const grid = document.getElementById('scMembersGrid');
+  if(!grid) return;
+  grid.innerHTML = bautizados.map(m => {
+    const asistio = asistieronFecha.has(m.id);
+    const locked  = yaRegistradosSC.has(m.id);
+    const selected = scPresentes.has(m.id);
+    const init = m.nombre[0] + (m.apellido[0]||'');
+    let cls = locked ? 'cena-si cena-lock' : (selected ? 'cena-si' : (asistio ? '' : 'cena-no'));
+    return `<div class="member-card ${cls}" onclick="toggleSCMember('${m.id}',this)" data-id="${m.id}" data-locked="${locked}">
+      <div class="member-avatar">${init}</div>
+      <div class="member-info">
+        <div class="mname">${m.nombre} ${m.apellido}${locked?'<span class="already-badge">guardado</span>':''}</div>
+        <div class="mmin">${m.ministerio}</div>
+      </div>
+      <div class="check" style="${selected?'background:var(--success);border-color:var(--success);':''}"></div>
+    </div>`;
+  }).join('') || '<p style="color:var(--gray);padding:1rem 0">Sin miembros bautizados activos</p>';
+}
+
+async function guardarSantaCena(){
+  const fecha = document.getElementById('scFecha').value;
+  if(!fecha){ showToast('Selecciona una fecha','error'); return; }
+  const yaRegistrados = new Set(DB.santa_cena.filter(sc => sc.fecha === fecha && sc.miembro).map(sc => sc.miembro));
+  const nuevos = [];
+  scPresentes.forEach(mid => {
+    if(!yaRegistrados.has(mid)) nuevos.push(mid);
+  });
+  if(nuevos.length === 0){ showToast('Sin registros nuevos para guardar','error'); return; }
+  showLoader('Guardando Santa Cena...');
+  const promises = nuevos.map(mid => {
+    const id = 'sc' + Date.now() + Math.random().toString(36).slice(2);
+    const entry = { id, fecha, miembro:mid, nombre_visitante:'', asistio:true, registrado_por:currentUser.nombre, ts:new Date().toISOString() };
+    DB.santa_cena.push(entry);
+    return apiAdd('SANTA_CENA', { ID:id, Fecha:fecha, ID_Miembro:mid, Nombre_Visitante:'', Asistio:true, Registrado_Por:currentUser.nombre, Timestamp:entry.ts });
+  });
+  await Promise.all(promises);
+  hideLoader();
+  addLog('asistencia',`${currentUser.nombre} registró Santa Cena: ${nuevos.length} personas — ${fecha}`,'success');
+  saveDB();
+  renderSantaCena();
+  showToast(`✓ ${nuevos.length} registros de Santa Cena guardados`,'success');
+}
+
+// ============================================================
+// EVENTOS
+// ============================================================
+let currentEventoTab = 'bautizo';
+
+function setEventoTab(tab, btn){
+  currentEventoTab = tab;
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('evBautizoForm').style.display     = tab==='bautizo'      ? 'block' : 'none';
+  document.getElementById('evPresentacionForm').style.display = tab==='presentacion' ? 'block' : 'none';
+  document.getElementById('evMatrimonioForm').style.display   = tab==='matrimonio'   ? 'block' : 'none';
+  if(tab==='presentacion') renderTestigosFields('P');
+  if(tab==='matrimonio')   renderTestigosFields('M');
+  renderEventosList();
+}
+
+function renderTestigosFields(prefix){
+  const countEl = document.getElementById(`ev${prefix}Testigos`);
+  if(!countEl) return;
+  const count = parseInt(countEl.value) || 0;
+  const container = document.getElementById(`ev${prefix}TestigosFields`);
+  if(count === 0){ container.innerHTML = ''; return; }
+  let html = `<label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Testigos</label>`;
+  html += `<div class="events-grid">`;
+  for(let i=1; i<=count; i++){
+    html += `<div class="form-group" style="margin:0;"><label>Testigo ${i} — Nombre</label><input type="text" id="ev${prefix}T${i}Nombre"></div>`;
+    html += `<div class="form-group" style="margin:0;"><label>Testigo ${i} — Apellido</label><input type="text" id="ev${prefix}T${i}Apellido"></div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+async function guardarEvento(tipo){
+  let datos = {}, fecha = '';
+  if(tipo === 'bautizo'){
+    fecha = document.getElementById('evBFecha').value;
+    const cedula   = document.getElementById('evBCedula').value.trim();
+    const nombre   = toTitleCaseName(document.getElementById('evBNombre').value);
+    const apellido = toTitleCaseName(document.getElementById('evBApellido').value);
+    if(!fecha||!nombre||!apellido){ showToast('Fecha, nombre y apellido son requeridos','error'); return; }
+    datos = { cedula, nombre, apellido };
+  } else if(tipo === 'presentacion'){
+    fecha = document.getElementById('evPFecha').value;
+    const nombreBebe   = toTitleCaseName(document.getElementById('evPNombreBebe').value);
+    const apellidoBebe = toTitleCaseName(document.getElementById('evPApellidoBebe').value);
+    const nombrePapa   = toTitleCaseName(document.getElementById('evPNombrePapa').value);
+    const nombreMama   = toTitleCaseName(document.getElementById('evPNombreMama').value);
+    if(!fecha||!nombreBebe||!apellidoBebe){ showToast('Fecha y nombre del bebé son requeridos','error'); return; }
+    const count = parseInt(document.getElementById('evPTestigos').value)||0;
+    const testigos = [];
+    for(let i=1;i<=count;i++){
+      const tn = (document.getElementById(`evPT${i}Nombre`)?.value||'').trim();
+      const ta = (document.getElementById(`evPT${i}Apellido`)?.value||'').trim();
+      if(tn) testigos.push({nombre:tn,apellido:ta});
+    }
+    datos = { nombre_bebe:nombreBebe, apellido_bebe:apellidoBebe, nombre_papa:nombrePapa, nombre_mama:nombreMama, testigos };
+  } else if(tipo === 'matrimonio'){
+    fecha = document.getElementById('evMFecha').value;
+    const nE = toTitleCaseName(document.getElementById('evMNombreEsposo').value);
+    const aE = toTitleCaseName(document.getElementById('evMApellidoEsposo').value);
+    const nA = toTitleCaseName(document.getElementById('evMNombreEsposa').value);
+    const aA = toTitleCaseName(document.getElementById('evMApellidoEsposa').value);
+    if(!fecha||!nE||!nA){ showToast('Fecha y nombres de los esposos son requeridos','error'); return; }
+    const count = parseInt(document.getElementById('evMTestigos').value)||0;
+    const testigos = [];
+    for(let i=1;i<=count;i++){
+      const tn = (document.getElementById(`evMT${i}Nombre`)?.value||'').trim();
+      const ta = (document.getElementById(`evMT${i}Apellido`)?.value||'').trim();
+      if(tn) testigos.push({nombre:tn,apellido:ta});
+    }
+    datos = { nombre_esposo:nE, apellido_esposo:aE, nombre_esposa:nA, apellido_esposa:aA, testigos };
+  }
+  const id = 'ev' + Date.now();
+  const evento = { id, tipo, fecha, datos, registrado_por:currentUser.nombre, ts:new Date().toISOString() };
+  showLoader('Guardando evento...');
+  DB.eventos.push(evento);
+  await apiAdd('EVENTOS', { ID:id, Tipo:tipo, Fecha:fecha, Datos_JSON:JSON.stringify(datos), Registrado_Por:currentUser.nombre, Timestamp:evento.ts });
+  hideLoader();
+  addLog('miembro',`${currentUser.nombre} registró ${tipo}`,'success');
+  saveDB();
+  clearEventoForm(tipo);
+  renderEventosList();
+  showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} registrado`,'success');
+}
+
+function clearEventoForm(tipo){
+  if(tipo==='bautizo'){
+    ['evBFecha','evBCedula','evBNombre','evBApellido'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  } else if(tipo==='presentacion'){
+    ['evPFecha','evPNombreBebe','evPApellidoBebe','evPNombrePapa','evPNombreMama'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('evPTestigos').value='2'; renderTestigosFields('P');
+  } else if(tipo==='matrimonio'){
+    ['evMFecha','evMNombreEsposo','evMApellidoEsposo','evMNombreEsposa','evMApellidoEsposa'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('evMTestigos').value='2'; renderTestigosFields('M');
+  }
+}
+
+function renderEventosList(){
+  const filtTipo  = document.getElementById('filtEventoTipo')?.value || '';
+  const filtFecha = document.getElementById('filtEventoFecha')?.value || '';
+  let list = [...DB.eventos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(filtTipo)  list = list.filter(e=>e.tipo===filtTipo);
+  if(filtFecha) list = list.filter(e=>e.fecha===filtFecha);
+  const labels = {bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
+  const body = document.getElementById('eventosBody');
+  if(!body) return;
+  body.innerHTML = list.map(e=>{
+    let det = '';
+    if(e.tipo==='bautizo')       det=`${e.datos.nombre||''} ${e.datos.apellido||''} (Cédula: ${e.datos.cedula||'—'})`;
+    else if(e.tipo==='presentacion') det=`${e.datos.nombre_bebe||''} ${e.datos.apellido_bebe||''} — Papá: ${e.datos.nombre_papa||'—'}, Mamá: ${e.datos.nombre_mama||'—'}`;
+    else if(e.tipo==='matrimonio') det=`${e.datos.nombre_esposo||''} ${e.datos.apellido_esposo||''} ♥ ${e.datos.nombre_esposa||''} ${e.datos.apellido_esposa||''}`;
+    return `<tr>
+      <td>${formatDate(e.fecha)}</td>
+      <td><span class="badge" style="background:#e0f2fe;color:#075985;">${labels[e.tipo]||e.tipo}</span></td>
+      <td style="font-size:0.85rem;">${det}</td>
+      <td>${e.registrado_por}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:2rem">Sin eventos registrados</td></tr>';
+}
+
+// ============================================================
+// CONTABILIDAD
+// ============================================================
+let contPeriod = 'month';
+let contFrom = null, contTo = null;
+let chartContInstance = null;
+
+function setContPeriod(p, btn){
+  contPeriod=p; contFrom=null; contTo=null;
+  document.getElementById('contFrom').value='';
+  document.getElementById('contTo').value='';
+  document.querySelectorAll('#contPeriodTabs .period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderContabilidad();
+}
+
+function setContRange(){
+  contFrom = document.getElementById('contFrom').value||null;
+  contTo   = document.getElementById('contTo').value||null;
+  document.querySelectorAll('#contPeriodTabs .period-tab').forEach(b=>b.classList.remove('active'));
+  renderContabilidad();
+}
+
+function getContFilteredRows(){
+  const today = new Date();
+  let rows = [...DB.contabilidad];
+  if(contFrom||contTo){
+    rows=rows.filter(r=>{const d=new Date(r.fecha+'T12:00:00');return(!contFrom||d>=new Date(contFrom))&&(!contTo||d<=new Date(contTo));});
+  } else {
+    rows=rows.filter(r=>{
+      const d=new Date(r.fecha+'T12:00:00');
+      if(contPeriod==='week')    return (today-d)/86400000<=7;
+      if(contPeriod==='month')   return d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear();
+      if(contPeriod==='quarter') return Math.floor(d.getMonth()/3)===Math.floor(today.getMonth()/3)&&d.getFullYear()===today.getFullYear();
+      if(contPeriod==='year')    return d.getFullYear()===today.getFullYear();
+      return true;
+    });
+  }
+  return rows;
+}
+
+async function guardarContabilidad(){
+  const fecha = document.getElementById('contFecha').value;
+  const tipo  = document.getElementById('contTipo').value;
+  const desc  = document.getElementById('contDesc').value.trim();
+  const monto = parseFloat(document.getElementById('contMonto').value);
+  const obs   = document.getElementById('contObs').value.trim();
+  if(!fecha||!desc||isNaN(monto)||monto<=0){ showToast('Fecha, descripción y monto son requeridos','error'); return; }
+  const id = 'c'+Date.now();
+  const row = { id, fecha, tipo, descripcion:desc, monto, observacion:obs, registrado_por:currentUser.nombre };
+  showLoader('Guardando movimiento...');
+  DB.contabilidad.push(row);
+  await apiAdd('CONTABILIDAD',{ ID:id, Fecha:fecha, Tipo:tipo, Descripcion:desc, Monto:monto, Observacion:obs, Registrado_Por:currentUser.nombre });
+  hideLoader();
+  addLog('asistencia',`${currentUser.nombre} registró ${tipo}: ${desc} — $${monto.toFixed(2)}`,'info');
+  saveDB();
+  document.getElementById('contDesc').value='';
+  document.getElementById('contMonto').value='';
+  document.getElementById('contObs').value='';
+  renderContabilidad();
+  showToast(`✓ ${tipo} registrado`,'success');
+}
+
+function renderContabilidad(){
+  const rows = getContFilteredRows().sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const totalIngr = rows.filter(r=>r.tipo==='Ingreso').reduce((s,r)=>s+r.monto,0);
+  const totalEgr  = rows.filter(r=>r.tipo==='Egreso').reduce((s,r)=>s+r.monto,0);
+  const saldo = totalIngr - totalEgr;
+  const fmt = v => '$'+v.toLocaleString('es-CO',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  const statsEl = document.getElementById('contStats');
+  if(statsEl) statsEl.innerHTML = `
+    <div class="fin-card"><div class="label">Total Ingresos</div><div class="value" style="color:#4ade80;">${fmt(totalIngr)}</div></div>
+    <div class="fin-card"><div class="label">Total Egresos</div><div class="value" style="color:#f87171;">${fmt(totalEgr)}</div></div>
+    <div class="fin-card"><div class="label">Saldo</div><div class="value" style="color:${saldo>=0?'#4ade80':'#f87171'};">${fmt(saldo)}</div></div>
+    <div class="fin-card"><div class="label">Movimientos</div><div class="value">${rows.length}</div></div>
+  `;
+
+  // Gráfico: todos los datos por mes
+  const meses = {};
+  DB.contabilidad.forEach(r=>{
+    const key = r.fecha.slice(0,7);
+    if(!meses[key]) meses[key]={ingr:0,egr:0};
+    if(r.tipo==='Ingreso') meses[key].ingr+=r.monto;
+    else meses[key].egr+=r.monto;
+  });
+  const sortedMeses = Object.keys(meses).sort();
+  const canvas = document.getElementById('chartCont');
+  if(canvas){
+    if(chartContInstance){ chartContInstance.destroy(); chartContInstance=null; }
+    if(sortedMeses.length>0){
+      const mNames=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      chartContInstance = new Chart(canvas,{
+        type:'bar',
+        data:{
+          labels:sortedMeses.map(m=>{const[y,mo]=m.split('-');return`${mNames[parseInt(mo)-1]} ${y}`;}),
+          datasets:[
+            {label:'Ingresos',data:sortedMeses.map(m=>meses[m].ingr),backgroundColor:'rgba(74,222,128,0.75)',borderRadius:4},
+            {label:'Egresos', data:sortedMeses.map(m=>meses[m].egr), backgroundColor:'rgba(248,113,113,0.75)',borderRadius:4}
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:true,position:'top',labels:{color:'#6b7280',font:{size:11}}}},
+          scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',callback:v=>'$'+v.toLocaleString('es-CO')}}}}
+      });
+    }
+  }
+
+  const body = document.getElementById('contabilidadBody');
+  if(body) body.innerHTML = rows.map(r=>`
+    <tr class="${r.tipo==='Ingreso'?'ingreso-row':'egreso-row'}">
+      <td>${formatDate(r.fecha)}</td>
+      <td><span class="badge badge-${r.tipo.toLowerCase()}">${r.tipo}</span></td>
+      <td>${r.descripcion}</td>
+      <td style="font-weight:700;">${fmt(r.monto)}</td>
+      <td>${r.observacion||'—'}</td>
+      <td>${r.registrado_por}</td>
+    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin movimientos</td></tr>';
+  const total = document.getElementById('contTotal');
+  if(total) total.textContent=`Total filtrado: ${rows.length} movimiento${rows.length!==1?'s':''}`;
+}
+
+function exportExcelContabilidad(){
+  const rows = getContFilteredRows().sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const data = rows.map(r=>({'Fecha':r.fecha,'Tipo':r.tipo,'Descripción':r.descripcion,'Monto':r.monto,'Observación':r.observacion||'','Registrado por':r.registrado_por}));
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Contabilidad');
+  XLSX.writeFile(wb,'ICAEP_Contabilidad.xlsx');
+  addLog('asistencia',`${currentUser.nombre} exportó Contabilidad Excel`,'info');
+  showToast('✓ Excel exportado','success');
+}
 </script>
 </body>
 </html>
