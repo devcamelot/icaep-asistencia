@@ -1565,7 +1565,7 @@ function clearLog(){
 // DASHBOARD
 // ============================================================
 function getFilteredRows(){
-  const today=new Date('2026-05-23');
+  const today=new Date();
   let rows=[...DB.asistencia];
   if(dashFrom||dashTo){
     rows=rows.filter(r=>{const d=new Date(r.fecha);return(!dashFrom||d>=new Date(dashFrom))&&(!dashTo||d<=new Date(dashTo));});
@@ -1614,11 +1614,19 @@ function renderDashboard(){
   });
   const totalCena=Object.values(byCena).reduce((a,b)=>a+b,0);
   const fechasUnicas=Object.keys(byDate).length;
+  const totalBautizadosMiembros = DB.miembros.filter(m=>m.activo!==false && m.bautizado==='SI').length;
+  const totalBautizosEv   = DB.eventos.filter(e=>e.tipo==='bautizo').length;
+  const totalPresentaciones = DB.eventos.filter(e=>e.tipo==='presentacion').length;
+  const totalMatrimonios    = DB.eventos.filter(e=>e.tipo==='matrimonio').length;
   document.getElementById('statsGrid').innerHTML=`
     <div class="stat-card"><div class="label">Total Asistencias</div><div class="value">${rows.length}</div><div class="sub">registros</div></div>
     <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">personas tomaron</div></div>
     <div class="stat-card"><div class="label">Servicios</div><div class="value">${fechasUnicas}</div><div class="sub">en el período</div></div>
     <div class="stat-card" onclick="document.querySelector('nav button:nth-child(4)').click()" style="cursor:pointer;border:2px solid var(--gold);"><div class="label">Miembros ↗</div><div class="value">${DB.miembros.filter(m=>m.activo!==false).length}</div><div class="sub">activos registrados</div></div>
+    <div class="stat-card" style="border:2px solid #dbeafe;"><div class="label">Bautizados</div><div class="value" style="font-size:1.6rem;">${totalBautizadosMiembros}</div><div class="sub">en lista de miembros</div></div>
+    <div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">Bautizos ↗</div><div class="value" style="font-size:1.6rem;">${totalBautizosEv}</div><div class="sub">eventos registrados</div></div>
+    <div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">Presentaciones ↗</div><div class="value" style="font-size:1.6rem;">${totalPresentaciones}</div><div class="sub">eventos registrados</div></div>
+    <div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">Matrimonios ↗</div><div class="value" style="font-size:1.6rem;">${totalMatrimonios}</div><div class="sub">eventos registrados</div></div>
   `;
   const minL=Object.keys(byMin);
   const servL=Object.keys(byServ);
@@ -2025,6 +2033,16 @@ async function guardarEvento(tipo){
     await apiAdd('EVENTOS', { ID:id, Tipo:tipo, Fecha:fecha, Datos_JSON:JSON.stringify(datos), Registrado_Por:currentUser.nombre, Timestamp:evento.ts });
     addLog('evento',`${currentUser.nombre} registró ${tipo}`,'success');
     showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} registrado`,'success');
+    if(tipo==='bautizo' && datos.cedula){
+      const cedNorm = normalizeCedulaValue(datos.cedula);
+      const miembroB = DB.miembros.find(m=>normalizeCedulaValue(m.cedula||'')===cedNorm && m.activo!==false);
+      if(miembroB && miembroB.bautizado!=='SI'){
+        miembroB.bautizado = 'SI';
+        await apiUpdate('MIEMBROS', miembroB.id, {Bautizado:'SI'});
+        addLog('miembro',`${currentUser.nombre} actualizó bautismo de ${miembroB.nombre} ${miembroB.apellido} al registrar bautizo`,'info');
+        showToast(`✓ Miembro ${miembroB.nombre} ${miembroB.apellido} actualizado a Bautizado: SI`,'success');
+      }
+    }
   }
   hideLoader();
   saveDB();
