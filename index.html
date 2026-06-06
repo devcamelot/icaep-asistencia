@@ -412,6 +412,8 @@ tr.egreso-row td{color:var(--danger);}
           <option value="asistencia">Asistencia</option>
           <option value="miembro">Miembros</option>
           <option value="usuario">Usuarios</option>
+          <option value="evento">Eventos</option>
+          <option value="contabilidad">Contabilidad</option>
         </select>
         <button class="btn btn-danger btn-sm" onclick="clearLog()">Limpiar Log</button>
       </div>
@@ -434,6 +436,7 @@ tr.egreso-row td{color:var(--danger);}
           </div>
           <button class="btn btn-outline btn-sm" onclick="setSCPrimerDomingo()">1er Dom. actual</button>
         </div>
+        <div id="scMinFilterWrap" style="margin-bottom:1rem;"></div>
         <div class="stats-grid" id="scStats" style="margin-bottom:1.2rem;"></div>
         <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.8rem;">
           <span style="display:inline-block;width:12px;height:12px;background:var(--success);border-radius:3px;margin-right:4px;"></span>Verde = tomó Santa Cena &nbsp;
@@ -469,7 +472,10 @@ tr.egreso-row td{color:var(--danger);}
           <div class="form-group" style="margin:0;"><label>Nombre</label><input type="text" id="evBNombre"></div>
           <div class="form-group" style="margin:0;"><label>Apellido</label><input type="text" id="evBApellido"></div>
         </div>
-        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarEvento('bautizo')">Guardar Bautizo</button>
+        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
+          <button id="evBSaveBtn" class="btn btn-primary" onclick="guardarEvento('bautizo')">Guardar Bautizo</button>
+          <button id="evBCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditEvento('bautizo')">Cancelar</button>
+        </div>
       </div>
       <!-- Presentación -->
       <div id="evPresentacionForm" class="card" style="margin-bottom:1.2rem;display:none;">
@@ -485,7 +491,10 @@ tr.egreso-row td{color:var(--danger);}
           </div>
         </div>
         <div id="evPTestigosFields" style="margin-top:1rem;"></div>
-        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarEvento('presentacion')">Guardar Presentación</button>
+        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
+          <button id="evPSaveBtn" class="btn btn-primary" onclick="guardarEvento('presentacion')">Guardar Presentación</button>
+          <button id="evPCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditEvento('presentacion')">Cancelar</button>
+        </div>
       </div>
       <!-- Matrimonio -->
       <div id="evMatrimonioForm" class="card" style="margin-bottom:1.2rem;display:none;">
@@ -501,7 +510,10 @@ tr.egreso-row td{color:var(--danger);}
           </div>
         </div>
         <div id="evMTestigosFields" style="margin-top:1rem;"></div>
-        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarEvento('matrimonio')">Guardar Matrimonio</button>
+        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
+          <button id="evMSaveBtn" class="btn btn-primary" onclick="guardarEvento('matrimonio')">Guardar Matrimonio</button>
+          <button id="evMCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditEvento('matrimonio')">Cancelar</button>
+        </div>
       </div>
       <!-- Lista de eventos -->
       <div class="card">
@@ -519,7 +531,7 @@ tr.egreso-row td{color:var(--danger);}
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th>Registrado por</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th>Registrado por</th><th></th></tr></thead>
             <tbody id="eventosBody"></tbody>
           </table>
         </div>
@@ -546,7 +558,10 @@ tr.egreso-row td{color:var(--danger);}
           <div class="form-group" style="margin:0;"><label>Monto</label><input type="number" id="contMonto" min="0" step="0.01" placeholder="0.00"></div>
           <div class="form-group" style="margin:0;"><label>Observación</label><input type="text" id="contObs" placeholder="Opcional"></div>
         </div>
-        <button class="btn btn-primary" style="margin-top:1rem;" onclick="guardarContabilidad()">Registrar</button>
+        <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">
+          <button id="contSaveBtn" class="btn btn-primary" onclick="guardarContabilidad()">Registrar</button>
+          <button id="contCancelBtn" class="btn btn-outline" style="display:none" onclick="cancelEditCont()">Cancelar</button>
+        </div>
       </div>
       <!-- Filtros de período -->
       <div class="period-tabs" id="contPeriodTabs">
@@ -577,7 +592,7 @@ tr.egreso-row td{color:var(--danger);}
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Observación</th><th>Por</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Observación</th><th>Por</th><th></th></tr></thead>
             <tbody id="contabilidadBody"></tbody>
           </table>
         </div>
@@ -788,6 +803,16 @@ async function apiUpdate(sheet, id, data){
       body: JSON.stringify({action:'updateRow', sheet, id, data})
     });
   } catch(e){ console.warn('Error actualizando en Sheets:', e); }
+}
+
+async function apiDelete(sheet, id){
+  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI') return;
+  try {
+    await fetch(API_URL, {
+      method:'POST',
+      body: JSON.stringify({action:'deleteRow', sheet, id})
+    });
+  } catch(e){ console.warn('Error eliminando en Sheets:', e); }
 }
 
 // Compatibilidad: saveDB guarda en localStorage como respaldo
@@ -1759,6 +1784,7 @@ function renderVisitantesList(){
 // SANTA CENA
 // ============================================================
 let scPresentes = new Set();
+let scMinFilter = '';
 
 function getPrimerDomingo(year, month){
   const d = new Date(year, month, 1);
@@ -1799,6 +1825,13 @@ function toggleSCMember(id, el){
   }
 }
 
+function setScMinFilter(min, btn){
+  scMinFilter = min;
+  document.querySelectorAll('#scMinFilterWrap .period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSantaCenaGrid();
+}
+
 function renderSantaCena(){
   const fecha = document.getElementById('scFecha')?.value || '';
   const asistieronFecha = new Set(
@@ -1812,6 +1845,17 @@ function renderSantaCena(){
   const bautizados = DB.miembros.filter(m => m.activo !== false && m.bautizado === 'SI');
   const totalAsistieron = bautizados.filter(m => asistieronFecha.has(m.id)).length;
 
+  // Renderizar filtros de ministerio
+  const filterWrap = document.getElementById('scMinFilterWrap');
+  if(filterWrap){
+    const ministerios = [...new Set(bautizados.map(m=>m.ministerio))].sort();
+    filterWrap.innerHTML =
+      `<button class="period-tab ${scMinFilter===''?'active':''}" onclick="setScMinFilter('',this)">Todos</button>` +
+      ministerios.map(mn=>`<button class="period-tab ${scMinFilter===mn?'active':''}" onclick="setScMinFilter('${mn}',this)">${mn}</button>`).join('');
+    filterWrap.className = 'period-tabs';
+    filterWrap.style.marginBottom = '1rem';
+  }
+
   const statsEl = document.getElementById('scStats');
   if(statsEl) statsEl.innerHTML = `
     <div class="stat-card"><div class="label">Bautizados activos</div><div class="value">${bautizados.length}</div></div>
@@ -1819,12 +1863,27 @@ function renderSantaCena(){
     <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${yaRegistradosSC.size}</div></div>
   `;
 
+  renderSantaCenaGrid();
+}
+
+function renderSantaCenaGrid(){
+  const fecha = document.getElementById('scFecha')?.value || '';
+  const asistieronFecha = new Set(
+    DB.asistencia.filter(a => a.fecha === fecha).map(a => a.miembro)
+  );
+  const yaRegistradosSC = new Set(
+    DB.santa_cena.filter(sc => sc.fecha === fecha && sc.miembro).map(sc => sc.miembro)
+  );
+
+  let bautizados = DB.miembros.filter(m => m.activo !== false && m.bautizado === 'SI');
+  if(scMinFilter) bautizados = bautizados.filter(m => m.ministerio === scMinFilter);
+
   const grid = document.getElementById('scMembersGrid');
   if(!grid) return;
   grid.innerHTML = bautizados.map(m => {
-    const asistio = asistieronFecha.has(m.id);
     const locked  = yaRegistradosSC.has(m.id);
     const selected = scPresentes.has(m.id);
+    const asistio = asistieronFecha.has(m.id);
     const init = m.nombre[0] + (m.apellido[0]||'');
     let cls = locked ? 'cena-si cena-lock' : (selected ? 'cena-si' : (asistio ? '' : 'cena-no'));
     return `<div class="member-card ${cls}" onclick="toggleSCMember('${m.id}',this)" data-id="${m.id}" data-locked="${locked}">
@@ -1866,6 +1925,7 @@ async function guardarSantaCena(){
 // EVENTOS
 // ============================================================
 let currentEventoTab = 'bautizo';
+let editEventoId = null;
 
 function setEventoTab(tab, btn){
   currentEventoTab = tab;
@@ -1935,17 +1995,30 @@ async function guardarEvento(tipo){
     }
     datos = { nombre_esposo:nE, apellido_esposo:aE, nombre_esposa:nA, apellido_esposa:aA, testigos };
   }
-  const id = 'ev' + Date.now();
-  const evento = { id, tipo, fecha, datos, registrado_por:currentUser.nombre, ts:new Date().toISOString() };
-  showLoader('Guardando evento...');
-  DB.eventos.push(evento);
-  await apiAdd('EVENTOS', { ID:id, Tipo:tipo, Fecha:fecha, Datos_JSON:JSON.stringify(datos), Registrado_Por:currentUser.nombre, Timestamp:evento.ts });
+  showLoader(editEventoId ? 'Actualizando evento...' : 'Guardando evento...');
+  if(editEventoId){
+    const idx = DB.eventos.findIndex(x=>x.id===editEventoId);
+    if(idx>=0){ DB.eventos[idx].fecha=fecha; DB.eventos[idx].datos=datos; }
+    await apiUpdate('EVENTOS', editEventoId, { Fecha:fecha, Datos_JSON:JSON.stringify(datos) });
+    addLog('evento',`${currentUser.nombre} editó ${tipo}`,'info');
+    showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} actualizado`,'success');
+  } else {
+    const id = 'ev' + Date.now();
+    const evento = { id, tipo, fecha, datos, registrado_por:currentUser.nombre, ts:new Date().toISOString() };
+    DB.eventos.push(evento);
+    await apiAdd('EVENTOS', { ID:id, Tipo:tipo, Fecha:fecha, Datos_JSON:JSON.stringify(datos), Registrado_Por:currentUser.nombre, Timestamp:evento.ts });
+    addLog('evento',`${currentUser.nombre} registró ${tipo}`,'success');
+    showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} registrado`,'success');
+  }
   hideLoader();
-  addLog('miembro',`${currentUser.nombre} registró ${tipo}`,'success');
   saveDB();
+  editEventoId = null;
+  const p={bautizo:'B',presentacion:'P',matrimonio:'M'}[tipo];
+  const lbl={bautizo:'Guardar Bautizo',presentacion:'Guardar Presentación',matrimonio:'Guardar Matrimonio'};
+  const sb=document.getElementById(`ev${p}SaveBtn`); const cb=document.getElementById(`ev${p}CancelBtn`);
+  if(sb) sb.textContent=lbl[tipo]; if(cb) cb.style.display='none';
   clearEventoForm(tipo);
   renderEventosList();
-  showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} registrado`,'success');
 }
 
 function clearEventoForm(tipo){
@@ -1958,6 +2031,75 @@ function clearEventoForm(tipo){
     ['evMFecha','evMNombreEsposo','evMApellidoEsposo','evMNombreEsposa','evMApellidoEsposa'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     document.getElementById('evMTestigos').value='2'; renderTestigosFields('M');
   }
+}
+
+function editEvento(id){
+  const e = DB.eventos.find(x=>x.id===id);
+  if(!e) return;
+  editEventoId = id;
+  document.getElementById('evBautizoForm').style.display      = e.tipo==='bautizo'      ? 'block' : 'none';
+  document.getElementById('evPresentacionForm').style.display  = e.tipo==='presentacion' ? 'block' : 'none';
+  document.getElementById('evMatrimonioForm').style.display    = e.tipo==='matrimonio'   ? 'block' : 'none';
+  document.querySelectorAll('#sec-eventos .sub-tab').forEach(b=>{
+    b.classList.toggle('active', b.getAttribute('onclick')?.includes(`'${e.tipo}'`));
+  });
+  if(e.tipo==='bautizo'){
+    document.getElementById('evBFecha').value    = e.fecha;
+    document.getElementById('evBCedula').value   = e.datos.cedula||'';
+    document.getElementById('evBNombre').value   = e.datos.nombre||'';
+    document.getElementById('evBApellido').value = e.datos.apellido||'';
+    document.getElementById('evBSaveBtn').textContent = 'Actualizar Bautizo';
+    document.getElementById('evBCancelBtn').style.display = '';
+  } else if(e.tipo==='presentacion'){
+    document.getElementById('evPFecha').value        = e.fecha;
+    document.getElementById('evPNombreBebe').value   = e.datos.nombre_bebe||'';
+    document.getElementById('evPApellidoBebe').value = e.datos.apellido_bebe||'';
+    document.getElementById('evPNombrePapa').value   = e.datos.nombre_papa||'';
+    document.getElementById('evPNombreMama').value   = e.datos.nombre_mama||'';
+    const tsP = e.datos.testigos||[];
+    document.getElementById('evPTestigos').value = tsP.length;
+    renderTestigosFields('P');
+    tsP.forEach((t,i)=>{ const tn=document.getElementById(`evPT${i+1}Nombre`); const ta=document.getElementById(`evPT${i+1}Apellido`); if(tn) tn.value=t.nombre||''; if(ta) ta.value=t.apellido||''; });
+    document.getElementById('evPSaveBtn').textContent = 'Actualizar Presentación';
+    document.getElementById('evPCancelBtn').style.display = '';
+  } else if(e.tipo==='matrimonio'){
+    document.getElementById('evMFecha').value          = e.fecha;
+    document.getElementById('evMNombreEsposo').value   = e.datos.nombre_esposo||'';
+    document.getElementById('evMApellidoEsposo').value = e.datos.apellido_esposo||'';
+    document.getElementById('evMNombreEsposa').value   = e.datos.nombre_esposa||'';
+    document.getElementById('evMApellidoEsposa').value = e.datos.apellido_esposa||'';
+    const tsM = e.datos.testigos||[];
+    document.getElementById('evMTestigos').value = tsM.length;
+    renderTestigosFields('M');
+    tsM.forEach((t,i)=>{ const tn=document.getElementById(`evMT${i+1}Nombre`); const ta=document.getElementById(`evMT${i+1}Apellido`); if(tn) tn.value=t.nombre||''; if(ta) ta.value=t.apellido||''; });
+    document.getElementById('evMSaveBtn').textContent = 'Actualizar Matrimonio';
+    document.getElementById('evMCancelBtn').style.display = '';
+  }
+  document.getElementById('sec-eventos').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function cancelEditEvento(tipo){
+  editEventoId = null;
+  const p={bautizo:'B',presentacion:'P',matrimonio:'M'}[tipo];
+  const lbl={bautizo:'Guardar Bautizo',presentacion:'Guardar Presentación',matrimonio:'Guardar Matrimonio'};
+  const sb=document.getElementById(`ev${p}SaveBtn`); const cb=document.getElementById(`ev${p}CancelBtn`);
+  if(sb) sb.textContent=lbl[tipo]; if(cb) cb.style.display='none';
+  clearEventoForm(tipo);
+}
+
+function deleteEvento(id){
+  const e = DB.eventos.find(x=>x.id===id);
+  if(!e) return;
+  const lbl={bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
+  showConfirm(`¿Eliminar el registro de ${lbl[e.tipo]||e.tipo} del ${formatDate(e.fecha)}?`, async ()=>{
+    showLoader('Eliminando...');
+    DB.eventos = DB.eventos.filter(x=>x.id!==id);
+    await apiDelete('EVENTOS', id);
+    hideLoader();
+    addLog('evento',`${currentUser.nombre} eliminó ${e.tipo} del ${e.fecha}`,'warn');
+    saveDB(); renderEventosList();
+    showToast('Evento eliminado','success');
+  });
 }
 
 function renderEventosList(){
@@ -1979,8 +2121,12 @@ function renderEventosList(){
       <td><span class="badge" style="background:#e0f2fe;color:#075985;">${labels[e.tipo]||e.tipo}</span></td>
       <td style="font-size:0.85rem;">${det}</td>
       <td>${e.registrado_por}</td>
+      <td style="display:flex;gap:4px;">
+        <button class="btn btn-warn btn-sm" onclick="editEvento('${e.id}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEvento('${e.id}')">Eliminar</button>
+      </td>
     </tr>`;
-  }).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:2rem">Sin eventos registrados</td></tr>';
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin eventos registrados</td></tr>';
 }
 
 // ============================================================
@@ -1989,6 +2135,7 @@ function renderEventosList(){
 let contPeriod = 'month';
 let contFrom = null, contTo = null;
 let chartContInstance = null;
+let editContId = null;
 
 function setContPeriod(p, btn){
   contPeriod=p; contFrom=null; contTo=null;
@@ -2031,19 +2178,30 @@ async function guardarContabilidad(){
   const monto = parseFloat(document.getElementById('contMonto').value);
   const obs   = document.getElementById('contObs').value.trim();
   if(!fecha||!desc||isNaN(monto)||monto<=0){ showToast('Fecha, descripción y monto son requeridos','error'); return; }
-  const id = 'c'+Date.now();
-  const row = { id, fecha, tipo, descripcion:desc, monto, observacion:obs, registrado_por:currentUser.nombre };
-  showLoader('Guardando movimiento...');
-  DB.contabilidad.push(row);
-  await apiAdd('CONTABILIDAD',{ ID:id, Fecha:fecha, Tipo:tipo, Descripcion:desc, Monto:monto, Observacion:obs, Registrado_Por:currentUser.nombre });
+  showLoader(editContId ? 'Actualizando movimiento...' : 'Guardando movimiento...');
+  if(editContId){
+    const idx = DB.contabilidad.findIndex(x=>x.id===editContId);
+    if(idx>=0) DB.contabilidad[idx] = {...DB.contabilidad[idx], fecha, tipo, descripcion:desc, monto, observacion:obs};
+    await apiUpdate('CONTABILIDAD', editContId, {Fecha:fecha, Tipo:tipo, Descripcion:desc, Monto:monto, Observacion:obs});
+    addLog('contabilidad',`${currentUser.nombre} editó ${tipo}: ${desc} — $${monto.toFixed(2)}`,'info');
+    showToast(`✓ Movimiento actualizado`,'success');
+  } else {
+    const id = 'c'+Date.now();
+    const row = { id, fecha, tipo, descripcion:desc, monto, observacion:obs, registrado_por:currentUser.nombre };
+    DB.contabilidad.push(row);
+    await apiAdd('CONTABILIDAD',{ ID:id, Fecha:fecha, Tipo:tipo, Descripcion:desc, Monto:monto, Observacion:obs, Registrado_Por:currentUser.nombre });
+    addLog('contabilidad',`${currentUser.nombre} registró ${tipo}: ${desc} — $${monto.toFixed(2)}`,'info');
+    showToast(`✓ ${tipo} registrado`,'success');
+  }
   hideLoader();
-  addLog('asistencia',`${currentUser.nombre} registró ${tipo}: ${desc} — $${monto.toFixed(2)}`,'info');
   saveDB();
+  editContId = null;
   document.getElementById('contDesc').value='';
   document.getElementById('contMonto').value='';
   document.getElementById('contObs').value='';
+  document.getElementById('contSaveBtn').textContent='Registrar';
+  document.getElementById('contCancelBtn').style.display='none';
   renderContabilidad();
-  showToast(`✓ ${tipo} registrado`,'success');
 }
 
 function renderContabilidad(){
@@ -2100,7 +2258,11 @@ function renderContabilidad(){
       <td style="font-weight:700;">${fmt(r.monto)}</td>
       <td>${r.observacion||'—'}</td>
       <td>${r.registrado_por}</td>
-    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin movimientos</td></tr>';
+      <td style="display:flex;gap:4px;">
+        <button class="btn btn-warn btn-sm" onclick="editCont('${r.id}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCont('${r.id}')">Eliminar</button>
+      </td>
+    </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:2rem">Sin movimientos</td></tr>';
   const total = document.getElementById('contTotal');
   if(total) total.textContent=`Total filtrado: ${rows.length} movimiento${rows.length!==1?'s':''}`;
 }
@@ -2112,8 +2274,45 @@ function exportExcelContabilidad(){
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Contabilidad');
   XLSX.writeFile(wb,'ICAEP_Contabilidad.xlsx');
-  addLog('asistencia',`${currentUser.nombre} exportó Contabilidad Excel`,'info');
+  addLog('contabilidad',`${currentUser.nombre} exportó Contabilidad Excel`,'info');
   showToast('✓ Excel exportado','success');
+}
+
+function editCont(id){
+  const r = DB.contabilidad.find(x=>x.id===id);
+  if(!r) return;
+  editContId = id;
+  document.getElementById('contFecha').value  = r.fecha;
+  document.getElementById('contTipo').value   = r.tipo;
+  document.getElementById('contDesc').value   = r.descripcion;
+  document.getElementById('contMonto').value  = r.monto;
+  document.getElementById('contObs').value    = r.observacion||'';
+  document.getElementById('contSaveBtn').textContent = 'Actualizar';
+  document.getElementById('contCancelBtn').style.display = '';
+  document.getElementById('contSaveBtn').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function cancelEditCont(){
+  editContId = null;
+  document.getElementById('contDesc').value  = '';
+  document.getElementById('contMonto').value = '';
+  document.getElementById('contObs').value   = '';
+  document.getElementById('contSaveBtn').textContent = 'Registrar';
+  document.getElementById('contCancelBtn').style.display = 'none';
+}
+
+function deleteCont(id){
+  const r = DB.contabilidad.find(x=>x.id===id);
+  if(!r) return;
+  showConfirm(`¿Eliminar "${r.descripcion}" del ${formatDate(r.fecha)}?`, async ()=>{
+    showLoader('Eliminando...');
+    DB.contabilidad = DB.contabilidad.filter(x=>x.id!==id);
+    await apiDelete('CONTABILIDAD', id);
+    hideLoader();
+    addLog('contabilidad',`${currentUser.nombre} eliminó ${r.tipo}: ${r.descripcion}`,'warn');
+    saveDB(); renderContabilidad();
+    showToast('Movimiento eliminado','success');
+  });
 }
 </script>
 </body>
