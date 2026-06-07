@@ -207,7 +207,7 @@ tr.egreso-row td{color:var(--danger);}
   <nav id="mainNav">
     <button class="active" onclick="showSection('dashboard',this)">Dashboard</button>
     <button onclick="showSection('asistencia',this)">Registrar</button>
-    <button onclick="showSection('santacena',this)">Santa Cena</button>
+    <button id="navSantaCena" onclick="showSection('santacena',this)">Santa Cena</button>
     <button onclick="showSection('historial',this)">Historial</button>
     <button onclick="showSection('miembros',this)">Miembros</button>
     <button id="navUsuarios" onclick="showSection('usuarios',this)" style="display:none">Usuarios</button>
@@ -890,6 +890,7 @@ async function doLogin(){
   document.getElementById('navEventos').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navContabilidad').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navLog').style.display = found.rol==='Admin'?'':'none';
+  document.getElementById('navSantaCena').style.display = found.rol==='Admin'?'':'none';
   initApp();
 }
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
@@ -1312,7 +1313,7 @@ function renderMiembrosTable(filter=''){
       <td style="display:flex;gap:6px;flex-wrap:wrap;">
         ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="openEditMember('${m.id}')">Editar</button>`:''}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="confirmDeleteMember('${m.id}')">${activo?'Desactivar':'Activar'}</button>`:''}
-        ${m.bautizado==='SI'&&activo?`<button class="btn btn-sm" style="background:#0F1F3D;color:#c9a84c;border:none;" onclick="openCertificado('${m.id}')">Certificado</button>`:''}
+        ${isAdmin&&m.bautizado==='SI'&&activo?`<button class="btn btn-sm" style="background:#0F1F3D;color:#c9a84c;border:none;" onclick="openCertificado('${m.id}')">Certificado</button>`:''}
       </td>
     </tr>`;
   }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">Sin miembros</td></tr>';
@@ -1657,19 +1658,23 @@ function renderDashboard(){
   });
   const totalCena=Object.values(byCena).reduce((a,b)=>a+b,0);
   const fechasUnicas=Object.keys(byDate).length;
+  const isAdmin = currentUser && currentUser.rol === 'Admin';
   const totalBautizadosMiembros = DB.miembros.filter(m=>m.activo!==false && m.bautizado==='SI').length;
   const totalBautizosEv   = DB.eventos.filter(e=>e.tipo==='bautizo').length;
   const totalPresentaciones = DB.eventos.filter(e=>e.tipo==='presentacion').length;
   const totalMatrimonios    = DB.eventos.filter(e=>e.tipo==='matrimonio').length;
+  const evKpi = (label, val) => isAdmin
+    ? `<div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">${label} ↗</div><div class="value" style="font-size:1.6rem;">${val}</div><div class="sub">eventos registrados</div></div>`
+    : `<div class="stat-card" style="border:2px solid rgba(201,168,76,0.4);"><div class="label">${label}</div><div class="value" style="font-size:1.6rem;">${val}</div><div class="sub">eventos registrados</div></div>`;
   document.getElementById('statsGrid').innerHTML=`
     <div class="stat-card"><div class="label">Total Asistencias</div><div class="value">${rows.length}</div><div class="sub">registros</div></div>
     <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">personas tomaron</div></div>
     <div class="stat-card"><div class="label">Servicios</div><div class="value">${fechasUnicas}</div><div class="sub">en el período</div></div>
     <div class="stat-card" onclick="document.querySelector('nav button:nth-child(4)').click()" style="cursor:pointer;border:2px solid var(--gold);"><div class="label">Miembros ↗</div><div class="value">${DB.miembros.filter(m=>m.activo!==false).length}</div><div class="sub">activos registrados</div></div>
     <div class="stat-card" style="border:2px solid #dbeafe;"><div class="label">Bautizados</div><div class="value" style="font-size:1.6rem;">${totalBautizadosMiembros}</div><div class="sub">en lista de miembros</div></div>
-    <div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">Bautizos ↗</div><div class="value" style="font-size:1.6rem;">${totalBautizosEv}</div><div class="sub">eventos registrados</div></div>
-    <div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">Presentaciones ↗</div><div class="value" style="font-size:1.6rem;">${totalPresentaciones}</div><div class="sub">eventos registrados</div></div>
-    <div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">Matrimonios ↗</div><div class="value" style="font-size:1.6rem;">${totalMatrimonios}</div><div class="sub">eventos registrados</div></div>
+    ${evKpi('Bautizos', totalBautizosEv)}
+    ${evKpi('Presentaciones', totalPresentaciones)}
+    ${evKpi('Matrimonios', totalMatrimonios)}
   `;
   const minL=Object.keys(byMin);
   const servL=Object.keys(byServ);
