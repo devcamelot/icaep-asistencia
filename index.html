@@ -1724,6 +1724,24 @@ function setDashRange(){
 const CMIN={'Jovenes':'#378ADD','Caballeros':'#1D9E75','Damas':'#D4537E','Adolescentes':'#9333ea','General':'#888780'};
 const CSERV={'Domingo 1ra':'#0f1f3d','Domingo 2da':'#1a3260','Miercoles':'#c9a84c','Jueves':'#378ADD','Sabado Jovenes':'#1D9E75','Sabado Adolescentes':'#9333ea','Extra':'#888780'};
 
+function getFilteredSantaCena(){
+  const today=new Date();
+  let rows=[...DB.santa_cena];
+  if(dashFrom||dashTo){
+    rows=rows.filter(r=>{const d=new Date(r.fecha+'T12:00:00');return(!dashFrom||d>=new Date(dashFrom))&&(!dashTo||d<=new Date(dashTo));});
+  } else {
+    rows=rows.filter(r=>{
+      const d=new Date(r.fecha+'T12:00:00');
+      if(dashPeriod==='week') return (today-d)/86400000<=7;
+      if(dashPeriod==='month') return d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear();
+      if(dashPeriod==='quarter') return Math.floor(d.getMonth()/3)===Math.floor(today.getMonth()/3)&&d.getFullYear()===today.getFullYear();
+      if(dashPeriod==='year') return d.getFullYear()===today.getFullYear();
+      return true;
+    });
+  }
+  return rows;
+}
+
 function renderDashboard(){
   const rows=getFilteredRows();
   const mmap={};DB.miembros.forEach(m=>mmap[m.id]=m.ministerio);
@@ -1731,10 +1749,16 @@ function renderDashboard(){
   rows.forEach(r=>{
     const min=mmap[r.miembro]||'General';
     byMin[min]=(byMin[min]||0)+1;
-    if(r.cena) byCena[min]=(byCena[min]||0)+1;
     const sk=r.servicio.startsWith('Extra')?'Extra':r.servicio;
     byServ[sk]=(byServ[sk]||0)+1;
     byDate[r.fecha]=(byDate[r.fecha]||0)+1;
+  });
+
+  // Santa Cena: ahora se lee de la hoja SANTA_CENA, filtrada por el mismo período
+  getFilteredSantaCena().forEach(sc=>{
+    if(!sc.asistio || !sc.miembro) return;
+    const min = mmap[sc.miembro] || 'General';
+    byCena[min] = (byCena[min]||0) + 1;
   });
   const totalCena=Object.values(byCena).reduce((a,b)=>a+b,0);
   const fechasUnicas=Object.keys(byDate).length;
