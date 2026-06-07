@@ -390,6 +390,7 @@ tr.egreso-row td{color:var(--danger);}
         <input class="search-box" placeholder="Buscar miembro..." oninput="filterMiembrosTable(this.value)">
         <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Agregar</button>
       </div>
+      <div class="period-tabs" id="miembrosMinFilter" style="margin-bottom:1rem;"></div>
       <div class="card">
         <div class="table-wrap">
           <table>
@@ -1283,8 +1284,12 @@ function renderHistorial(){
     const m=DB.miembros.find(x=>x.id===r.miembro);
     const nombre=m?m.nombre+' '+m.apellido:r.miembro;
     const min=m?m.ministerio:'—';
-    // Cruza con la hoja SANTA_CENA: ¿este miembro tomó cena en esta fecha?
-    const tomoCena = DB.santa_cena.some(sc=>sc.fecha===r.fecha && sc.miembro===r.miembro && sc.asistio);
+   // Cruza con SANTA_CENA por MISMO MES (la cena es mensual) y solo en servicios de Domingo
+    const rowMes = r.fecha.slice(0,7); // "2026-06"
+    const esDomingo = r.servicio.startsWith('Domingo');
+    const tomoCena = esDomingo && DB.santa_cena.some(sc=>
+      sc.miembro===r.miembro && sc.asistio && (sc.fecha||'').slice(0,7)===rowMes
+    );
     return `<tr>
       <td>${formatDate(r.fecha)}</td>
       <td>${nombre}</td>
@@ -1341,13 +1346,39 @@ function exportExcelHistorial(){
 // ============================================================
 let editMemberId = null;
 
+let miembrosMinFilter = '';
+let miembrosSearch = '';
+
+function renderMiembrosMinFilter(){
+  const wrap = document.getElementById('miembrosMinFilter');
+  if(!wrap) return;
+  // Líder solo ve su ministerio, no necesita filtros
+  if(currentUser && currentUser.rol==='Lider'){ wrap.style.display='none'; return; }
+  wrap.style.display = 'flex';
+  const ministerios = [...new Set(DB.miembros.map(m=>m.ministerio))].sort();
+  wrap.innerHTML =
+    `<button class="period-tab ${miembrosMinFilter===''?'active':''}" onclick="setMiembrosMinFilter('',this)">Todos</button>` +
+    ministerios.map(mn=>`<button class="period-tab ${miembrosMinFilter===mn?'active':''}" onclick="setMiembrosMinFilter('${mn}',this)">${mn}</button>`).join('');
+}
+
+function setMiembrosMinFilter(min, btn){
+  miembrosMinFilter = min;
+  document.querySelectorAll('#miembrosMinFilter .period-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMiembrosTable(miembrosSearch);
+}
+
 function renderMiembrosTable(filter=''){
+  miembrosSearch = filter;
   let list = DB.miembros.filter(m =>
     ((m.nombre+' '+m.apellido+' '+(m.cedula||'')).toLowerCase().includes(filter.toLowerCase()))
   );
   if(currentUser && currentUser.rol==='Lider'){
     list = list.filter(m=>m.ministerio===currentUser.ministerio);
+  } else if(miembrosMinFilter){
+    list = list.filter(m=>m.ministerio===miembrosMinFilter);
   }
+  renderMiembrosMinFilter();
   const isAdmin = currentUser && currentUser.rol==='Admin';
   document.getElementById('miembrosBody').innerHTML = list.map(m => {
     const activo = m.activo !== false;
