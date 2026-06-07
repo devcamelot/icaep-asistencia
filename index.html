@@ -156,6 +156,13 @@ tr.ingreso-row td{color:var(--success);}
 tr.egreso-row td{color:var(--danger);}
 .events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1rem;}
 .visitante-badge{font-size:0.62rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;margin-left:4px;}
+#printArea{display:none;}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body>*{display:none!important;}
+  #printArea{display:flex!important;align-items:center;justify-content:center;position:fixed;inset:0;background:#fff;z-index:99999;}
+  @page{size:A4 landscape;margin:0;}
+}
 </style>
 </head>
 <body>
@@ -688,6 +695,32 @@ tr.egreso-row td{color:var(--danger);}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MODAL CERTIFICADO -->
+<div class="modal-overlay" id="modalCertificado">
+  <div class="modal" style="max-width:700px;">
+    <h3>Certificado — <span id="certMiembroNombre" style="color:var(--gold);font-size:0.95rem;font-family:'Lato',sans-serif;font-weight:400;"></span></h3>
+    <div class="form-group" style="margin-bottom:0.8rem;">
+      <label>Tipo de Certificado</label>
+      <select id="certTipo" onchange="previewCertificado()">
+        <option value="bautizo">Bautizo</option>
+      </select>
+    </div>
+    <div style="overflow:hidden;height:352px;background:#d0d0d0;border-radius:8px;display:flex;align-items:flex-start;justify-content:center;padding:12px 0;border:1px solid var(--lightgray);">
+      <div style="transform:scale(0.44);transform-origin:top center;flex-shrink:0;box-shadow:0 8px 32px rgba(0,0,0,0.22);" id="certPreviewInner"></div>
+    </div>
+    <p style="font-size:0.76rem;color:var(--gray);margin-top:6px;text-align:center;">Vista previa — se imprimirá en A4 horizontal</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1;" onclick="printCertificado()">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;vertical-align:middle;margin-right:6px;display:inline-block;"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+        Imprimir / Guardar PDF
+      </button>
+      <button class="btn btn-outline" style="flex:1;" onclick="closeModal('certificado')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"><div id="certPrintContent"></div></div>
 
 <script>
 // ============================================================
@@ -1270,6 +1303,7 @@ function renderMiembrosTable(filter=''){
       <td style="display:flex;gap:6px;flex-wrap:wrap;">
         ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="openEditMember('${m.id}')">Editar</button>`:''}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="confirmDeleteMember('${m.id}')">${activo?'Desactivar':'Activar'}</button>`:''}
+        ${m.bautizado==='SI'&&activo?`<button class="btn btn-sm" style="background:#0F1F3D;color:#c9a84c;border:none;" onclick="openCertificado('${m.id}')">Certificado</button>`:''}
       </td>
     </tr>`;
   }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">Sin miembros</td></tr>';
@@ -2365,6 +2399,82 @@ function deleteCont(id){
     saveDB(); renderContabilidad();
     showToast('Movimiento eliminado','success');
   });
+}
+
+// ============================================================
+// CERTIFICADOS
+// ============================================================
+let certMiembroId = null;
+
+function openCertificado(id){
+  const m = DB.miembros.find(x=>x.id===id);
+  if(!m) return;
+  certMiembroId = id;
+  document.getElementById('certMiembroNombre').textContent = m.nombre+' '+m.apellido;
+  document.getElementById('certTipo').value = 'bautizo';
+  previewCertificado();
+  document.getElementById('modalCertificado').classList.add('open');
+}
+
+function previewCertificado(){
+  const m = DB.miembros.find(x=>x.id===certMiembroId);
+  if(!m) return;
+  document.getElementById('certPreviewInner').innerHTML = getCertHTML(m);
+}
+
+function printCertificado(){
+  const m = DB.miembros.find(x=>x.id===certMiembroId);
+  if(!m) return;
+  document.getElementById('certPrintContent').innerHTML = getCertHTML(m);
+  window.print();
+}
+
+function getCertHTML(m){
+  const nombre = m.nombre+' '+m.apellido;
+  const hoy = new Date();
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr = hoy.getDate()+' de '+meses[hoy.getMonth()]+' de '+hoy.getFullYear();
+  return `<div style="width:297mm;height:210mm;background:#fff;box-sizing:border-box;display:flex;align-items:stretch;font-family:Georgia,serif;">
+  <div style="flex:1;border:6px solid #0F1F3D;margin:5mm;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9mm 14mm;position:relative;">
+    <div style="position:absolute;inset:4px;border:1.5px solid #c9a84c;pointer-events:none;"></div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:5mm;z-index:1;">
+      <img src="logo_iglesia.png" style="height:52px;" onerror="this.style.display='none'">
+      <div>
+        <div style="font-family:'Cinzel',Georgia,serif;font-size:17pt;color:#0F1F3D;font-weight:700;letter-spacing:2.5px;line-height:1.2;">ICAEP CAMELOT</div>
+        <div style="font-size:7pt;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Iglesia Cristiana Apostólica Evangélica</div>
+      </div>
+    </div>
+
+    <div style="width:52%;height:1.5px;background:#c9a84c;margin-bottom:5mm;"></div>
+
+    <div style="font-family:'Cinzel',Georgia,serif;font-size:18pt;color:#0F1F3D;letter-spacing:4px;text-transform:uppercase;margin-bottom:5mm;text-align:center;">Certificado de Bautismo</div>
+
+    <div style="font-size:11pt;color:#333;text-align:center;line-height:2;margin-bottom:1mm;">Este documento certifica que</div>
+    <div style="font-family:'Cinzel',Georgia,serif;font-size:17pt;color:#0F1F3D;font-weight:700;padding:1mm 20mm;border-bottom:1.5px solid #c9a84c;margin-bottom:4mm;text-align:center;">${nombre}</div>
+    <div style="font-size:11pt;color:#333;text-align:center;line-height:2;margin-bottom:5mm;">en obediencia a Dios y a su Palabra ha recibido el bautismo.</div>
+
+    <div style="font-size:8pt;color:#555;font-style:italic;max-width:80%;line-height:1.75;margin-bottom:6mm;padding:6px 14px;border-left:3px solid #c9a84c;background:#fdf8ee;">
+      "Por tanto, id, y haced discípulos a todas las naciones, bautizándolos en el nombre del Padre, y del Hijo, y del Espíritu Santo; enseñándoles que guarden todas las cosas que os he mandado; y he aquí yo estoy con vosotros todos los días, hasta el fin del mundo."
+      <span style="font-style:normal;font-weight:700;"> Mateo 28:19-20</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-around;width:88%;">
+      <div style="text-align:center;">
+        <div style="height:24px;"></div>
+        <div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Pastor</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:9.5pt;color:#0F1F3D;margin-bottom:3px;font-weight:600;">${fechaStr}</div>
+        <div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Fecha</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="height:24px;"></div>
+        <div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Sello de la Iglesia</div>
+      </div>
+    </div>
+  </div>
+</div>`;
 }
 </script>
 </body>
