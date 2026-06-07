@@ -840,6 +840,17 @@ async function apiAdd(sheet, row){
   } catch(e){ console.warn('Error guardando en Sheets:', e); }
 }
 
+// Guarda VARIAS filas en una sola petición (evita pérdida de registros)
+async function apiAddBatch(sheet, rows){
+  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI' || !rows || rows.length === 0) return;
+  try {
+    await fetch(API_URL, {
+      method:'POST',
+      body: JSON.stringify({action:'addRows', sheet, rows})
+    });
+  } catch(e){ console.warn('Error guardando batch en Sheets:', e); }
+}
+
 // Actualiza UNA fila en Sheets por ID
 async function apiUpdate(sheet, id, data){
   if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI') return;
@@ -1162,22 +1173,18 @@ async function guardarAsistencia(){
   const servNombre = selectedService==='Extra'
     ? 'Extra: '+document.getElementById('extraNombre').value.trim()
     : selectedService;
-  let nuevos=0;
-  const promises=[];
+   let nuevos=0;
+  const rowsToSave=[];
   presentMembers.forEach(mid=>{
     if(!already.has(mid)){
       const id='r'+Date.now()+Math.random().toString(36).slice(2);
-      const row={id, fecha, miembro:mid, servicio:servNombre, cena};
-      DB.asistencia.push(row);
-      promises.push(apiAdd('ASISTENCIA',{
-        ID:id, Fecha:fecha, ID_Miembro:mid,
-        Servicio:servNombre, Tomo_Santa_Cena:cena
-      }));
+      DB.asistencia.push({id, fecha, miembro:mid, servicio:servNombre, cena});
+      rowsToSave.push({ID:id, Fecha:fecha, ID_Miembro:mid, Servicio:servNombre, Tomo_Santa_Cena:cena});
       nuevos++;
     }
   });
   showLoader('Guardando asistencia...');
-  await Promise.all(promises);
+  await apiAddBatch('ASISTENCIA', rowsToSave);
   hideLoader();
   addLog('asistencia',`${currentUser.nombre} registró ${nuevos} asistencias — ${servNombre} — ${fecha}`,'success');
   saveDB();
@@ -1969,13 +1976,13 @@ async function guardarSantaCena(){
   });
   if(nuevos.length === 0){ showToast('Sin registros nuevos para guardar','error'); return; }
   showLoader('Guardando Santa Cena...');
-  const promises = nuevos.map(mid => {
+ const rowsToSave = nuevos.map(mid => {
     const id = 'sc' + Date.now() + Math.random().toString(36).slice(2);
-    const entry = { id, fecha, miembro:mid, nombre_visitante:'', asistio:true, registrado_por:currentUser.nombre, ts:new Date().toISOString() };
-    DB.santa_cena.push(entry);
-    return apiAdd('SANTA_CENA', { ID:id, Fecha:fecha, ID_Miembro:mid, Nombre_Visitante:'', Asistio:true, Registrado_Por:currentUser.nombre, Timestamp:entry.ts });
+    const ts = new Date().toISOString();
+    DB.santa_cena.push({ id, fecha, miembro:mid, nombre_visitante:'', asistio:true, registrado_por:currentUser.nombre, ts });
+    return { ID:id, Fecha:fecha, ID_Miembro:mid, Nombre_Visitante:'', Asistio:true, Registrado_Por:currentUser.nombre, Timestamp:ts };
   });
-  await Promise.all(promises);
+  await apiAddBatch('SANTA_CENA', rowsToSave);
   hideLoader();
   addLog('asistencia',`${currentUser.nombre} registró Santa Cena: ${nuevos.length} personas — ${fecha}`,'success');
   saveDB();
