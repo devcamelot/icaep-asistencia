@@ -147,6 +147,13 @@ tr:hover td{background:#fafaf7;}
 .member-card.cena-no{border-color:var(--danger)!important;background:#fef2f2!important;}
 .member-card.cena-lock{opacity:0.85;cursor:default;}
 .visitor-form{background:#f7f3ec;border:1.5px solid var(--gold);border-radius:var(--radius);padding:1rem;margin-top:0.6rem;}
+.vc-card{border:2px solid var(--lightgray);border-radius:var(--radius);padding:12px;text-align:center;background:var(--white);}
+.vc-card .vc-min{font-size:0.8rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.vc-controls{display:flex;align-items:center;justify-content:center;gap:12px;}
+.vc-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--navy);background:var(--white);color:var(--navy);font-size:1.2rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.vc-btn:hover{background:var(--navy);color:var(--gold);}
+.vc-count{font-size:1.4rem;font-weight:700;color:var(--navy);min-width:32px;}
+.vc-card.has-count{border-color:var(--gold);background:#fdf8ee;}
 .fin-card{background:var(--navy);border-radius:var(--radius);padding:1.1rem;color:var(--white);}
 .fin-card .label{font-size:0.72rem;color:var(--gold2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
 .fin-card .value{font-size:1.8rem;font-weight:700;line-height:1;}
@@ -282,7 +289,7 @@ tr.egreso-row td{color:var(--danger);}
         <div class="members-grid" id="membersGrid"></div>
         <div id="duplicateWarn" style="display:none;background:#fffbeb;border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:0.85rem;color:#92400e;"></div>
 
-        <!-- VISITANTES -->
+        <!-- VISITANTES 
         <div style="margin-top:1.4rem;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
             <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);">
@@ -307,6 +314,15 @@ tr.egreso-row td{color:var(--danger);}
             </div>
           </div>
           <div id="visitantesList"></div>
+        </div>-->
+
+        <!-- VISITANTES (contador por ministerio) -->
+        <div style="margin-top:1.4rem;">
+          <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:0.6rem;">
+            Visitantes por Ministerio <span id="visitantesLabel" style="color:var(--gold);"></span>
+          </label>
+          <div id="visitorCounters" class="events-grid"></div>
+          <div id="visitantesList" style="margin-top:0.6rem;"></div>
         </div>
 
         <div style="margin-top:1.2rem;display:flex;gap:10px;flex-wrap:wrap;">
@@ -959,7 +975,7 @@ function initApp(){
   renderServiceButtons();
   renderMinFilterButtons();
   renderMembersGrid();
-  renderVisitantesList();
+  renderVisitorCounters();
   renderMiembrosTable();
   renderHistorial();
   renderUsuariosTable();
@@ -1185,6 +1201,23 @@ async function guardarAsistencia(){
   });
   showLoader('Guardando asistencia...');
   await apiAddBatch('ASISTENCIA', rowsToSave);
+
+  // Guardar visitantes anónimos por ministerio (una fila por visitante)
+  const visRows = [];
+  Object.keys(visitorCounts).forEach(min=>{
+    const cantidad = visitorCounts[min] || 0;
+    for(let i=0;i<cantidad;i++){
+      const vid = 'v'+Date.now()+Math.random().toString(36).slice(2);
+      DB.visitantes.push({id:vid, fecha, nombre:'', apellido:'', ministerio:min, servicio:servNombre, registrado_por:currentUser.nombre});
+      visRows.push({ID:vid, Fecha:fecha, Nombre:'', Apellido:'', Ministerio:min, Servicio:servNombre, Registrado_Por:currentUser.nombre});
+    }
+  });
+  if(visRows.length>0){
+    await apiAddBatch('VISITANTES', visRows);
+    addLog('asistencia',`${currentUser.nombre} registró ${visRows.length} visitantes — ${servNombre} — ${fecha}`,'info');
+  }
+  visitorCounts = {};
+  renderVisitorCounters();
   hideLoader();
   addLog('asistencia',`${currentUser.nombre} registró ${nuevos} asistencias — ${servNombre} — ${fecha}`,'success');
   saveDB();
@@ -1215,17 +1248,24 @@ function renderHistorial(){
   if(filtBaut)    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.bautizado===filtBaut;});
   if(filtMiembro) rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);if(!m)return false;return(m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').toLowerCase().includes(filtMiembro);});
 
-  // Filas de visitantes
-  let visRows = [...DB.visitantes].map(v=>({
-    esVisitante:true, fecha:v.fecha, nombre:v.nombre+' '+v.apellido,
-    ministerio:v.ministerio, servicio:v.servicio, id:v.id
+// Filas de visitantes (anónimos, agrupados por ministerio + servicio + fecha)
+  const visGrupos = {};
+  DB.visitantes.forEach(v=>{
+    const key = v.fecha+'|'+v.servicio+'|'+v.ministerio;
+    if(!visGrupos[key]) visGrupos[key] = { fecha:v.fecha, servicio:v.servicio, ministerio:v.ministerio, count:0 };
+    visGrupos[key].count++;
+  });
+  let visRows = Object.values(visGrupos).map(g=>({
+    esVisitante:true, fecha:g.fecha,
+    nombre:`Visitantes (${g.count})`,
+    ministerio:g.ministerio, servicio:g.servicio
   }));
   if(currentUser && currentUser.rol==='Lider') visRows=visRows.filter(r=>r.ministerio===currentUser.ministerio);
   if(filtFecha)   visRows=visRows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    visRows=visRows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     visRows=visRows.filter(r=>r.ministerio===filtMin);
   if(filtBaut)    visRows=[]; // visitantes no tienen dato de bautismo
-  if(filtMiembro) visRows=visRows.filter(r=>r.nombre.toLowerCase().includes(filtMiembro));
+  if(filtMiembro) visRows=[]; // visitantes anónimos no se buscan por nombre/cédula
 
   const allRows = [...rows, ...visRows].sort((a,b)=>b.fecha.localeCompare(a.fecha));
 
@@ -1790,64 +1830,52 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 });
 
 // ============================================================
-// VISITANTES
+// VISITANTES (contador por ministerio)
 // ============================================================
-function toggleVisitorForm(){
-  const f = document.getElementById('visitorForm');
-  const open = f.style.display === 'none' || f.style.display === '';
-  f.style.display = open ? 'block' : 'none';
-  if(open){
-    document.getElementById('visNombre').value = '';
-    document.getElementById('visApellido').value = '';
-    document.getElementById('visNombre').focus();
+let visitorCounts = {}; // { Jovenes: 3, Damas: 5, ... }
+
+const VISITOR_MINISTERIOS = ['Jovenes','Caballeros','Damas','Adolescentes','General'];
+
+function renderVisitorCounters(){
+  const cont = document.getElementById('visitorCounters');
+  if(!cont) return;
+  // Si es líder, solo su ministerio
+  let mins = VISITOR_MINISTERIOS;
+  if(currentUser && currentUser.rol === 'Lider'){
+    mins = [currentUser.ministerio];
   }
+  cont.innerHTML = mins.map(m=>{
+    const n = visitorCounts[m] || 0;
+    return `<div class="vc-card ${n>0?'has-count':''}" id="vc-${m}">
+      <div class="vc-min">${m}</div>
+      <div class="vc-controls">
+        <button class="vc-btn" onclick="changeVisitor('${m}',-1)">−</button>
+        <span class="vc-count" id="vc-count-${m}">${n}</span>
+        <button class="vc-btn" onclick="changeVisitor('${m}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateVisitorLabel();
 }
 
-async function guardarVisitante(){
-  const nombre   = toTitleCaseName(document.getElementById('visNombre').value);
-  const apellido = toTitleCaseName(document.getElementById('visApellido').value);
-  const ministerio = document.getElementById('visMinisterio').value;
-  if(!nombre || !apellido){ showToast('Nombre y apellido requeridos','error'); return; }
-  const fecha = document.getElementById('servFecha').value;
-  if(!fecha){ showToast('Selecciona una fecha de servicio','error'); return; }
-  const servicio = selectedService === 'Extra'
-    ? 'Extra: ' + (document.getElementById('extraNombre').value.trim() || '')
-    : selectedService;
-  const id = 'v' + Date.now() + Math.random().toString(36).slice(2);
-  const vis = { id, fecha, nombre, apellido, ministerio, servicio, registrado_por: currentUser.nombre };
-  showLoader('Registrando visitante...');
-  DB.visitantes.push(vis);
-  await apiAdd('VISITANTES', { ID:id, Fecha:fecha, Nombre:nombre, Apellido:apellido, Ministerio:ministerio, Servicio:servicio, Registrado_Por:currentUser.nombre });
-  hideLoader();
-  addLog('asistencia',`${currentUser.nombre} registró visitante: ${nombre} ${apellido} (${servicio})`,'info');
-  saveDB();
-  toggleVisitorForm();
-  renderVisitantesList();
-  showToast(`✓ Visitante ${nombre} ${apellido} registrado`,'success');
+function changeVisitor(min, delta){
+  visitorCounts[min] = Math.max(0, (visitorCounts[min]||0) + delta);
+  const countEl = document.getElementById('vc-count-'+min);
+  const card = document.getElementById('vc-'+min);
+  if(countEl) countEl.textContent = visitorCounts[min];
+  if(card) card.classList.toggle('has-count', visitorCounts[min] > 0);
+  updateVisitorLabel();
 }
 
-function renderVisitantesList(){
-  const fecha = document.getElementById('servFecha')?.value || '';
-  const servicio = selectedService === 'Extra'
-    ? 'Extra: ' + (document.getElementById('extraNombre')?.value?.trim() || '')
-    : selectedService;
-  const list = DB.visitantes.filter(v => v.fecha === fecha && v.servicio === servicio);
+function updateVisitorLabel(){
+  const total = Object.values(visitorCounts).reduce((a,b)=>a+b,0);
   const lbl = document.getElementById('visitantesLabel');
-  if(lbl) lbl.textContent = list.length > 0 ? `(${list.length})` : '';
-  const container = document.getElementById('visitantesList');
-  if(!container) return;
-  container.innerHTML = list.length > 0
-    ? `<div class="members-grid" style="margin-top:0.6rem;">${list.map(v=>`
-        <div class="member-card present">
-          <div class="member-avatar">${v.nombre[0]}${v.apellido[0]||''}</div>
-          <div class="member-info">
-            <div class="mname">${v.nombre} ${v.apellido}</div>
-            <div class="mmin">${v.ministerio} · Visitante</div>
-          </div>
-          <div class="check" style="background:var(--gold);border-color:var(--gold);"></div>
-        </div>`).join('')}</div>`
-    : '';
+  if(lbl) lbl.textContent = total > 0 ? `(${total} en total)` : '';
 }
+
+// Compatibilidad: estas se llaman en otros lados, las dejamos vacías/redirigidas
+function renderVisitantesList(){ renderVisitorCounters(); }
+function toggleVisitorForm(){ /* ya no se usa */ }
 
 // ============================================================
 // SANTA CENA
