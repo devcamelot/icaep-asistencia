@@ -1283,12 +1283,14 @@ function renderHistorial(){
     const m=DB.miembros.find(x=>x.id===r.miembro);
     const nombre=m?m.nombre+' '+m.apellido:r.miembro;
     const min=m?m.ministerio:'—';
+    // Cruza con la hoja SANTA_CENA: ¿este miembro tomó cena en esta fecha?
+    const tomoCena = DB.santa_cena.some(sc=>sc.fecha===r.fecha && sc.miembro===r.miembro && sc.asistio);
     return `<tr>
       <td>${formatDate(r.fecha)}</td>
       <td>${nombre}</td>
       <td><span class="badge badge-${min.toLowerCase()}">${min}</span></td>
       <td>${r.servicio}</td>
-      <td><span class="badge badge-${r.cena}">${r.cena?'Sí':'No'}</span></td>
+      <td><span class="badge badge-${tomoCena}">${tomoCena?'Sí':'No'}</span></td>
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
   document.getElementById('historialTotal').textContent = `Total: ${allRows.length} registro${allRows.length!==1?'s':''}`;
