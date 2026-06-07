@@ -720,7 +720,16 @@ tr.egreso-row td{color:var(--danger);}
   </div>
 </div>
 
-<div id="printArea"><div id="certPrintContent"></div></div>
+<div id="printArea">
+  <svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+    <defs>
+      <filter id="certNavyFilter">
+        <feColorMatrix type="matrix" values="0 0 0 0 0.0588  0 0 0 0 0.1216  0 0 0 0 0.2392  0 0 0 1 0"/>
+      </filter>
+    </defs>
+  </svg>
+  <div id="certPrintContent"></div>
+</div>
 
 <script>
 // ============================================================
@@ -2439,7 +2448,7 @@ function getCertHTML(m){
     <div style="position:absolute;inset:4px;border:1.5px solid #c9a84c;pointer-events:none;"></div>
 
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:5mm;z-index:1;">
-      <img src="logo_iglesia.png" style="height:52px;" onerror="this.style.display='none'">
+      <img src="logo_iglesia.png" style="height:52px;filter:url(#certNavyFilter);" onerror="this.style.display='none'">
       <div>
         <div style="font-family:'Cinzel',Georgia,serif;font-size:17pt;color:#0F1F3D;font-weight:700;letter-spacing:2.5px;line-height:1.2;">ICAEP CAMELOT</div>
         <div style="font-size:7pt;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Iglesia Cristiana Apostólica Evangélica</div>
