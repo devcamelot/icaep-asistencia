@@ -51,12 +51,13 @@ body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--navy);min
 .error-msg{color:var(--danger);font-size:0.85rem;margin-top:8px;text-align:center;}
 #appShell{display:none;min-height:100vh;flex-direction:column;}
 header{background:var(--navy);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
-.header-title{font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;letter-spacing:1px;}
+.header-title{font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;letter-spacing:1px;display:flex;align-items:center;gap:8px;}
+.header-title img{height:40px;}
 .header-user{color:var(--cream);font-size:0.8rem;display:flex;align-items:center;gap:10px;}
-.header-user span{opacity:0.8;}
-.header-user button{background:transparent;border:1px solid rgba(201,168,76,0.4);color:var(--gold);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.75rem;}
-nav{background:var(--white);border-bottom:1px solid var(--lightgray);display:flex;overflow-x:auto;padding:0 1rem;}
-nav button{padding:14px 16px;border:none;background:transparent;color:var(--gray);font-family:'Lato',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.8px;}
+.header-user span{opacity:0.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+.header-user button{background:transparent;border:1px solid rgba(201,168,76,0.4);color:var(--gold);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.75rem;white-space:nowrap;}
+nav{background:var(--white);border-bottom:1px solid var(--lightgray);display:flex;overflow-x:auto;padding:0 1rem;-webkit-overflow-scrolling:touch;}
+nav button{padding:14px 14px;border:none;background:transparent;color:var(--gray);font-family:'Lato',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.8px;flex-shrink:0;}
 nav button.active{color:var(--navy);border-bottom-color:var(--gold);}
 nav button:hover{color:var(--navy);}
 main{flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%;}
@@ -67,26 +68,35 @@ main{flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%;}
 .section-header h2{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--navy);}
 .section-header p{color:var(--gray);font-size:0.9rem;margin-top:4px;}
 .card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(201,168,76,0.15);}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:1.5rem;}
 .stat-card{background:var(--navy);border-radius:var(--radius);padding:1.1rem;color:var(--white);}
 .stat-card .label{font-size:0.72rem;color:var(--gold2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
 .stat-card .value{font-size:2rem;font-weight:700;line-height:1;}
 .stat-card .sub{font-size:0.75rem;color:rgba(255,255,255,0.6);margin-top:4px;}
-.service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:1.2rem;}
+.service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:1.2rem;}
 .service-btn{padding:12px 8px;border:2px solid var(--lightgray);border-radius:var(--radius);background:var(--white);cursor:pointer;text-align:center;font-family:'Lato',sans-serif;transition:all 0.2s;}
 .service-btn .day{font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--gray);}
 .service-btn .name{font-size:0.88rem;font-weight:700;color:var(--navy);margin-top:3px;}
 .service-btn.selected{border-color:var(--gold);background:#fdf8ee;}
+
+/* ── MEMBER CARDS – fully responsive ── */
 .members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:1rem 0;}
-.member-card{border:2px solid var(--lightgray);border-radius:var(--radius);padding:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:10px;}
+.member-card{border:2px solid var(--lightgray);border-radius:var(--radius);padding:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:flex-start;gap:8px;min-width:0;}
 .member-card:hover{border-color:var(--gold);}
 .member-card.present{border-color:var(--success);background:#f0fdf4;}
 .member-card.already{border-color:var(--warn);background:#fffbeb;opacity:0.7;cursor:not-allowed;}
-.member-avatar{width:34px;height:34px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0;}
-.member-info .mname{font-size:0.83rem;font-weight:700;color:var(--navy);}
-.member-info .mmin{font-size:0.7rem;color:var(--gray);}
-.check{width:18px;height:18px;border-radius:50%;border:2px solid var(--lightgray);margin-left:auto;flex-shrink:0;transition:all 0.2s;}
+.member-avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:2px;}
+.member-info{flex:1;min-width:0;overflow:hidden;}
+.member-info .mname{font-size:0.82rem;font-weight:700;color:var(--navy);word-break:break-word;line-height:1.3;white-space:normal;}
+.member-info .mmin{font-size:0.7rem;color:var(--gray);margin-top:2px;}
+.check{width:16px;height:16px;border-radius:50%;border:2px solid var(--lightgray);margin-left:auto;flex-shrink:0;transition:all 0.2s;margin-top:2px;}
 .member-card.present .check{background:var(--success);border-color:var(--success);}
+
+/* Santa Cena cards – same responsive fix */
+.member-card.cena-si{border-color:var(--success)!important;background:#f0fdf4!important;}
+.member-card.cena-no{border-color:var(--danger)!important;background:#fef2f2!important;}
+.member-card.cena-lock{opacity:0.85;cursor:default;}
+
 .cena-toggle{display:flex;align-items:center;gap:10px;background:#fdf8ee;border:1px solid var(--gold);border-radius:var(--radius);padding:10px 14px;margin-bottom:1rem;font-size:0.88rem;color:var(--navy);}
 .toggle-sw{position:relative;width:40px;height:22px;flex-shrink:0;}
 .toggle-sw input{opacity:0;width:0;height:0;}
@@ -94,39 +104,40 @@ main{flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%;}
 .slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:0.3s;}
 input:checked+.slider{background:var(--gold);}
 input:checked+.slider:before{transform:translateX(18px);}
-.table-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:0.87rem;}
-th{background:var(--navy);color:var(--gold);padding:10px 12px;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;}
-td{padding:10px 12px;border-bottom:1px solid var(--lightgray);color:var(--navy);}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:0.87rem;min-width:500px;}
+th{background:var(--navy);color:var(--gold);padding:10px 12px;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid var(--lightgray);color:var(--navy);vertical-align:middle;}
 tr:hover td{background:#fafaf7;}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.71rem;font-weight:700;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.71rem;font-weight:700;white-space:nowrap;}
 .badge-jovenes{background:#dbeafe;color:#1e40af;}
 .badge-caballeros{background:#dcfce7;color:#166534;}
 .badge-damas{background:#fce7f3;color:#9d174d;}
 .badge-adolescentes{background:#f3e8ff;color:#6b21a8;}
-.badge-general{background:var(--lightgray);color:var(--gray);}
+.badge-general,.badge-biblia,.badge-niños,.badge-intermedio{background:var(--lightgray);color:var(--gray);}
 .badge-si,.badge-true{background:#dcfce7;color:#166534;}
 .badge-no,.badge-false{background:#fee2e2;color:#991b1b;}
 .badge-admin{background:#fef3c7;color:#92400e;}
 .badge-lider{background:#e0f2fe;color:#075985;}
-.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
 .chart-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(201,168,76,0.15);}
 .chart-card h3{font-family:'Cinzel',serif;font-size:0.92rem;color:var(--navy);margin-bottom:1rem;}
 .period-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem;}
 .period-tab{padding:6px 14px;border:1.5px solid var(--lightgray);border-radius:20px;background:transparent;font-family:'Lato',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;color:var(--gray);}
 .period-tab.active{background:var(--navy);color:var(--gold);border-color:var(--navy);}
 .date-range{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem;}
-.date-range label{font-size:0.8rem;color:var(--gray);}
-.date-range input{padding:6px 10px;border:1.5px solid var(--lightgray);border-radius:8px;font-size:0.8rem;color:var(--navy);}
+.date-range label{font-size:0.8rem;color:var(--gray);white-space:nowrap;}
+.date-range input{padding:6px 10px;border:1.5px solid var(--lightgray);border-radius:8px;font-size:0.8rem;color:var(--navy);max-width:150px;}
 .search-box{padding:8px 14px;border:1.5px solid var(--lightgray);border-radius:8px;font-size:0.88rem;font-family:'Lato',sans-serif;}
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:10px;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,31,61,0.6);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,31,61,0.6);z-index:200;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--white);border-radius:14px;padding:2rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto;}
+.modal{background:var(--white);border-radius:14px;padding:2rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto;margin:auto;}
 .modal h3{font-family:'Cinzel',serif;font-size:1.1rem;margin-bottom:1.2rem;color:var(--navy);}
-.modal-actions{display:flex;gap:10px;margin-top:1.2rem;}
+.modal-actions{display:flex;gap:10px;margin-top:1.2rem;flex-wrap:wrap;}
+.modal-actions .btn{flex:1;min-width:120px;}
 #modalChart .modal{max-width:980px;width:95vw;padding:1.25rem;}
-#modalChartBody{height:68vh;min-height:360px;}
+#modalChartBody{height:68vh;min-height:300px;}
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);color:var(--white);padding:12px 20px;border-radius:10px;font-size:0.9rem;z-index:300;transform:translateY(100px);opacity:0;transition:all 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.2);max-width:320px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.success{border-left:4px solid var(--gold);}
@@ -137,15 +148,10 @@ tr:hover td{background:#fafaf7;}
 .log-dot.success{background:var(--success);}
 .log-dot.warn{background:var(--warn);}
 .log-dot.error{background:var(--danger);}
-.already-badge{font-size:0.65rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;margin-left:4px;}
-@media(max-width:600px){main{padding:1rem;}.members-grid{grid-template-columns:repeat(2,1fr);}}
-/* ---- Nuevos estilos ---- */
+.already-badge{font-size:0.65rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;margin-left:4px;display:inline-block;}
 .sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;}
 .sub-tab{padding:8px 18px;border:1.5px solid var(--lightgray);border-radius:8px;background:transparent;font-family:'Lato',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;color:var(--gray);}
 .sub-tab.active{background:var(--navy);color:var(--gold);border-color:var(--navy);}
-.member-card.cena-si{border-color:var(--success)!important;background:#f0fdf4!important;}
-.member-card.cena-no{border-color:var(--danger)!important;background:#fef2f2!important;}
-.member-card.cena-lock{opacity:0.85;cursor:default;}
 .visitor-form{background:#f7f3ec;border:1.5px solid var(--gold);border-radius:var(--radius);padding:1rem;margin-top:0.6rem;}
 .vc-card{border:2px solid var(--lightgray);border-radius:var(--radius);padding:12px;text-align:center;background:var(--white);}
 .vc-card .vc-min{font-size:0.8rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
@@ -156,13 +162,33 @@ tr:hover td{background:#fafaf7;}
 .vc-card.has-count{border-color:var(--gold);background:#fdf8ee;}
 .fin-card{background:var(--navy);border-radius:var(--radius);padding:1.1rem;color:var(--white);}
 .fin-card .label{font-size:0.72rem;color:var(--gold2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.fin-card .value{font-size:1.8rem;font-weight:700;line-height:1;}
+.fin-card .value{font-size:1.6rem;font-weight:700;line-height:1;word-break:break-all;}
 .badge-ingreso{background:#dcfce7;color:#166534;}
 .badge-egreso{background:#fee2e2;color:#991b1b;}
-tr.ingreso-row td{color:var(--success);}
-tr.egreso-row td{color:var(--danger);}
 .events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1rem;}
 .visitante-badge{font-size:0.62rem;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;margin-left:4px;}
+
+/* ── Contabilidad – libro 3 columnas ── */
+.libro-table{width:100%;border-collapse:collapse;font-size:0.84rem;min-width:640px;}
+.libro-table th{background:var(--navy);color:var(--gold);padding:9px 10px;text-align:right;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+.libro-table th:first-child,.libro-table th:nth-child(2),.libro-table th:nth-child(3){text-align:left;}
+.libro-table td{padding:8px 10px;border-bottom:1px solid var(--lightgray);color:var(--navy);vertical-align:middle;}
+.libro-table td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+.libro-table td.saldo-col{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;}
+.libro-table tr:hover td{background:#fafaf7;}
+.libro-table tr.anulado td{opacity:0.5;text-decoration:line-through;}
+.libro-table tr.saldo-inicial td{background:#fdf8ee;}
+.libro-table tfoot td{background:var(--navy);color:var(--gold);font-weight:700;padding:10px;text-align:right;font-variant-numeric:tabular-nums;}
+.libro-table tfoot td:first-child,.libro-table tfoot td:nth-child(2),.libro-table tfoot td:nth-child(3){text-align:left;}
+.saldo-pos{color:var(--success);}
+.saldo-neg{color:var(--danger);}
+.badge-anulado{background:#fee2e2;color:#991b1b;font-size:0.65rem;padding:2px 6px;border-radius:4px;margin-left:4px;}
+
+/* ── Min filter con "sin asistencia" ── */
+.min-filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:0.8rem;}
+.period-tab.sin-asist{border-color:var(--warn);color:var(--warn);}
+.period-tab.sin-asist.active{background:var(--warn);color:var(--white);border-color:var(--warn);}
+
 #printArea{display:none;}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
@@ -170,6 +196,39 @@ tr.egreso-row td{color:var(--danger);}
   #printArea{display:flex!important;align-items:center;justify-content:center;position:fixed;inset:0;background:#fff;z-index:99999;}
   @page{size:A4 landscape;margin:0;}
 }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  main{padding:1rem 0.75rem;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:0.75rem;}
+  .stat-card .value{font-size:1.6rem;}
+  .charts-grid{grid-template-columns:1fr;}
+  .service-grid{grid-template-columns:repeat(2,1fr);}
+  .members-grid{grid-template-columns:repeat(2,1fr);}
+  .events-grid{grid-template-columns:1fr 1fr;}
+  .date-range{flex-direction:column;align-items:flex-start;}
+  .date-range input{max-width:100%;width:100%;}
+  .toolbar{flex-direction:column;align-items:stretch;}
+  .toolbar .search-box{width:100%;}
+  .modal{padding:1.25rem;}
+  .section-head-row{flex-direction:column;}
+  header{padding:0 1rem;}
+  .header-title span{display:none;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .members-grid{grid-template-columns:repeat(2,1fr);}
+  .service-grid{grid-template-columns:repeat(2,1fr);}
+  .events-grid{grid-template-columns:1fr;}
+  .modal-actions{flex-direction:column;}
+  .modal-actions .btn{min-width:unset;}
+  .member-avatar{width:28px;height:28px;font-size:0.7rem;}
+  .member-info .mname{font-size:0.78rem;}
+  table{font-size:0.78rem;}
+  th,td{padding:7px 8px;}
+  nav button{padding:12px 10px;font-size:0.75rem;}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -189,12 +248,8 @@ tr.egreso-row td{color:var(--danger);}
       <label>Contraseña</label>
       <div class="password-wrap">
         <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
-        <button type="button" class="pass-eye-btn" id="toggleLoginPassBtn" onclick="toggleLoginPassword()" aria-label="Mostrar contraseña" title="Mostrar contraseña">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path id="eyeTopPath" d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path>
-            <circle id="eyePupil" cx="12" cy="12" r="3"></circle>
-            <path id="eyeSlash" d="M4 20L20 4" style="display:none"></path>
-          </svg>
+        <button type="button" class="pass-eye-btn" id="toggleLoginPassBtn" onclick="toggleLoginPassword()" aria-label="Mostrar contraseña">
+          <svg viewBox="0 0 24 24"><path id="eyeTopPath" d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path><circle id="eyePupil" cx="12" cy="12" r="3"></circle><path id="eyeSlash" d="M4 20L20 4" style="display:none"></path></svg>
         </button>
       </div>
     </div>
@@ -205,7 +260,10 @@ tr.egreso-row td{color:var(--danger);}
 
 <div id="appShell">
   <header>
-    <span class="header-title"><img src="logo_iglesia.png" alt="ICAEP" style="height:50px;vertical-align:middle;margin-right:8px;filter:brightness(0) invert(1);"> ICAEP Camelot</span>
+    <span class="header-title">
+      <img src="logo_iglesia.png" alt="ICAEP" style="height:40px;filter:brightness(0) invert(1);">
+      <span>ICAEP Camelot</span>
+    </span>
     <div class="header-user">
       <span id="headerUsername"></span>
       <button onclick="doLogout()">Salir</button>
@@ -228,8 +286,8 @@ tr.egreso-row td{color:var(--danger);}
     <div id="sec-dashboard" class="section active">
       <div class="section-header section-head-row">
         <div><h2>Dashboard</h2><p>Resumen general de asistencia</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('dashboard')" title="Refrescar datos" aria-label="Refrescar datos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('dashboard')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
         </button>
       </div>
       <div class="period-tabs">
@@ -245,10 +303,10 @@ tr.egreso-row td{color:var(--danger);}
       </div>
       <div class="stats-grid" id="statsGrid"></div>
       <div class="charts-grid">
-        <div class="chart-card"><h3>Asistencia por Ministerio</h3><div style="position:relative;height:240px;"><canvas id="chartMin"></canvas></div></div>
-        <div class="chart-card"><h3>Santa Cena por Ministerio</h3><div style="position:relative;height:240px;"><canvas id="chartCena"></canvas></div></div>
-        <div class="chart-card"><h3>Asistencia por Servicio</h3><div style="position:relative;height:240px;"><canvas id="chartServ"></canvas></div></div>
-        <div class="chart-card"><h3>Tendencia de Asistencia</h3><div style="position:relative;height:240px;"><canvas id="chartTrend"></canvas></div></div>
+        <div class="chart-card"><h3>Asistencia por Ministerio</h3><div style="position:relative;height:220px;"><canvas id="chartMin"></canvas></div></div>
+        <div class="chart-card"><h3>Santa Cena por Ministerio</h3><div style="position:relative;height:220px;"><canvas id="chartCena"></canvas></div></div>
+        <div class="chart-card"><h3>Asistencia por Servicio</h3><div style="position:relative;height:220px;"><canvas id="chartServ"></canvas></div></div>
+        <div class="chart-card"><h3>Tendencia de Asistencia</h3><div style="position:relative;height:220px;"><canvas id="chartTrend"></canvas></div></div>
       </div>
       <div style="text-align:right">
         <button class="btn btn-gold" onclick="exportExcel()">Exportar Excel</button>
@@ -275,7 +333,7 @@ tr.egreso-row td{color:var(--danger);}
 
         <div id="minFilterWrap" style="display:none;margin-bottom:1rem;">
           <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Filtrar por Ministerio</label>
-          <div id="minFilterBtns" class="period-tabs"></div>
+          <div id="minFilterBtns" class="min-filter-row"></div>
         </div>
 
         <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">
@@ -284,37 +342,10 @@ tr.egreso-row td{color:var(--danger);}
         <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
           <button class="btn btn-sm btn-outline" onclick="selectAll(true)">Todos</button>
           <button class="btn btn-sm btn-outline" onclick="selectAll(false)">Ninguno</button>
-          <input class="search-box" style="width:180px;padding:6px 12px;font-size:0.85rem;" placeholder="Buscar..." oninput="filterMembersGrid(this.value)">
+          <input class="search-box" style="flex:1;min-width:140px;max-width:220px;padding:6px 12px;font-size:0.85rem;" placeholder="Buscar..." oninput="filterMembersGrid(this.value)">
         </div>
         <div class="members-grid" id="membersGrid"></div>
         <div id="duplicateWarn" style="display:none;background:#fffbeb;border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:0.85rem;color:#92400e;"></div>
-
-        <!-- VISITANTES 
-        <div style="margin-top:1.4rem;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-            <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);">
-              Visitantes <span id="visitantesLabel" style="color:var(--gold);"></span>
-            </label>
-            <button class="btn btn-sm btn-outline" onclick="toggleVisitorForm()">+ Visitante</button>
-          </div>
-          <div id="visitorForm" class="visitor-form" style="display:none;">
-            <div class="events-grid">
-              <div class="form-group" style="margin:0;"><label>Nombre</label><input type="text" id="visNombre"></div>
-              <div class="form-group" style="margin:0;"><label>Apellido</label><input type="text" id="visApellido"></div>
-              <div class="form-group" style="margin:0;"><label>Ministerio</label>
-                <select id="visMinisterio">
-                  <option>Jovenes</option><option>Caballeros</option>
-                  <option>Damas</option><option>Adolescentes</option><option>General</option>
-                </select>
-              </div>
-            </div>
-            <div style="margin-top:0.8rem;display:flex;gap:8px;">
-              <button class="btn btn-primary btn-sm" onclick="guardarVisitante()">Agregar</button>
-              <button class="btn btn-outline btn-sm" onclick="toggleVisitorForm()">Cancelar</button>
-            </div>
-          </div>
-          <div id="visitantesList"></div>
-        </div>-->
 
         <!-- VISITANTES (contador por ministerio) -->
         <div style="margin-top:1.4rem;">
@@ -336,8 +367,8 @@ tr.egreso-row td{color:var(--danger);}
     <div id="sec-historial" class="section">
       <div class="section-header section-head-row">
         <div><h2>Historial</h2><p>Todos los registros de asistencia</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('historial')" title="Refrescar datos" aria-label="Refrescar datos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('historial')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
         </button>
       </div>
       <div class="card">
@@ -361,11 +392,11 @@ tr.egreso-row td{color:var(--danger);}
             <option value="SI">Solo Bautizados</option>
             <option value="NO">Solo No Bautizados</option>
           </select>
-          <button class="btn btn-outline btn-sm btn-icon" onclick="clearHistorialFilters()" title="Limpiar filtros" aria-label="Limpiar filtros">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
+          <button class="btn btn-outline btn-sm btn-icon" onclick="clearHistorialFilters()" title="Limpiar filtros">
+            <svg viewBox="0 0 24 24"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
           </button>
-          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelHistorial()" title="Exportar Excel" aria-label="Exportar Excel">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
+          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelHistorial()" title="Exportar Excel">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
           </button>
         </div>
         <div class="table-wrap">
@@ -382,12 +413,12 @@ tr.egreso-row td{color:var(--danger);}
     <div id="sec-miembros" class="section">
       <div class="section-header section-head-row">
         <div><h2>Miembros</h2></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('miembros')" title="Refrescar datos" aria-label="Refrescar datos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('miembros')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
         </button>
       </div>
       <div class="toolbar">
-        <input class="search-box" placeholder="Buscar miembro..." oninput="filterMiembrosTable(this.value)">
+        <input class="search-box" placeholder="Buscar miembro..." oninput="filterMiembrosTable(this.value)" style="flex:1;max-width:300px;">
         <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Agregar</button>
       </div>
       <div class="period-tabs" id="miembrosMinFilter" style="margin-bottom:1rem;"></div>
@@ -401,16 +432,16 @@ tr.egreso-row td{color:var(--danger);}
       </div>
     </div>
 
-    <!-- USUARIOS (solo admin) -->
+    <!-- USUARIOS -->
     <div id="sec-usuarios" class="section">
       <div class="section-header section-head-row"><div><h2>Usuarios</h2><p>Gestión de acceso al sistema</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('usuarios')" title="Refrescar datos" aria-label="Refrescar datos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('usuarios')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
         </button>
       </div>
       <div class="toolbar">
-        <input class="search-box" placeholder="Buscar usuario..." oninput="filterUsuariosTable(this.value)">
-        <button class="btn btn-primary btn-sm" onclick="openModal('addUser')">+ Agregar Usuario</button>
+        <input class="search-box" placeholder="Buscar usuario..." oninput="filterUsuariosTable(this.value)" style="flex:1;max-width:300px;">
+        <button class="btn btn-primary btn-sm" onclick="openAddUser()">+ Agregar Usuario</button>
       </div>
       <div class="card">
         <div class="table-wrap">
@@ -422,11 +453,11 @@ tr.egreso-row td{color:var(--danger);}
       </div>
     </div>
 
-    <!-- LOG (solo admin) -->
+    <!-- LOG -->
     <div id="sec-log" class="section">
       <div class="section-header section-head-row"><div><h2>Log del Sistema</h2><p>Registro de todas las acciones</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('log')" title="Refrescar datos" aria-label="Refrescar datos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('log')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
         </button>
       </div>
       <div class="toolbar">
@@ -448,13 +479,13 @@ tr.egreso-row td{color:var(--danger);}
     <div id="sec-santacena" class="section">
       <div class="section-header section-head-row">
         <div><h2>Santa Cena</h2><p>Registro de participantes en la Santa Cena</p></div>
-        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('santacena')" title="Refrescar" aria-label="Refrescar">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('santacena')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
         </button>
       </div>
       <div class="card">
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.2rem;">
-          <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+          <div class="form-group" style="margin:0;flex:1;min-width:160px;">
             <label>Fecha del 1er Domingo</label>
             <input type="date" id="scFecha" onchange="renderSantaCena()">
           </div>
@@ -462,30 +493,29 @@ tr.egreso-row td{color:var(--danger);}
         </div>
         <div id="scMinFilterWrap" style="margin-bottom:1rem;"></div>
         <div class="stats-grid" id="scStats" style="margin-bottom:1.2rem;"></div>
-        <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.8rem;">
-          <span style="display:inline-block;width:12px;height:12px;background:var(--success);border-radius:3px;margin-right:4px;"></span>Verde = tomó Santa Cena &nbsp;
-          <span style="display:inline-block;width:12px;height:12px;background:var(--danger);border-radius:3px;margin-right:4px;"></span>Rojo = asistió pero no marcado &nbsp;
-          Normal = no hay registro de asistencia
+        <p style="font-size:0.82rem;color:var(--gray);margin-bottom:0.8rem;line-height:1.6;">
+          <span style="display:inline-block;width:12px;height:12px;background:var(--success);border-radius:3px;margin-right:4px;vertical-align:middle;"></span>Verde = tomó Santa Cena &nbsp;
+          <span style="display:inline-block;width:12px;height:12px;background:var(--danger);border-radius:3px;margin-right:4px;vertical-align:middle;"></span>Rojo = asistió pero no marcado &nbsp;
+          Normal = sin registro de asistencia
         </p>
         <div class="members-grid" id="scMembersGrid"></div>
-        <div style="margin-top:1.2rem;display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn btn-primary" style="flex:1;min-width:140px" onclick="guardarSantaCena()">Guardar Santa Cena</button>
+        <div style="margin-top:1.2rem;">
+          <button class="btn btn-primary" style="width:100%;" onclick="guardarSantaCena()">Guardar Santa Cena</button>
         </div>
       </div>
     </div>
 
-    <!-- EVENTOS (solo Admin) -->
+    <!-- EVENTOS -->
     <div id="sec-eventos" class="section">
       <div class="section-header section-head-row">
         <div><h2>Eventos</h2><p>Bautizos, presentaciones y matrimonios</p></div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-primary btn-sm" onclick="openAddEvento()">+ Nuevo Evento</button>
-          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('eventos')" title="Refrescar" aria-label="Refrescar">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('eventos')" title="Refrescar">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
           </button>
         </div>
       </div>
-      <!-- Lista de eventos -->
       <div class="card">
         <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
           <select id="filtEventoTipo" class="search-box" style="width:180px" onchange="renderEventosList()">
@@ -496,12 +526,9 @@ tr.egreso-row td{color:var(--danger);}
           </select>
           <input type="date" id="filtEventoFecha" class="search-box" style="width:155px" onchange="renderEventosList()">
           <button class="btn btn-outline btn-sm btn-icon" onclick="document.getElementById('filtEventoFecha').value='';renderEventosList();" title="Limpiar fecha">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
+            <svg viewBox="0 0 24 24"><path d="M3 5h18"></path><path d="M6 5l5.5 7v6l1-0.6 1 0.6v-6L18 5"></path></svg>
           </button>
-          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelEventos()" title="Exportar Excel">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
-            &nbsp;Exportar Excel
-          </button>
+          <button class="btn btn-gold btn-sm" onclick="exportExcelEventos()">Exportar Excel</button>
         </div>
         <div class="table-wrap">
           <table>
@@ -512,51 +539,67 @@ tr.egreso-row td{color:var(--danger);}
       </div>
     </div>
 
-    <!-- CONTABILIDAD (solo Admin) -->
+    <!-- CONTABILIDAD – Libro de 3 columnas -->
     <div id="sec-contabilidad" class="section">
       <div class="section-header section-head-row">
-        <div><h2>Contabilidad</h2><p>Gestión financiera de la iglesia</p></div>
-        <div style="display:flex;gap:8px;">
+        <div><h2>Contabilidad</h2><p>Libro contable de tres columnas</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-primary btn-sm" onclick="openAddCont()">+ Nuevo Movimiento</button>
-          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('contabilidad')" title="Refrescar" aria-label="Refrescar">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('contabilidad')" title="Refrescar">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
           </button>
         </div>
       </div>
-      <!-- Filtros de período -->
-      <div class="period-tabs" id="contPeriodTabs">
-        <button class="period-tab active" onclick="setContPeriod('week',this)">Semana</button>
-        <button class="period-tab" onclick="setContPeriod('month',this)">Mes</button>
-        <button class="period-tab" onclick="setContPeriod('quarter',this)">Trimestre</button>
-        <button class="period-tab" onclick="setContPeriod('year',this)">Año</button>
-        <button class="period-tab" onclick="setContPeriod('all',this)">Todo</button>
+
+      <!-- Saldo inicial -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);white-space:nowrap;">Saldo Inicial:</label>
+          <input type="number" id="saldoInicial" min="0" step="0.01" value="0" style="border:1.5px solid var(--gold);border-radius:8px;padding:7px 12px;font-size:0.95rem;font-weight:700;color:var(--navy);width:180px;" onchange="renderContabilidad()">
+          <span style="font-size:0.8rem;color:var(--gray);">El saldo inicia con este valor antes del primer movimiento.</span>
+        </div>
       </div>
-      <div class="date-range">
-        <label>Desde <input type="date" id="contFrom" onchange="setContRange()"></label>
-        <label>Hasta <input type="date" id="contTo" onchange="setContRange()"></label>
+
+      <!-- Filtros -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input type="date" id="contFiltDesde" class="search-box" onchange="renderContabilidad()">
+          <input type="date" id="contFiltHasta" class="search-box" onchange="renderContabilidad()">
+          <input type="text" id="contFiltConcepto" class="search-box" placeholder="Buscar concepto..." style="flex:1;min-width:160px;" oninput="renderContabilidad()">
+          <button class="btn btn-outline btn-sm" onclick="clearContFiltros()">Limpiar</button>
+          <button class="btn btn-gold btn-sm" onclick="exportExcelContabilidad()">Exportar Excel</button>
+          <button class="btn btn-primary btn-sm" onclick="imprimirLibro()">Imprimir</button>
+        </div>
       </div>
+
       <!-- Tarjetas resumen -->
       <div class="stats-grid" id="contStats" style="margin-bottom:1.5rem;"></div>
+
       <!-- Gráfico -->
       <div class="chart-card" style="margin-bottom:1.5rem;">
-        <h3>Ingresos vs Egresos por Mes</h3>
-        <div style="position:relative;height:240px;"><canvas id="chartCont"></canvas></div>
+        <h3>Entradas vs Salidas por Mes</h3>
+        <div style="position:relative;height:220px;"><canvas id="chartCont"></canvas></div>
       </div>
-      <!-- Tabla -->
+
+      <!-- Libro -->
       <div class="card">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
-          <button class="btn btn-gold btn-sm btn-icon" onclick="exportExcelContabilidad()">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
-            &nbsp;Exportar Excel
-          </button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Monto</th><th>Observación</th><th>Por</th><th></th></tr></thead>
-            <tbody id="contabilidadBody"></tbody>
+        <div class="table-wrap" id="libroWrap">
+          <table class="libro-table" id="libroTable">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Fecha</th>
+                <th style="text-align:left;">N° Comp.</th>
+                <th style="text-align:left;min-width:160px;">Concepto</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Saldo</th>
+                <th style="text-align:left;width:80px;"></th>
+              </tr>
+            </thead>
+            <tbody id="libroBody"></tbody>
+            <tfoot id="libroFoot"></tfoot>
           </table>
         </div>
-        <div id="contTotal" style="text-align:right;padding:10px 0;font-size:0.85rem;color:var(--gray);font-weight:700;"></div>
       </div>
     </div>
 
@@ -583,8 +626,8 @@ tr.egreso-row td{color:var(--danger);}
       <select id="mPunto"><option>CENTRAL</option><option>SAN VICENTE</option><option>ICIEDA CIUDAD CAMELOT</option><option>N/A</option></select>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="saveMember()">Guardar</button>
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('addMember')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMember()">Guardar</button>
+      <button class="btn btn-outline" onclick="closeModal('addMember')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -597,44 +640,41 @@ tr.egreso-row td{color:var(--danger);}
     <div class="form-group"><label>Nombre</label><input type="text" id="uNombre"></div>
     <div class="form-group"><label>Contraseña</label><input type="password" id="uPass" placeholder="Mínimo 6 caracteres"></div>
     <div class="form-group"><label>Rol</label>
-      <select id="uRol" onchange="toggleMinisterioField()">
-        <option value="Admin">Admin</option>
-        <option value="Lider">Líder</option>
-      </select>
+      <select id="uRol" onchange="toggleMinisterioField()"><option value="Admin">Admin</option><option value="Lider">Líder</option></select>
     </div>
     <div class="form-group" id="uMinisterioWrap">
       <label>Ministerio Asignado</label>
       <select id="uMinisterio"><option>Jovenes</option><option>Caballeros</option><option>Damas</option><option>Adolescentes</option></select>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1" onclick="saveUser()">Guardar</button>
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('addUser')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveUser()">Guardar</button>
+      <button class="btn btn-outline" onclick="closeModal('addUser')">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL CONFIRMACIÓN -->
+<!-- LOADER -->
 <div id="appLoader" style="display:none;position:fixed;inset:0;background:rgba(15,31,61,0.75);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
   <div style="width:40px;height:40px;border:3px solid rgba(201,168,76,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
   <p id="loaderMsg" style="color:var(--gold);font-family:'Lato',sans-serif;font-size:0.9rem;"></p>
 </div>
-<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
+<!-- MODAL CONFIRMACIÓN -->
 <div class="modal-overlay" id="modalConfirm">
   <div class="modal" style="max-width:380px;text-align:center;">
     <div style="font-size:2rem;margin-bottom:1rem;">⚠️</div>
     <h3 id="confirmTitle" style="margin-bottom:0.8rem;">Confirmar acción</h3>
     <p id="confirmMsg" style="color:var(--gray);font-size:0.9rem;margin-bottom:1.5rem;line-height:1.5;"></p>
-    <div class="modal-actions">
-      <button class="btn btn-danger" id="confirmOkBtn" style="flex:1" onclick="doConfirm()">Sí, confirmar</button>
-      <button class="btn btn-outline" id="confirmCancelBtn" style="flex:1" onclick="cancelConfirm()">Cancelar</button>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="doConfirm()">Sí, confirmar</button>
+      <button class="btn btn-outline" id="confirmCancelBtn" onclick="cancelConfirm()">Cancelar</button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="modalChart">
-  <div class="modal">
-    <div id="modalChartBody">
+  <div class="modal" style="max-width:980px;width:95vw;padding:1.25rem;">
+    <div id="modalChartBody" style="height:68vh;min-height:300px;">
       <canvas id="modalChartCanvas"></canvas>
     </div>
     <div class="modal-actions" style="justify-content:flex-end;">
@@ -667,9 +707,7 @@ tr.egreso-row td{color:var(--danger);}
         <div class="form-group"><label>Fecha</label><input type="date" id="evPFecha"></div>
         <div class="form-group"><label>Nombre papá</label><input type="text" id="evPNombrePapa"></div>
         <div class="form-group"><label>Nombre mamá</label><input type="text" id="evPNombreMama"></div>
-        <div class="form-group"><label>¿Cuántos testigos?</label>
-          <input type="number" id="evPTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('P')">
-        </div>
+        <div class="form-group"><label>¿Cuántos testigos?</label><input type="number" id="evPTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('P')"></div>
       </div>
       <div id="evPTestigosFields" style="margin-top:1rem;"></div>
     </div>
@@ -680,15 +718,13 @@ tr.egreso-row td{color:var(--danger);}
         <div class="form-group"><label>Apellido esposo</label><input type="text" id="evMApellidoEsposo"></div>
         <div class="form-group"><label>Nombre esposa</label><input type="text" id="evMNombreEsposa"></div>
         <div class="form-group"><label>Apellido esposa</label><input type="text" id="evMApellidoEsposa"></div>
-        <div class="form-group"><label>¿Cuántos testigos?</label>
-          <input type="number" id="evMTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('M')">
-        </div>
+        <div class="form-group"><label>¿Cuántos testigos?</label><input type="number" id="evMTestigos" min="0" max="10" value="2" oninput="renderTestigosFields('M')"></div>
       </div>
       <div id="evMTestigosFields" style="margin-top:1rem;"></div>
     </div>
     <div class="modal-actions">
-      <button id="evSaveBtn" class="btn btn-primary" style="flex:1" onclick="guardarEvento(currentEventoTab)">Guardar</button>
-      <button class="btn btn-outline" style="flex:1" onclick="cancelEditEvento()">Cancelar</button>
+      <button id="evSaveBtn" class="btn btn-primary" onclick="guardarEvento(currentEventoTab)">Guardar</button>
+      <button class="btn btn-outline" onclick="cancelEditEvento()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -698,15 +734,16 @@ tr.egreso-row td{color:var(--danger);}
   <div class="modal">
     <h3 id="modalContTitle">Registrar Movimiento</h3>
     <div class="form-group"><label>Fecha</label><input type="date" id="contFecha"></div>
+    <div class="form-group"><label>N° Comprobante <span style="font-weight:400;text-transform:none;color:var(--gray)">(opcional)</span></label><input type="text" id="contComp" placeholder="Ej: 001, REC-01..."></div>
     <div class="form-group"><label>Tipo</label>
-      <select id="contTipo"><option value="Ingreso">Ingreso</option><option value="Egreso">Egreso</option></select>
+      <select id="contTipo"><option value="Ingreso">Entrada (Ingreso)</option><option value="Egreso">Salida (Egreso)</option></select>
     </div>
-    <div class="form-group"><label>Descripción</label><input type="text" id="contDesc" placeholder="Ej: Diezmos, Ofrendas..."></div>
+    <div class="form-group"><label>Concepto / Descripción</label><input type="text" id="contDesc" placeholder="Ej: Diezmos, Ofrendas, Pago servicios..."></div>
     <div class="form-group"><label>Monto</label><input type="number" id="contMonto" min="0" step="0.01" placeholder="0.00"></div>
-    <div class="form-group"><label>Observación</label><input type="text" id="contObs" placeholder="Opcional"></div>
+    <div class="form-group"><label>Observación <span style="font-weight:400;text-transform:none;color:var(--gray)">(opcional)</span></label><input type="text" id="contObs" placeholder="Opcional"></div>
     <div class="modal-actions">
-      <button id="contSaveBtn" class="btn btn-primary" style="flex:1" onclick="guardarContabilidad()">Registrar</button>
-      <button class="btn btn-outline" style="flex:1" onclick="cancelEditCont()">Cancelar</button>
+      <button id="contSaveBtn" class="btn btn-primary" onclick="guardarContabilidad()">Registrar</button>
+      <button class="btn btn-outline" onclick="cancelEditCont()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -719,118 +756,100 @@ tr.egreso-row td{color:var(--danger);}
     <h3>Certificado — <span id="certMiembroNombre" style="color:var(--gold);font-size:0.95rem;font-family:'Lato',sans-serif;font-weight:400;"></span></h3>
     <div class="form-group" style="margin-bottom:0.8rem;">
       <label>Tipo de Certificado</label>
-      <select id="certTipo" onchange="previewCertificado()">
-        <option value="bautizo">Bautizo</option>
-      </select>
+      <select id="certTipo" onchange="previewCertificado()"><option value="bautizo">Bautizo</option></select>
     </div>
-    <div style="overflow:hidden;height:352px;background:#d0d0d0;border-radius:8px;display:flex;align-items:flex-start;justify-content:center;padding:12px 0;border:1px solid var(--lightgray);">
-      <div style="transform:scale(0.44);transform-origin:top center;flex-shrink:0;box-shadow:0 8px 32px rgba(0,0,0,0.22);" id="certPreviewInner"></div>
+    <div style="overflow:hidden;height:320px;background:#d0d0d0;border-radius:8px;display:flex;align-items:flex-start;justify-content:center;padding:12px 0;border:1px solid var(--lightgray);">
+      <div style="transform:scale(0.40);transform-origin:top center;flex-shrink:0;box-shadow:0 8px 32px rgba(0,0,0,0.22);" id="certPreviewInner"></div>
     </div>
     <p style="font-size:0.76rem;color:var(--gray);margin-top:6px;text-align:center;">Vista previa — se imprimirá en A4 horizontal</p>
     <div class="modal-actions">
-      <button class="btn btn-primary" style="flex:1;" onclick="printCertificado()">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;vertical-align:middle;margin-right:6px;display:inline-block;"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
-        Imprimir / Guardar PDF
-      </button>
-      <button class="btn btn-outline" style="flex:1;" onclick="closeModal('certificado')">Cerrar</button>
+      <button class="btn btn-primary" onclick="printCertificado()">Imprimir / Guardar PDF</button>
+      <button class="btn btn-outline" onclick="closeModal('certificado')">Cerrar</button>
     </div>
   </div>
 </div>
 
 <div id="printArea">
   <svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
-    <defs>
-      <filter id="certNavyFilter">
-        <feColorMatrix type="matrix" values="0 0 0 0 0.0588  0 0 0 0 0.1216  0 0 0 0 0.2392  0 0 0 1 0"/>
-      </filter>
-    </defs>
+    <defs><filter id="certNavyFilter"><feColorMatrix type="matrix" values="0 0 0 0 0.0588  0 0 0 0 0.1216  0 0 0 0 0.2392  0 0 0 1 0"/></filter></defs>
   </svg>
   <div id="certPrintContent"></div>
 </div>
 
 <script>
 // ============================================================
-// CONFIGURACIÓN — pega tu URL de Apps Script aquí
+// CONFIGURACIÓN
 // ============================================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbxo0QvDU14xDPLmrmblDQrSe_5CFaSkR2Y1Hl5yqHXrgStjboTXmPELIHF9_Q7l1HwmPQ/exec';
-// Ejemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
 
 // ============================================================
-// BASE DE DATOS (en memoria, sincronizada con Sheets)
+// BASE DE DATOS
 // ============================================================
 let DB = { usuarios:[], miembros:[], asistencia:[], log:[], santa_cena:[], visitantes:[], eventos:[], contabilidad:[] };
 let DB_READY = false;
 
-// Muestra pantalla de carga
 function showLoader(msg='Cargando datos...'){
   document.getElementById('loaderMsg').textContent = msg;
   document.getElementById('appLoader').style.display = 'flex';
 }
-function hideLoader(){
-  document.getElementById('appLoader').style.display = 'none';
-}
+function hideLoader(){ document.getElementById('appLoader').style.display = 'none'; }
 
-// Convierte fila del Sheet al formato interno de la app
 function normalizeSheet(data){
   return {
     usuarios: (data.USUARIOS||[]).map(r=>({
-      id: String(r.ID), email: String(r.Email||'').toLowerCase(),
-      nombre: String(r.Nombre||''), pass: String(r.Password||''),
-      rol: String(r.Rol||'Lider'), ministerio: String(r.Ministerio||''),
-      activo: String(r.Activo).toLowerCase()!=='false'
+      id:String(r.ID), email:String(r.Email||'').toLowerCase(),
+      nombre:String(r.Nombre||''), pass:String(r.Password||''),
+      rol:String(r.Rol||'Lider'), ministerio:String(r.Ministerio||''),
+      activo:String(r.Activo).toLowerCase()!=='false'
     })),
     miembros: (data.MIEMBROS||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), cedula: String(r.Cedula||''),
-      nombre: String(r.Nombre||''), apellido: String(r.Apellido||''),
-      ministerio: String(r.Ministerio||''), tipo: String(r.Tipo||''),
-      bautizado: String(r.Bautizado||'NO'), punto: String(r.Punto||'N/A'),
-      activo: String(r.Activo).toLowerCase()!=='false'
+      id:String(r.ID), cedula:String(r.Cedula||''),
+      nombre:String(r.Nombre||''), apellido:String(r.Apellido||''),
+      ministerio:String(r.Ministerio||''), tipo:String(r.Tipo||''),
+      bautizado:String(r.Bautizado||'NO'), punto:String(r.Punto||'N/A'),
+      activo:String(r.Activo).toLowerCase()!=='false'
     })),
     asistencia: (data.ASISTENCIA||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
-      miembro: String(r.ID_Miembro||''), servicio: String(r.Servicio||''),
-      cena: String(r.Tomo_Santa_Cena).toLowerCase()==='true'
+      id:String(r.ID), fecha:String(r.Fecha||'').split('T')[0],
+      miembro:String(r.ID_Miembro||''), servicio:String(r.Servicio||''),
+      cena:String(r.Tomo_Santa_Cena).toLowerCase()==='true'
     })),
     log: (data.LOG||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), ts: String(r.Timestamp||''),
-      tipo: String(r.Tipo||''), msg: String(r.Mensaje||''),
-      level: 'info', user: String(r.Usuario||'')
+      id:String(r.ID), ts:String(r.Timestamp||''),
+      tipo:String(r.Tipo||''), msg:String(r.Mensaje||''),
+      level:'info', user:String(r.Usuario||'')
     })),
     santa_cena: (data.SANTA_CENA||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
-      miembro: String(r.ID_Miembro||''), nombre_visitante: String(r.Nombre_Visitante||''),
-      asistio: String(r.Asistio).toLowerCase()==='true',
-      registrado_por: String(r.Registrado_Por||''), ts: String(r.Timestamp||'')
+      id:String(r.ID), fecha:String(r.Fecha||'').split('T')[0],
+      miembro:String(r.ID_Miembro||''), nombre_visitante:String(r.Nombre_Visitante||''),
+      asistio:String(r.Asistio).toLowerCase()==='true',
+      registrado_por:String(r.Registrado_Por||''), ts:String(r.Timestamp||'')
     })),
     visitantes: (data.VISITANTES||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
-      nombre: String(r.Nombre||''), apellido: String(r.Apellido||''),
-      ministerio: String(r.Ministerio||''), servicio: String(r.Servicio||''),
-      registrado_por: String(r.Registrado_Por||'')
+      id:String(r.ID), fecha:String(r.Fecha||'').split('T')[0],
+      nombre:String(r.Nombre||''), apellido:String(r.Apellido||''),
+      ministerio:String(r.Ministerio||''), servicio:String(r.Servicio||''),
+      registrado_por:String(r.Registrado_Por||'')
     })),
     eventos: (data.EVENTOS||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), tipo: String(r.Tipo||'').toLowerCase(),
-      fecha: String(r.Fecha||'').split('T')[0],
-      datos: (()=>{try{return JSON.parse(String(r.Datos_JSON||'{}'));}catch(e){return {};} })(),
-      registrado_por: String(r.Registrado_Por||''), ts: String(r.Timestamp||'')
+      id:String(r.ID), tipo:String(r.Tipo||'').toLowerCase(),
+      fecha:String(r.Fecha||'').split('T')[0],
+      datos:(()=>{try{return JSON.parse(String(r.Datos_JSON||'{}'));}catch(e){return {};}})(),
+      registrado_por:String(r.Registrado_Por||''), ts:String(r.Timestamp||'')
     })),
     contabilidad: (data.CONTABILIDAD||[]).filter(r=>r.ID).map(r=>({
-      id: String(r.ID), fecha: String(r.Fecha||'').split('T')[0],
-      tipo: String(r.Tipo||''), descripcion: String(r.Descripcion||''),
-      monto: parseFloat(r.Monto)||0, observacion: String(r.Observacion||''),
-      registrado_por: String(r.Registrado_Por||'')
+      id:String(r.ID), fecha:String(r.Fecha||'').split('T')[0],
+      tipo:String(r.Tipo||''), descripcion:String(r.Descripcion||''),
+      monto:parseFloat(r.Monto)||0, observacion:String(r.Observacion||''),
+      registrado_por:String(r.Registrado_Por||''),
+      comprobante:String(r.Comprobante||''),
+      anulado:String(r.Anulado||'false').toLowerCase()==='true',
+      ts:String(r.Timestamp||r.Fecha||'')
     }))
   };
 }
 
-// Carga todos los datos desde Sheets al iniciar
 async function loadFromSheets(){
-  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI'){
-    // Modo demo sin Sheets — datos vacíos excepto usuario admin
-    DB.usuarios = [{id:'u1',email:'iglesiaescalandop@gmail.com',nombre:'Icaep Camelot',pass:'admin123',rol:'Admin',ministerio:'',activo:true}];
-    DB_READY = true;
-    return;
-  }
   showLoader('Conectando con Google Sheets...');
   try {
     const res = await fetch(`${API_URL}?action=getAll`);
@@ -846,53 +865,20 @@ async function loadFromSheets(){
   }
 }
 
-// Guarda UNA fila nueva en Sheets
 async function apiAdd(sheet, row){
-  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI') return;
-  try {
-    await fetch(API_URL, {
-      method:'POST',
-      body: JSON.stringify({action:'addRow', sheet, row})
-    });
-  } catch(e){ console.warn('Error guardando en Sheets:', e); }
+  try { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'addRow',sheet,row})}); } catch(e){ console.warn(e); }
 }
-
-// Guarda VARIAS filas en una sola petición (evita pérdida de registros)
 async function apiAddBatch(sheet, rows){
-  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI' || !rows || rows.length === 0) return;
-  try {
-    await fetch(API_URL, {
-      method:'POST',
-      body: JSON.stringify({action:'addRows', sheet, rows})
-    });
-  } catch(e){ console.warn('Error guardando batch en Sheets:', e); }
+  if(!rows||rows.length===0) return;
+  try { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'addRows',sheet,rows})}); } catch(e){ console.warn(e); }
 }
-
-// Actualiza UNA fila en Sheets por ID
 async function apiUpdate(sheet, id, data){
-  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI') return;
-  try {
-    await fetch(API_URL, {
-      method:'POST',
-      body: JSON.stringify({action:'updateRow', sheet, id, data})
-    });
-  } catch(e){ console.warn('Error actualizando en Sheets:', e); }
+  try { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'updateRow',sheet,id,data})}); } catch(e){ console.warn(e); }
 }
-
 async function apiDelete(sheet, id){
-  if(API_URL === 'TU_URL_APPS_SCRIPT_AQUI') return;
-  try {
-    await fetch(API_URL, {
-      method:'POST',
-      body: JSON.stringify({action:'deleteRow', sheet, id})
-    });
-  } catch(e){ console.warn('Error eliminando en Sheets:', e); }
+  try { await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'deleteRow',sheet,id})}); } catch(e){ console.warn(e); }
 }
-
-// Compatibilidad: saveDB guarda en localStorage como respaldo
-function saveDB(){
-  try{ localStorage.setItem('icaep_backup', JSON.stringify(DB)); }catch(e){}
-}
+function saveDB(){ try{ localStorage.setItem('icaep_backup',JSON.stringify(DB)); }catch(e){} }
 
 // ============================================================
 // AUTH
@@ -903,16 +889,14 @@ async function doLogin(){
   const email = document.getElementById('loginUser').value.trim().toLowerCase();
   const pass  = document.getElementById('loginPass').value;
   document.getElementById('loginError').textContent='';
-  showLoader('Verificando credenciales...');
   await loadFromSheets();
-  hideLoader();
   const found = DB.usuarios.find(u=>u.email===email && u.pass===pass && u.activo!==false);
   if(!found){ document.getElementById('loginError').textContent='Correo o contraseña incorrectos'; return; }
   currentUser = found;
   addLog('login',`Inicio de sesión: ${found.nombre} (${found.rol})`,'info');
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='flex';
-  const roleText = found.rol==='Lider' ? `Lider de ${found.ministerio||'Ministerio'}` : found.rol;
+  const roleText = found.rol==='Lider'?`Lider de ${found.ministerio||'Ministerio'}`:found.rol;
   document.getElementById('headerUsername').textContent = `${found.nombre} · ${roleText}`;
   document.getElementById('navUsuarios').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navEventos').style.display = found.rol==='Admin'?'':'none';
@@ -925,40 +909,40 @@ document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='
 
 function doLogout(){
   addLog('login',`Cierre de sesión: ${currentUser.nombre}`,'info');
-  saveDB();
-  currentUser=null;
+  saveDB(); currentUser=null;
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('appShell').style.display='none';
 }
 
 function toggleLoginPassword(){
-  const passInput = document.getElementById('loginPass');
-  const slash = document.getElementById('eyeSlash');
-  const pupil = document.getElementById('eyePupil');
-  const btn = document.getElementById('toggleLoginPassBtn');
-  const show = passInput.type === 'password';
-  passInput.type = show ? 'text' : 'password';
-  slash.style.display = show ? 'none' : 'block';
-  pupil.style.display = show ? 'block' : 'none';
-  btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
-  btn.setAttribute('title', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+  const p=document.getElementById('loginPass');
+  const slash=document.getElementById('eyeSlash');
+  const pupil=document.getElementById('eyePupil');
+  const show=p.type==='password';
+  p.type=show?'text':'password';
+  slash.style.display=show?'none':'block';
+  pupil.style.display=show?'block':'none';
 }
 
 // ============================================================
 // INIT
 // ============================================================
 const SERVICES = [
-  {id:'Domingo 1ra', day:'Dom', name:'Domingo 1ra', ministerios:null},
-  {id:'Domingo 2da', day:'Dom', name:'Domingo 2da', ministerios:null},
-  {id:'Miercoles',   day:'Mié', name:'Miércoles',   ministerios:null},
-  {id:'Jueves',      day:'Jue', name:'Jueves',       ministerios:null},
-  {id:'Sabado Jovenes',      day:'Sáb', name:'Sáb Jóvenes',      ministerios:['Jovenes']},
-  {id:'Sabado Adolescentes', day:'Sáb', name:'Sáb Adolescentes', ministerios:['Adolescentes']},
-  {id:'Extra',       day:'',    name:'Día Extra',    ministerios:null}
+  {id:'Domingo 1ra',          day:'Dom', name:'Domingo 1ra',     dias:[0]},
+  {id:'Domingo 2da',          day:'Dom', name:'Domingo 2da',     dias:[0]},
+  {id:'Miercoles',            day:'Mié', name:'Miércoles',       dias:[3]},
+  {id:'Jueves',               day:'Jue', name:'Jueves',          dias:[4]},
+  {id:'Sabado Jovenes',       day:'Sáb', name:'Sáb Jóvenes',    dias:[6], ministerios:['Jovenes']},
+  {id:'Sabado Adolescentes',  day:'Sáb', name:'Sáb Adolescentes',dias:[6], ministerios:['Adolescentes']},
+  {id:'Extra',                day:'',    name:'Día Extra',        dias:null}
 ];
+
+// ── CAMBIO 1: Visitantes por ministerio – General → Biblia + Niños + Intermedio ──
+const VISITOR_MINISTERIOS = ['Jovenes','Caballeros','Damas','Adolescentes','Biblia','Niños','Intermedio'];
 
 let selectedService = 'Domingo 1ra';
 let memberMinFilter = '';
+let sinAsistenciaFilter = false;   // CAMBIO 2: filtro "sin asistencia"
 let presentMembers = new Set();
 let dashPeriod = 'month';
 let dashFrom = null, dashTo = null;
@@ -992,30 +976,28 @@ function showSection(id,btn){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='dashboard')    { syncAndRender('dashboard'); }
-  if(id==='historial')    { syncAndRender('historial'); }
-  if(id==='miembros')     { syncAndRender('miembros'); }
-  if(id==='usuarios')     { renderUsuariosTable(); }
-  if(id==='log')          { renderLog(); }
-  if(id==='santacena')    { syncAndRender('santacena'); }
-  if(id==='eventos')      { syncAndRender('eventos'); }
-  if(id==='contabilidad') { syncAndRender('contabilidad'); }
+  if(id==='dashboard')    syncAndRender('dashboard');
+  if(id==='historial')    syncAndRender('historial');
+  if(id==='miembros')     syncAndRender('miembros');
+  if(id==='usuarios')     renderUsuariosTable();
+  if(id==='log')          renderLog();
+  if(id==='santacena')    syncAndRender('santacena');
+  if(id==='eventos')      syncAndRender('eventos');
+  if(id==='contabilidad') syncAndRender('contabilidad');
 }
 
 async function syncAndRender(section){
-  if(API_URL !== 'TU_URL_APPS_SCRIPT_AQUI'){
-    try{
-      const res = await fetch(`${API_URL}?action=getAll`);
-      const data = await res.json();
-      if(!data.error){
-        const n=normalizeSheet(data);
-        DB.miembros=n.miembros; DB.asistencia=n.asistencia; DB.usuarios=n.usuarios;
-        if(n.log.length) DB.log=n.log;
-        DB.santa_cena=n.santa_cena; DB.visitantes=n.visitantes;
-        DB.eventos=n.eventos; DB.contabilidad=n.contabilidad;
-      }
-    }catch(e){}
-  }
+  try{
+    const res=await fetch(`${API_URL}?action=getAll`);
+    const data=await res.json();
+    if(!data.error){
+      const n=normalizeSheet(data);
+      DB.miembros=n.miembros; DB.asistencia=n.asistencia; DB.usuarios=n.usuarios;
+      if(n.log.length) DB.log=n.log;
+      DB.santa_cena=n.santa_cena; DB.visitantes=n.visitantes;
+      DB.eventos=n.eventos; DB.contabilidad=n.contabilidad;
+    }
+  }catch(e){}
   if(section==='dashboard')     renderDashboard();
   if(section==='historial')     renderHistorial();
   if(section==='miembros')      renderMiembrosTable();
@@ -1037,23 +1019,21 @@ async function refreshSectionData(section){
 // SERVICIOS
 // ============================================================
 const LIDER_SERVICES = {
-  'Caballeros':    ['Miercoles'],
-  'Damas':         ['Jueves'],
-  'Jovenes':       ['Sabado Jovenes'],
-  'Adolescentes':  ['Sabado Adolescentes']
+  'Caballeros':   ['Miercoles'],
+  'Damas':        ['Jueves'],
+  'Jovenes':      ['Sabado Jovenes'],
+  'Adolescentes': ['Sabado Adolescentes']
 };
 
 function renderServiceButtons(){
-  const grid = document.getElementById('serviceGrid');
-  let services = SERVICES;
-  if(currentUser && currentUser.rol === 'Lider'){
-    const allowed = LIDER_SERVICES[currentUser.ministerio] || SERVICES.map(s=>s.id);
-    services = SERVICES.filter(s => allowed.includes(s.id));
-    if(services.length > 0 && !services.find(s=>s.id===selectedService)){
-      selectedService = services[0].id;
-    }
+  const grid=document.getElementById('serviceGrid');
+  let services=SERVICES;
+  if(currentUser&&currentUser.rol==='Lider'){
+    const allowed=LIDER_SERVICES[currentUser.ministerio]||SERVICES.map(s=>s.id);
+    services=SERVICES.filter(s=>allowed.includes(s.id));
+    if(services.length>0&&!services.find(s=>s.id===selectedService)) selectedService=services[0].id;
   }
-  grid.innerHTML = services.map(s=>`
+  grid.innerHTML=services.map(s=>`
     <div class="service-btn ${s.id===selectedService?'selected':''}" onclick="selectService('${s.id}',this)">
       <div class="day">${s.day}</div>
       <div class="name">${s.name}</div>
@@ -1061,89 +1041,123 @@ function renderServiceButtons(){
 }
 
 function selectService(id,el){
-  selectedService = id;
-  memberMinFilter = '';
+  selectedService=id; memberMinFilter=''; sinAsistenciaFilter=false;
   document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('extraServiceWrap').style.display = id==='Extra'?'block':'none';
+  document.getElementById('extraServiceWrap').style.display=id==='Extra'?'block':'none';
   renderMinFilterButtons();
   renderMembersGrid();
   renderVisitantesList();
   checkDuplicates();
 }
 
+// ── CAMBIO 2: filtro de ministerio + "Sin asistencia" ──
 function renderMinFilterButtons(){
-  const wrap = document.getElementById('minFilterWrap');
-  if(!currentUser || currentUser.rol !== 'Admin'){ wrap.style.display='none'; return; }
-  const srv = SERVICES.find(s=>s.id===selectedService);
-  if(srv && srv.ministerios){ wrap.style.display='none'; return; }
-  wrap.style.display = 'block';
-  const ministries = [...new Set(DB.miembros.filter(m=>m.activo!==false).map(m=>m.ministerio))].sort();
-  document.getElementById('minFilterBtns').innerHTML =
-    `<button class="period-tab ${memberMinFilter===''?'active':''}" onclick="setMinFilter('',this)">Todos</button>` +
-    ministries.map(m=>`<button class="period-tab ${memberMinFilter===m?'active':''}" onclick="setMinFilter('${m}',this)">${m}</button>`).join('');
+  const wrap=document.getElementById('minFilterWrap');
+  if(!currentUser||currentUser.rol!=='Admin'){ wrap.style.display='none'; return; }
+  const srv=SERVICES.find(s=>s.id===selectedService);
+  if(srv&&srv.ministerios){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  const ministries=[...new Set(DB.miembros.filter(m=>m.activo!==false).map(m=>m.ministerio))].sort();
+  document.getElementById('minFilterBtns').innerHTML=
+    `<button class="period-tab ${memberMinFilter===''&&!sinAsistenciaFilter?'active':''}" onclick="setMinFilter('',false,this)">Todos</button>`+
+    ministries.map(m=>`<button class="period-tab ${memberMinFilter===m&&!sinAsistenciaFilter?'active':''}" onclick="setMinFilter('${m}',false,this)">${m}</button>`).join('')+
+    `<button class="period-tab sin-asist ${sinAsistenciaFilter&&memberMinFilter===''?'active':''}" onclick="setMinFilter('',true,this)" title="Mostrar solo los que aún no tienen asistencia en esta fecha">Sin asistencia</button>`+
+    ministries.map(m=>`<button class="period-tab sin-asist ${sinAsistenciaFilter&&memberMinFilter===m?'active':''}" onclick="setMinFilter('${m}',true,this)">Sin: ${m}</button>`).join('');
 }
 
-function setMinFilter(min, btn){
-  memberMinFilter = min;
+function setMinFilter(min,sinAsist,btn){
+  memberMinFilter=min; sinAsistenciaFilter=!!sinAsist;
   document.querySelectorAll('#minFilterBtns .period-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderMembersGrid();
 }
 
-function onFechaChange(){
-  checkDuplicates();
-  renderVisitantesList();
-}
+function onFechaChange(){ checkDuplicates(); renderVisitantesList(); renderMinFilterButtons(); renderMembersGrid(); }
 
 // ============================================================
 // REGISTRO ASISTENCIA
 // ============================================================
+
+// ── CAMBIO 1: Mapeo servicio → días válidos ──
+const SERVICE_DIAS = {
+  'Domingo 1ra':         [0],
+  'Domingo 2da':         [0],
+  'Miercoles':           [3],
+  'Jueves':              [4],
+  'Sabado Jovenes':      [6],
+  'Sabado Adolescentes': [6],
+  'Extra':               null  // cualquier día
+};
+const DIA_NOMBRES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function validarServicioFecha(servicio, fecha){
+  if(!fecha) return {ok:false, msg:'Selecciona una fecha.'};
+  const diasValidos = SERVICE_DIAS[servicio];
+  if(diasValidos === null) return {ok:true}; // Extra: siempre válido
+  // Calcular día de la semana correctamente para evitar desfase de zona horaria
+  const [y,m,d] = fecha.split('-').map(Number);
+  const dow = new Date(y, m-1, d).getDay();
+  if(!diasValidos.includes(dow)){
+    const nombresDias = diasValidos.map(n=>DIA_NOMBRES[n]).join(' o ');
+    const diaFecha = DIA_NOMBRES[dow];
+    return {
+      ok: false,
+      msg: `⚠️ El servicio "${servicio}" solo se puede registrar los días ${nombresDias}. La fecha seleccionada (${formatDate(fecha)}) es ${diaFecha}.`
+    };
+  }
+  return {ok:true};
+}
+
 function getVisibleMembers(){
-  const srv = SERVICES.find(s=>s.id===selectedService);
-  let members = DB.miembros.filter(m => m.activo !== false);
+  const srv=SERVICES.find(s=>s.id===selectedService);
+  let members=DB.miembros.filter(m=>m.activo!==false);
   if(currentUser.rol==='Lider'){
-    members = members.filter(m=>m.ministerio===currentUser.ministerio);
-  } else if(srv && srv.ministerios){
-    members = members.filter(m=>srv.ministerios.includes(m.ministerio));
+    members=members.filter(m=>m.ministerio===currentUser.ministerio);
+  } else if(srv&&srv.ministerios){
+    members=members.filter(m=>srv.ministerios.includes(m.ministerio));
   } else if(memberMinFilter){
-    members = members.filter(m=>m.ministerio===memberMinFilter);
+    members=members.filter(m=>m.ministerio===memberMinFilter);
+  }
+  // Aplicar filtro "sin asistencia"
+  if(sinAsistenciaFilter){
+    const fecha=document.getElementById('servFecha').value;
+    const already=getAlreadyPresent(fecha);
+    members=members.filter(m=>!already.has(m.id));
   }
   return members;
 }
 
 function renderMembersGrid(filter=''){
-  const members = getVisibleMembers().filter(m=>
+  const members=getVisibleMembers().filter(m=>
     (m.nombre+' '+m.apellido).toLowerCase().includes(filter.toLowerCase())
   );
-  const fecha = document.getElementById('servFecha').value;
-  const alreadySet = getAlreadyPresent(fecha);
-
-  const srv = SERVICES.find(s=>s.id===selectedService);
-  const label = currentUser.rol==='Lider' ? `· ${currentUser.ministerio}` :
-    (srv && srv.ministerios ? `· ${srv.ministerios.join(', ')}` :
-    (memberMinFilter ? `· ${memberMinFilter}` : ''));
-  document.getElementById('filterMinLabel').textContent = label;
-
-  document.getElementById('membersGrid').innerHTML = members.map(m=>{
-    const init = m.nombre[0]+(m.apellido[0]||'');
-    const isPresent = presentMembers.has(m.id);
-    const isAlready = alreadySet.has(m.id);
+  const fecha=document.getElementById('servFecha').value;
+  const alreadySet=getAlreadyPresent(fecha);
+  const srv=SERVICES.find(s=>s.id===selectedService);
+  const label=currentUser.rol==='Lider'?`· ${currentUser.ministerio}`:
+    (srv&&srv.ministerios?`· ${srv.ministerios.join(', ')}`:
+    (memberMinFilter?`· ${memberMinFilter}`:''));
+  document.getElementById('filterMinLabel').textContent=label+(sinAsistenciaFilter?' · Sin asistencia':'');
+  document.getElementById('membersGrid').innerHTML=members.map(m=>{
+    const init=m.nombre[0]+(m.apellido[0]||'');
+    const isPresent=presentMembers.has(m.id);
+    const isAlready=alreadySet.has(m.id);
     return `<div class="member-card ${isPresent?'present':''} ${isAlready&&!isPresent?'already':''}"
       onclick="${isAlready&&!isPresent?'':` toggleMember('${m.id}',this)`}"
       data-id="${m.id}">
       <div class="member-avatar">${init}</div>
       <div class="member-info">
-        <div class="mname">${m.nombre} ${m.apellido}${isAlready?'<span class="already-badge">ya registrado</span>':''}</div>
+        <div class="mname">${m.nombre} ${m.apellido}${isAlready?'<span class="already-badge">ya reg.</span>':''}</div>
         <div class="mmin">${m.ministerio}</div>
       </div>
       <div class="check"></div>
     </div>`;
-  }).join('') || '<p style="color:var(--gray);font-size:0.9rem;padding:1rem 0">Sin miembros para mostrar</p>';
+  }).join('')||'<p style="color:var(--gray);font-size:0.9rem;padding:1rem 0">Sin miembros para mostrar</p>';
 }
 
 function getAlreadyPresent(fecha){
-  const set = new Set();
+  const set=new Set();
   DB.asistencia.filter(a=>a.fecha===fecha).forEach(a=>set.add(a.miembro));
   return set;
 }
@@ -1155,21 +1169,21 @@ function toggleMember(id,el){
 }
 
 function checkDuplicates(){
-  const fecha = document.getElementById('servFecha').value;
-  const already = getAlreadyPresent(fecha);
-  const overlap = [...presentMembers].filter(id=>already.has(id));
-  const wrap = document.getElementById('duplicateWarn');
+  const fecha=document.getElementById('servFecha').value;
+  const already=getAlreadyPresent(fecha);
+  const overlap=[...presentMembers].filter(id=>already.has(id));
+  const wrap=document.getElementById('duplicateWarn');
   if(overlap.length>0){
-    const names = overlap.map(id=>{const m=DB.miembros.find(x=>x.id===id);return m?m.nombre+' '+m.apellido:id;});
+    const names=overlap.map(id=>{const m=DB.miembros.find(x=>x.id===id);return m?m.nombre+' '+m.apellido:id;});
     wrap.style.display='block';
-    wrap.innerHTML=`⚠️ Estas personas ya tienen asistencia registrada en este dia: <strong>${names.join(', ')}</strong>. No se duplicaran.`;
+    wrap.innerHTML=`⚠️ Estas personas ya tienen asistencia registrada en este día: <strong>${names.join(', ')}</strong>. No se duplicarán.`;
   } else { wrap.style.display='none'; }
 }
 
 function selectAll(val){
-  const members = getVisibleMembers();
-  const fecha = document.getElementById('servFecha').value;
-  const already = getAlreadyPresent(fecha);
+  const members=getVisibleMembers();
+  const fecha=document.getElementById('servFecha').value;
+  const already=getAlreadyPresent(fecha);
   if(val) members.forEach(m=>{ if(!already.has(m.id)) presentMembers.add(m.id); });
   else presentMembers.clear();
   renderMembersGrid();
@@ -1180,44 +1194,48 @@ function filterMembersGrid(v){ renderMembersGrid(v); }
 
 async function guardarAsistencia(){
   if(presentMembers.size===0){ showToast('Selecciona al menos un miembro','error'); return; }
+
+  // ── CAMBIO 1: Validar servicio vs día de la semana ──
+  const fecha=document.getElementById('servFecha').value;
+  const valResult=validarServicioFecha(selectedService,fecha);
+  if(!valResult.ok){ showAlertModal(valResult.msg,'Servicio no válido para este día'); return; }
+
   if(selectedService==='Extra'){
-    const nombre = document.getElementById('extraNombre').value.trim();
+    const nombre=document.getElementById('extraNombre').value.trim();
     if(!nombre){ showToast('Escribe el nombre del evento extra','error'); return; }
   }
-  const fecha = document.getElementById('servFecha').value;
-  const cena  = false; // Santa Cena se registra en su propia sección
-  const already = getAlreadyPresent(fecha);
-  const servNombre = selectedService==='Extra'
-    ? 'Extra: '+document.getElementById('extraNombre').value.trim()
-    : selectedService;
-   let nuevos=0;
+  const cena=false;
+  const already=getAlreadyPresent(fecha);
+  const servNombre=selectedService==='Extra'
+    ?'Extra: '+document.getElementById('extraNombre').value.trim()
+    :selectedService;
+  let nuevos=0;
   const rowsToSave=[];
   presentMembers.forEach(mid=>{
     if(!already.has(mid)){
       const id='r'+Date.now()+Math.random().toString(36).slice(2);
-      DB.asistencia.push({id, fecha, miembro:mid, servicio:servNombre, cena});
-      rowsToSave.push({ID:id, Fecha:fecha, ID_Miembro:mid, Servicio:servNombre, Tomo_Santa_Cena:cena});
+      DB.asistencia.push({id,fecha,miembro:mid,servicio:servNombre,cena});
+      rowsToSave.push({ID:id,Fecha:fecha,ID_Miembro:mid,Servicio:servNombre,Tomo_Santa_Cena:cena});
       nuevos++;
     }
   });
   showLoader('Guardando asistencia...');
-  await apiAddBatch('ASISTENCIA', rowsToSave);
+  await apiAddBatch('ASISTENCIA',rowsToSave);
 
-  // Guardar visitantes anónimos por ministerio (una fila por visitante)
-  const visRows = [];
+  const visRows=[];
   Object.keys(visitorCounts).forEach(min=>{
-    const cantidad = visitorCounts[min] || 0;
+    const cantidad=visitorCounts[min]||0;
     for(let i=0;i<cantidad;i++){
-      const vid = 'v'+Date.now()+Math.random().toString(36).slice(2);
-      DB.visitantes.push({id:vid, fecha, nombre:'', apellido:'', ministerio:min, servicio:servNombre, registrado_por:currentUser.nombre});
-      visRows.push({ID:vid, Fecha:fecha, Nombre:'', Apellido:'', Ministerio:min, Servicio:servNombre, Registrado_Por:currentUser.nombre});
+      const vid='v'+Date.now()+Math.random().toString(36).slice(2);
+      DB.visitantes.push({id:vid,fecha,nombre:'',apellido:'',ministerio:min,servicio:servNombre,registrado_por:currentUser.nombre});
+      visRows.push({ID:vid,Fecha:fecha,Nombre:'',Apellido:'',Ministerio:min,Servicio:servNombre,Registrado_Por:currentUser.nombre});
     }
   });
   if(visRows.length>0){
-    await apiAddBatch('VISITANTES', visRows);
+    await apiAddBatch('VISITANTES',visRows);
     addLog('asistencia',`${currentUser.nombre} registró ${visRows.length} visitantes — ${servNombre} — ${fecha}`,'info');
   }
-  visitorCounts = {};
+  visitorCounts={};
   renderVisitorCounters();
   hideLoader();
   addLog('asistencia',`${currentUser.nombre} registró ${nuevos} asistencias — ${servNombre} — ${fecha}`,'success');
@@ -1232,64 +1250,48 @@ async function guardarAsistencia(){
 // HISTORIAL
 // ============================================================
 function renderHistorial(){
-  const filtFecha   = document.getElementById('filtFecha').value;
-  const filtMiembro = (document.getElementById('filtMiembro').value||'').toLowerCase();
-  const filtServ    = document.getElementById('filtServicio').value;
-  const filtMin     = document.getElementById('filtMinisterio').value;
-  const filtBaut    = document.getElementById('filtBautizado').value;
-
-  // Filas de miembros
-  let rows = [...DB.asistencia].map(r=>({...r, esVisitante:false}));
-  if(currentUser && currentUser.rol==='Lider'){
-    rows = rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===currentUser.ministerio;});
-  }
+  const filtFecha=(document.getElementById('filtFecha').value);
+  const filtMiembro=(document.getElementById('filtMiembro').value||'').toLowerCase();
+  const filtServ=document.getElementById('filtServicio').value;
+  const filtMin=document.getElementById('filtMinisterio').value;
+  const filtBaut=document.getElementById('filtBautizado').value;
+  let rows=[...DB.asistencia].map(r=>({...r,esVisitante:false}));
+  if(currentUser&&currentUser.rol==='Lider') rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===currentUser.ministerio;});
   if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
   if(filtBaut)    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.bautizado===filtBaut;});
   if(filtMiembro) rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);if(!m)return false;return(m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').toLowerCase().includes(filtMiembro);});
 
-// Filas de visitantes (anónimos, agrupados por ministerio + servicio + fecha)
-  const visGrupos = {};
+  const visGrupos={};
   DB.visitantes.forEach(v=>{
-    const key = v.fecha+'|'+v.servicio+'|'+v.ministerio;
-    if(!visGrupos[key]) visGrupos[key] = { fecha:v.fecha, servicio:v.servicio, ministerio:v.ministerio, count:0 };
+    const key=v.fecha+'|'+v.servicio+'|'+v.ministerio;
+    if(!visGrupos[key]) visGrupos[key]={fecha:v.fecha,servicio:v.servicio,ministerio:v.ministerio,count:0};
     visGrupos[key].count++;
   });
-  let visRows = Object.values(visGrupos).map(g=>({
-    esVisitante:true, fecha:g.fecha,
-    nombre:`Visitantes (${g.count})`,
-    ministerio:g.ministerio, servicio:g.servicio
-  }));
-  if(currentUser && currentUser.rol==='Lider') visRows=visRows.filter(r=>r.ministerio===currentUser.ministerio);
+  let visRows=Object.values(visGrupos).map(g=>({esVisitante:true,fecha:g.fecha,nombre:`Visitantes (${g.count})`,ministerio:g.ministerio,servicio:g.servicio}));
+  if(currentUser&&currentUser.rol==='Lider') visRows=visRows.filter(r=>r.ministerio===currentUser.ministerio);
   if(filtFecha)   visRows=visRows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    visRows=visRows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     visRows=visRows.filter(r=>r.ministerio===filtMin);
-  if(filtBaut)    visRows=[]; // visitantes no tienen dato de bautismo
-  if(filtMiembro) visRows=[]; // visitantes anónimos no se buscan por nombre/cédula
+  if(filtBaut||filtMiembro) visRows=[];
 
-  const allRows = [...rows, ...visRows].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-
+  const allRows=[...rows,...visRows].sort((a,b)=>b.fecha.localeCompare(a.fecha));
   const body=document.getElementById('historialBody');
   body.innerHTML=allRows.map(r=>{
-    if(r.esVisitante){
-      return `<tr>
-        <td>${formatDate(r.fecha)}</td>
-        <td>${r.nombre}<span class="visitante-badge">Visitante</span></td>
-        <td><span class="badge badge-${r.ministerio.toLowerCase()}">${r.ministerio}</span></td>
-        <td>${r.servicio}</td>
-        <td><span class="badge badge-general">—</span></td>
-      </tr>`;
-    }
+    if(r.esVisitante) return `<tr>
+      <td>${formatDate(r.fecha)}</td>
+      <td>${r.nombre}<span class="visitante-badge">Visitante</span></td>
+      <td><span class="badge badge-${r.ministerio.toLowerCase()}">${r.ministerio}</span></td>
+      <td>${r.servicio}</td>
+      <td><span class="badge badge-general">—</span></td>
+    </tr>`;
     const m=DB.miembros.find(x=>x.id===r.miembro);
     const nombre=m?m.nombre+' '+m.apellido:r.miembro;
     const min=m?m.ministerio:'—';
-   // Cruza con SANTA_CENA por MISMO MES (la cena es mensual) y solo en servicios de Domingo
-    const rowMes = r.fecha.slice(0,7); // "2026-06"
-    const esDomingo = r.servicio.startsWith('Domingo');
-    const tomoCena = esDomingo && DB.santa_cena.some(sc=>
-      sc.miembro===r.miembro && sc.asistio && (sc.fecha||'').slice(0,7)===rowMes
-    );
+    const rowMes=r.fecha.slice(0,7);
+    const esDomingo=r.servicio.startsWith('Domingo');
+    const tomoCena=esDomingo&&DB.santa_cena.some(sc=>sc.miembro===r.miembro&&sc.asistio&&(sc.fecha||'').slice(0,7)===rowMes);
     return `<tr>
       <td>${formatDate(r.fecha)}</td>
       <td>${nombre}</td>
@@ -1298,41 +1300,34 @@ function renderHistorial(){
       <td><span class="badge badge-${tomoCena}">${tomoCena?'Sí':'No'}</span></td>
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
-  document.getElementById('historialTotal').textContent = `Total: ${allRows.length} registro${allRows.length!==1?'s':''}`;
+  document.getElementById('historialTotal').textContent=`Total: ${allRows.length} registro${allRows.length!==1?'s':''}`;
 }
 
 function clearHistorialFilters(isInit=false){
-  document.getElementById('filtFecha').value = '';
-  document.getElementById('filtMiembro').value = '';
-  document.getElementById('filtServicio').value = '';
-  document.getElementById('filtBautizado').value = '';
-
-  const filtMinSel = document.getElementById('filtMinisterio');
-  filtMinSel.value = '';
-  filtMinSel.disabled = !!(currentUser && currentUser.rol==='Lider');
-
+  document.getElementById('filtFecha').value='';
+  document.getElementById('filtMiembro').value='';
+  document.getElementById('filtServicio').value='';
+  document.getElementById('filtBautizado').value='';
+  const filtMinSel=document.getElementById('filtMinisterio');
+  filtMinSel.value='';
+  filtMinSel.disabled=!!(currentUser&&currentUser.rol==='Lider');
   if(!isInit) renderHistorial();
 }
 
 function exportExcelHistorial(){
-  const filtFecha   = document.getElementById('filtFecha').value;
-  const filtMiembro = (document.getElementById('filtMiembro').value||'').toLowerCase();
-  const filtServ    = document.getElementById('filtServicio').value;
-  const filtMin     = document.getElementById('filtMinisterio').value;
-  const filtBaut    = document.getElementById('filtBautizado').value;
-  let rows = [...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  if(currentUser && currentUser.rol==='Lider'){
-    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===currentUser.ministerio;});
-  }
+  const filtFecha=document.getElementById('filtFecha').value;
+  const filtMiembro=(document.getElementById('filtMiembro').value||'').toLowerCase();
+  const filtServ=document.getElementById('filtServicio').value;
+  const filtMin=document.getElementById('filtMinisterio').value;
+  const filtBaut=document.getElementById('filtBautizado').value;
+  let rows=[...DB.asistencia].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(currentUser&&currentUser.rol==='Lider') rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===currentUser.ministerio;});
   if(filtFecha)   rows=rows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    rows=rows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
   if(filtMin)     rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.ministerio===filtMin;});
   if(filtBaut)    rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return m&&m.bautizado===filtBaut;});
   if(filtMiembro) rows=rows.filter(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);if(!m)return false;return(m.nombre+' '+m.apellido).toLowerCase().includes(filtMiembro)||(m.cedula||'').includes(filtMiembro);});
-  const data=rows.map(r=>{
-    const m=DB.miembros.find(x=>x.id===r.miembro);
-    return {'Fecha':r.fecha,'Miembro':m?m.nombre+' '+m.apellido:r.miembro,'Cédula':m?m.cedula||'':'','Ministerio':m?m.ministerio:'—','Servicio':r.servicio,'Santa Cena':r.cena?'SI':'NO'};
-  });
+  const data=rows.map(r=>{const m=DB.miembros.find(x=>x.id===r.miembro);return{'Fecha':r.fecha,'Miembro':m?m.nombre+' '+m.apellido:r.miembro,'Cédula':m?m.cedula||'':'','Ministerio':m?m.ministerio:'—','Servicio':r.servicio,'Santa Cena':r.cena?'SI':'NO'};});
   const ws=XLSX.utils.json_to_sheet(data);
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Historial');
@@ -1344,44 +1339,37 @@ function exportExcelHistorial(){
 // ============================================================
 // MIEMBROS
 // ============================================================
-let editMemberId = null;
-
-let miembrosMinFilter = '';
-let miembrosSearch = '';
+let editMemberId=null;
+let miembrosMinFilter='';
+let miembrosSearch='';
 
 function renderMiembrosMinFilter(){
-  const wrap = document.getElementById('miembrosMinFilter');
+  const wrap=document.getElementById('miembrosMinFilter');
   if(!wrap) return;
-  // Líder solo ve su ministerio, no necesita filtros
-  if(currentUser && currentUser.rol==='Lider'){ wrap.style.display='none'; return; }
-  wrap.style.display = 'flex';
-  const ministerios = [...new Set(DB.miembros.map(m=>m.ministerio))].sort();
-  wrap.innerHTML =
-    `<button class="period-tab ${miembrosMinFilter===''?'active':''}" onclick="setMiembrosMinFilter('',this)">Todos</button>` +
+  if(currentUser&&currentUser.rol==='Lider'){ wrap.style.display='none'; return; }
+  wrap.style.display='flex';
+  const ministerios=[...new Set(DB.miembros.map(m=>m.ministerio))].sort();
+  wrap.innerHTML=
+    `<button class="period-tab ${miembrosMinFilter===''?'active':''}" onclick="setMiembrosMinFilter('',this)">Todos</button>`+
     ministerios.map(mn=>`<button class="period-tab ${miembrosMinFilter===mn?'active':''}" onclick="setMiembrosMinFilter('${mn}',this)">${mn}</button>`).join('');
 }
 
-function setMiembrosMinFilter(min, btn){
-  miembrosMinFilter = min;
+function setMiembrosMinFilter(min,btn){
+  miembrosMinFilter=min;
   document.querySelectorAll('#miembrosMinFilter .period-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderMiembrosTable(miembrosSearch);
 }
 
 function renderMiembrosTable(filter=''){
-  miembrosSearch = filter;
-  let list = DB.miembros.filter(m =>
-    ((m.nombre+' '+m.apellido+' '+(m.cedula||'')).toLowerCase().includes(filter.toLowerCase()))
-  );
-  if(currentUser && currentUser.rol==='Lider'){
-    list = list.filter(m=>m.ministerio===currentUser.ministerio);
-  } else if(miembrosMinFilter){
-    list = list.filter(m=>m.ministerio===miembrosMinFilter);
-  }
+  miembrosSearch=filter;
+  let list=DB.miembros.filter(m=>((m.nombre+' '+m.apellido+' '+(m.cedula||'')).toLowerCase().includes(filter.toLowerCase())));
+  if(currentUser&&currentUser.rol==='Lider') list=list.filter(m=>m.ministerio===currentUser.ministerio);
+  else if(miembrosMinFilter) list=list.filter(m=>m.ministerio===miembrosMinFilter);
   renderMiembrosMinFilter();
-  const isAdmin = currentUser && currentUser.rol==='Admin';
-  document.getElementById('miembrosBody').innerHTML = list.map(m => {
-    const activo = m.activo !== false;
+  const isAdmin=currentUser&&currentUser.rol==='Admin';
+  document.getElementById('miembrosBody').innerHTML=list.map(m=>{
+    const activo=m.activo!==false;
     return `<tr style="${activo?'':'opacity:0.5'}">
       <td>${m.cedula||'—'}</td>
       <td><strong>${m.nombre} ${m.apellido}</strong></td>
@@ -1390,13 +1378,13 @@ function renderMiembrosTable(filter=''){
       <td><span class="badge badge-${m.bautizado==='SI'?'si':'no'}">${m.bautizado}</span></td>
       <td>${m.punto}</td>
       <td><span class="badge badge-${activo?'si':'no'}">${activo?'Activo':'Inactivo'}</span></td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap;">
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
         ${isAdmin?`<button class="btn btn-warn btn-sm" onclick="openEditMember('${m.id}')">Editar</button>`:''}
         ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="confirmDeleteMember('${m.id}')">${activo?'Desactivar':'Activar'}</button>`:''}
         ${isAdmin&&m.bautizado==='SI'&&activo?`<button class="btn btn-sm" style="background:#0F1F3D;color:#c9a84c;border:none;" onclick="openCertificado('${m.id}')">Certificado</button>`:''}
       </td>
     </tr>`;
-  }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">Sin miembros</td></tr>';
+  }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">Sin miembros</td></tr>';
 }
 function filterMiembrosTable(v){ renderMiembrosTable(v); }
 
@@ -1404,18 +1392,12 @@ function openModal(id){ document.getElementById('modal'+id.charAt(0).toUpperCase
 function closeModal(id){ document.getElementById('modal'+id.charAt(0).toUpperCase()+id.slice(1)).classList.remove('open'); }
 
 function openAddMember(){
-  editMemberId = null;
-  document.getElementById('modalMemberTitle').textContent = 'Agregar Miembro';
+  editMemberId=null;
+  document.getElementById('modalMemberTitle').textContent='Agregar Miembro';
   ['mCedula','mNombre','mApellido'].forEach(id=>document.getElementById(id).value='');
-  // Lock ministerio for leaders
-  const mSel = document.getElementById('mMinisterio');
-  if(currentUser.rol==='Lider'){
-    mSel.value = currentUser.ministerio;
-    mSel.disabled = true;
-  } else {
-    mSel.disabled = false;
-    mSel.value = 'Jovenes';
-  }
+  const mSel=document.getElementById('mMinisterio');
+  if(currentUser.rol==='Lider'){ mSel.value=currentUser.ministerio; mSel.disabled=true; }
+  else { mSel.disabled=false; mSel.value='Jovenes'; }
   document.getElementById('mTipo').value='Miembro Activo';
   document.getElementById('mBautizado').value='SI';
   document.getElementById('mPunto').value='CENTRAL';
@@ -1423,66 +1405,43 @@ function openAddMember(){
 }
 
 function openEditMember(id){
-  const m = DB.miembros.find(x=>x.id===id);
-  if(!m) return;
-  editMemberId = id;
-  document.getElementById('modalMemberTitle').textContent = 'Editar Miembro';
-  document.getElementById('mCedula').value = m.cedula||'';
-  document.getElementById('mNombre').value = m.nombre;
-  document.getElementById('mApellido').value = m.apellido;
-  const mSel = document.getElementById('mMinisterio');
-  mSel.value = m.ministerio;
-  mSel.disabled = currentUser.rol==='Lider';
-  document.getElementById('mTipo').value = m.tipo;
-  document.getElementById('mBautizado').value = m.bautizado;
-  document.getElementById('mPunto').value = m.punto;
+  const m=DB.miembros.find(x=>x.id===id);if(!m)return;
+  editMemberId=id;
+  document.getElementById('modalMemberTitle').textContent='Editar Miembro';
+  document.getElementById('mCedula').value=m.cedula||'';
+  document.getElementById('mNombre').value=m.nombre;
+  document.getElementById('mApellido').value=m.apellido;
+  const mSel=document.getElementById('mMinisterio');
+  mSel.value=m.ministerio; mSel.disabled=currentUser.rol==='Lider';
+  document.getElementById('mTipo').value=m.tipo;
+  document.getElementById('mBautizado').value=m.bautizado;
+  document.getElementById('mPunto').value=m.punto;
   openModal('addMember');
 }
 
-function normalizeCedulaValue(v=''){
-  return String(v).trim().replace(/\D/g,'');
-}
-
-function toTitleCaseName(v=''){
-  return String(v)
-    .trim()
-    .replace(/\s+/g,' ')
-    .toLowerCase()
-    .replace(/(^|[\s-])([a-záéíóúñ])/g,(m,p1,p2)=>p1+p2.toUpperCase());
-}
+function normalizeCedulaValue(v=''){ return String(v).trim().replace(/\D/g,''); }
+function toTitleCaseName(v=''){ return String(v).trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s-])([a-záéíóúñ])/g,(m,p1,p2)=>p1+p2.toUpperCase()); }
 
 async function saveMember(){
-  const cedulaInput = document.getElementById('mCedula').value;
-  const cedula = normalizeCedulaValue(cedulaInput);
-  const n = toTitleCaseName(document.getElementById('mNombre').value);
-  const a = toTitleCaseName(document.getElementById('mApellido').value);
+  const cedula=normalizeCedulaValue(document.getElementById('mCedula').value);
+  const n=toTitleCaseName(document.getElementById('mNombre').value);
+  const a=toTitleCaseName(document.getElementById('mApellido').value);
   if(!n||!a){ showToast('Nombre y apellido requeridos','error'); return; }
-  if(!cedula){
-    showAlertModal('La cédula es obligatoria y debe contener solo números.', 'Dato requerido');
-    return;
-  }
-
-  const cedulaExistente = DB.miembros.some(m =>
-    normalizeCedulaValue(m.cedula||'')===cedula && m.id!==editMemberId
-  );
-  if(cedulaExistente){
-    showAlertModal('La cédula ya existe en la base de datos.', 'Cédula duplicada');
-    return;
-  }
-
-  document.getElementById('mCedula').value = cedula;
-  document.getElementById('mNombre').value = n;
-  document.getElementById('mApellido').value = a;
-  const ministerio = document.getElementById('mMinisterio').value;
-  const tipo = document.getElementById('mTipo').value;
-  const bautizado = document.getElementById('mBautizado').value;
-  const punto = document.getElementById('mPunto').value;
+  if(!cedula){ showAlertModal('La cédula es obligatoria y debe contener solo números.','Dato requerido'); return; }
+  const cedulaExistente=DB.miembros.some(m=>normalizeCedulaValue(m.cedula||'')===cedula&&m.id!==editMemberId);
+  if(cedulaExistente){ showAlertModal('La cédula ya existe en la base de datos.','Cédula duplicada'); return; }
+  document.getElementById('mCedula').value=cedula;
+  document.getElementById('mNombre').value=n;
+  document.getElementById('mApellido').value=a;
+  const ministerio=document.getElementById('mMinisterio').value;
+  const tipo=document.getElementById('mTipo').value;
+  const bautizado=document.getElementById('mBautizado').value;
+  const punto=document.getElementById('mPunto').value;
   showLoader('Guardando miembro...');
   if(editMemberId){
-    const m = DB.miembros.find(x=>x.id===editMemberId);
-    m.cedula=cedula; m.nombre=n; m.apellido=a;
-    m.ministerio=ministerio; m.tipo=tipo; m.bautizado=bautizado; m.punto=punto;
-    await apiUpdate('MIEMBROS', editMemberId, {Cedula:cedula,Nombre:n,Apellido:a,Ministerio:ministerio,Tipo:tipo,Bautizado:bautizado,Punto:punto});
+    const m=DB.miembros.find(x=>x.id===editMemberId);
+    m.cedula=cedula;m.nombre=n;m.apellido=a;m.ministerio=ministerio;m.tipo=tipo;m.bautizado=bautizado;m.punto=punto;
+    await apiUpdate('MIEMBROS',editMemberId,{Cedula:cedula,Nombre:n,Apellido:a,Ministerio:ministerio,Tipo:tipo,Bautizado:bautizado,Punto:punto});
     addLog('miembro',`${currentUser.nombre} editó miembro: ${n} ${a}`,'info');
     showToast('✓ Miembro actualizado','success');
   } else {
@@ -1494,71 +1453,56 @@ async function saveMember(){
     showToast('✓ Miembro agregado','success');
   }
   hideLoader();
-  saveDB(); closeModal('addMember'); renderMiembrosTable(); renderMembersGrid();
+  saveDB();closeModal('addMember');renderMiembrosTable();renderMembersGrid();
 }
 
-// Modal de confirmación reutilizable
-let _confirmCallback = null;
-let _confirmMode = 'confirm';
-function showConfirm(msg, onConfirm){
-  _confirmMode = 'confirm';
-  _confirmCallback = onConfirm;
-  document.getElementById('confirmTitle').textContent = 'Confirmar acción';
-  document.getElementById('confirmMsg').textContent = msg;
-  document.getElementById('confirmOkBtn').textContent = 'Sí, confirmar';
-  document.getElementById('confirmCancelBtn').style.display = '';
+let _confirmCallback=null;
+let _confirmMode='confirm';
+
+function showConfirm(msg,onConfirm){
+  _confirmMode='confirm'; _confirmCallback=onConfirm;
+  document.getElementById('confirmTitle').textContent='Confirmar acción';
+  document.getElementById('confirmMsg').textContent=msg;
+  document.getElementById('confirmOkBtn').textContent='Sí, confirmar';
+  document.getElementById('confirmCancelBtn').style.display='';
   document.getElementById('confirmOkBtn').classList.remove('btn-primary');
   document.getElementById('confirmOkBtn').classList.add('btn-danger');
   document.getElementById('modalConfirm').classList.add('open');
 }
 
-function showAlertModal(msg, title='Aviso'){
-  _confirmMode = 'alert';
-  _confirmCallback = null;
-  document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmMsg').textContent = msg;
-  document.getElementById('confirmOkBtn').textContent = 'Entendido';
-  document.getElementById('confirmCancelBtn').style.display = 'none';
+function showAlertModal(msg,title='Aviso'){
+  _confirmMode='alert'; _confirmCallback=null;
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  document.getElementById('confirmOkBtn').textContent='Entendido';
+  document.getElementById('confirmCancelBtn').style.display='none';
   document.getElementById('confirmOkBtn').classList.remove('btn-danger');
   document.getElementById('confirmOkBtn').classList.add('btn-primary');
   document.getElementById('modalConfirm').classList.add('open');
 }
 
-function doConfirm(){ 
+function doConfirm(){
   document.getElementById('modalConfirm').classList.remove('open');
-  if(_confirmMode==='alert'){
-    _confirmCallback = null;
-    return;
-  }
+  if(_confirmMode==='alert'){ _confirmCallback=null; return; }
   if(_confirmCallback) _confirmCallback();
-  _confirmCallback = null;
+  _confirmCallback=null;
 }
-function cancelConfirm(){
-  document.getElementById('modalConfirm').classList.remove('open');
-  _confirmCallback = null;
-}
+function cancelConfirm(){ document.getElementById('modalConfirm').classList.remove('open'); _confirmCallback=null; }
 
 function confirmDeleteMember(id){
-  const m = DB.miembros.find(x=>x.id===id);
-  if(!m) return;
-  const activo = m.activo !== false;
-  const accion = activo ? 'desactivar' : 'activar';
-  showConfirm(
-    `¿Estás seguro de ${accion} a ${m.nombre} ${m.apellido}? ${activo?'El miembro no aparecerá en los registros de asistencia.':'El miembro volverá a estar disponible.'}`,
-    () => toggleMemberActive(id)
-  );
+  const m=DB.miembros.find(x=>x.id===id);if(!m)return;
+  const activo=m.activo!==false;
+  showConfirm(`¿Estás seguro de ${activo?'desactivar':'activar'} a ${m.nombre} ${m.apellido}?`,()=>toggleMemberActive(id));
 }
 
 async function toggleMemberActive(id){
-  const m = DB.miembros.find(x=>x.id===id);
-  if(!m) return;
-  m.activo = m.activo === false ? true : false;
-  const accion = m.activo ? 'activó' : 'desactivó';
+  const m=DB.miembros.find(x=>x.id===id);if(!m)return;
+  m.activo=m.activo===false?true:false;
   showLoader('Actualizando...');
-  await apiUpdate('MIEMBROS', id, {Activo: m.activo});
+  await apiUpdate('MIEMBROS',id,{Activo:m.activo});
   hideLoader();
-  addLog('miembro',`${currentUser.nombre} ${accion} miembro: ${m.nombre} ${m.apellido}`,'warn');
-  saveDB(); renderMiembrosTable(); renderMembersGrid();
+  addLog('miembro',`${currentUser.nombre} ${m.activo?'activó':'desactivó'} miembro: ${m.nombre} ${m.apellido}`,'warn');
+  saveDB();renderMiembrosTable();renderMembersGrid();
   showToast(`Miembro ${m.activo?'activado':'desactivado'}`);
 }
 
@@ -1573,18 +1517,14 @@ function renderUsuariosTable(filter=''){
     <td><span class="badge badge-${u.rol.toLowerCase()}">${u.rol}</span></td>
     <td>${u.ministerio||'—'}</td>
     <td><span class="badge badge-${u.activo!==false?'si':'no'}">${u.activo!==false?'Activo':'Inactivo'}</span></td>
-    <td style="display:flex;gap:6px;flex-wrap:wrap;">
+    <td style="display:flex;gap:4px;flex-wrap:wrap;">
       <button class="btn btn-warn btn-sm" onclick="editUser('${u.id}')">Editar</button>
       ${u.id!==currentUser.id?`<button class="btn btn-danger btn-sm" onclick="toggleUserActive('${u.id}')">${u.activo!==false?'Desactivar':'Activar'}</button>`:''}
     </td>
   </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin usuarios</td></tr>';
 }
-function filterUsuariosTable(v){renderUsuariosTable(v);}
-
-function toggleMinisterioField(){
-  const rol=document.getElementById('uRol').value;
-  document.getElementById('uMinisterioWrap').style.display=rol==='Lider'?'block':'none';
-}
+function filterUsuariosTable(v){ renderUsuariosTable(v); }
+function toggleMinisterioField(){ document.getElementById('uMinisterioWrap').style.display=document.getElementById('uRol').value==='Lider'?'block':'none'; }
 
 function openAddUser(){
   editUserId=null;
@@ -1614,19 +1554,19 @@ async function saveUser(){
   const pass=document.getElementById('uPass').value;
   const rol=document.getElementById('uRol').value;
   const ministerio=rol==='Lider'?document.getElementById('uMinisterio').value:'';
-  if(!email||!nombre){showToast('Email y nombre requeridos','error');return;}
-  document.getElementById('uNombre').value = nombre;
+  if(!email||!nombre){ showToast('Email y nombre requeridos','error'); return; }
+  document.getElementById('uNombre').value=nombre;
   const exists=DB.usuarios.find(u=>u.email===email&&u.id!==editUserId);
-  if(exists){showToast('Ya existe un usuario con ese email','error');return;}
+  if(exists){ showToast('Ya existe un usuario con ese email','error'); return; }
   showLoader('Guardando usuario...');
   if(editUserId){
     const u=DB.usuarios.find(x=>x.id===editUserId);
     u.email=email;u.nombre=nombre;u.rol=rol;u.ministerio=ministerio;
     if(pass.length>=6) u.pass=pass;
-    await apiUpdate('USUARIOS', editUserId, {Email:email,Nombre:nombre,Rol:rol,Ministerio:ministerio,...(pass.length>=6?{Password:pass}:{})});
+    await apiUpdate('USUARIOS',editUserId,{Email:email,Nombre:nombre,Rol:rol,Ministerio:ministerio,...(pass.length>=6?{Password:pass}:{})});
     addLog('usuario',`${currentUser.nombre} editó usuario: ${nombre}`,'info');
   } else {
-    if(pass.length<6){hideLoader();showToast('Contraseña mínimo 6 caracteres','error');return;}
+    if(pass.length<6){ hideLoader();showToast('Contraseña mínimo 6 caracteres','error');return; }
     const id='u'+Date.now();
     DB.usuarios.push({id,email,nombre,pass,rol,ministerio,activo:true});
     await apiAdd('USUARIOS',{ID:id,Email:email,Nombre:nombre,Password:pass,Rol:rol,Ministerio:ministerio,Activo:true});
@@ -1641,17 +1581,12 @@ async function toggleUserActive(id){
   const u=DB.usuarios.find(x=>x.id===id);if(!u)return;
   u.activo=!u.activo;
   showLoader('Actualizando...');
-  await apiUpdate('USUARIOS', id, {Activo: u.activo});
+  await apiUpdate('USUARIOS',id,{Activo:u.activo});
   hideLoader();
   addLog('usuario',`${currentUser.nombre} ${u.activo?'activó':'desactivó'} usuario: ${u.nombre}`,'warn');
   saveDB();renderUsuariosTable();
   showToast(u.activo?'Usuario activado':'Usuario desactivado');
 }
-
-// Override openModal for addUser to use openAddUser
-const _origOpenAddUser = ()=>openModal('addUser');
-document.querySelector('[onclick="openModal(\'addUser\')"]') && 
-  document.querySelector('[onclick="openModal(\'addUser\')"]').setAttribute('onclick',"openAddUser()");
 
 // ============================================================
 // LOG
@@ -1660,7 +1595,6 @@ async function addLog(tipo,msg,level='info'){
   const entry={id:'l'+Date.now()+Math.random().toString(36).slice(2),ts:new Date().toISOString(),tipo,msg,level,user:currentUser?currentUser.nombre:'sistema'};
   DB.log.unshift(entry);
   if(DB.log.length>500) DB.log=DB.log.slice(0,500);
-  // Persist to Sheets
   await apiAdd('LOG',{ID:entry.id,Timestamp:entry.ts,Tipo:tipo,Mensaje:msg,Usuario:entry.user});
 }
 
@@ -1679,11 +1613,7 @@ function renderLog(filter=''){
     </div>`).join('');
 }
 
-function clearLog(){
-  if(!confirm('¿Limpiar todo el log?'))return;
-  DB.log=[];saveDB();renderLog();
-  showToast('Log limpiado');
-}
+function clearLog(){ if(!confirm('¿Limpiar todo el log?'))return; DB.log=[];saveDB();renderLog();showToast('Log limpiado'); }
 
 // ============================================================
 // DASHBOARD
@@ -1710,14 +1640,14 @@ function setDashPeriod(p,btn){
   dashPeriod=p;dashFrom=null;dashTo=null;
   document.getElementById('dashFrom').value='';
   document.getElementById('dashTo').value='';
-  document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#sec-dashboard .period-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderDashboard();
 }
 function setDashRange(){
   dashFrom=document.getElementById('dashFrom').value||null;
   dashTo=document.getElementById('dashTo').value||null;
-  document.querySelectorAll('.period-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#sec-dashboard .period-tab').forEach(b=>b.classList.remove('active'));
   renderDashboard();
 }
 
@@ -1753,92 +1683,75 @@ function renderDashboard(){
     byServ[sk]=(byServ[sk]||0)+1;
     byDate[r.fecha]=(byDate[r.fecha]||0)+1;
   });
-
-  // Santa Cena: ahora se lee de la hoja SANTA_CENA, filtrada por el mismo período
   getFilteredSantaCena().forEach(sc=>{
-    if(!sc.asistio || !sc.miembro) return;
-    const min = mmap[sc.miembro] || 'General';
-    byCena[min] = (byCena[min]||0) + 1;
+    if(!sc.asistio||!sc.miembro) return;
+    const min=mmap[sc.miembro]||'General';
+    byCena[min]=(byCena[min]||0)+1;
   });
   const totalCena=Object.values(byCena).reduce((a,b)=>a+b,0);
   const fechasUnicas=Object.keys(byDate).length;
-  const isAdmin = currentUser && currentUser.rol === 'Admin';
-  const totalBautizadosMiembros = DB.miembros.filter(m=>m.activo!==false && m.bautizado==='SI').length;
-  const totalBautizosEv   = DB.eventos.filter(e=>e.tipo==='bautizo').length;
-  const totalPresentaciones = DB.eventos.filter(e=>e.tipo==='presentacion').length;
-  const totalMatrimonios    = DB.eventos.filter(e=>e.tipo==='matrimonio').length;
-  const evKpi = (label, val) => isAdmin
-    ? `<div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">${label} ↗</div><div class="value" style="font-size:1.6rem;">${val}</div><div class="sub">eventos registrados</div></div>`
-    : `<div class="stat-card" style="border:2px solid rgba(201,168,76,0.4);"><div class="label">${label}</div><div class="value" style="font-size:1.6rem;">${val}</div><div class="sub">eventos registrados</div></div>`;
+  const isAdmin=currentUser&&currentUser.rol==='Admin';
+  const totalBautizadosMiembros=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI').length;
+  const totalBautizosEv=DB.eventos.filter(e=>e.tipo==='bautizo').length;
+  const totalPresentaciones=DB.eventos.filter(e=>e.tipo==='presentacion').length;
+  const totalMatrimonios=DB.eventos.filter(e=>e.tipo==='matrimonio').length;
+  const evKpi=(label,val)=>isAdmin
+    ?`<div class="stat-card" onclick="document.getElementById('navEventos').click()" style="cursor:pointer;border:2px solid rgba(201,168,76,0.4);"><div class="label">${label} ↗</div><div class="value" style="font-size:1.5rem;">${val}</div><div class="sub">eventos</div></div>`
+    :`<div class="stat-card"><div class="label">${label}</div><div class="value" style="font-size:1.5rem;">${val}</div><div class="sub">eventos</div></div>`;
   document.getElementById('statsGrid').innerHTML=`
     <div class="stat-card"><div class="label">Total Asistencias</div><div class="value">${rows.length}</div><div class="sub">registros</div></div>
-    <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">personas tomaron</div></div>
+    <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">personas</div></div>
     <div class="stat-card"><div class="label">Servicios</div><div class="value">${fechasUnicas}</div><div class="sub">en el período</div></div>
-    <div class="stat-card" onclick="document.querySelector('nav button:nth-child(4)').click()" style="cursor:pointer;border:2px solid var(--gold);"><div class="label">Miembros ↗</div><div class="value">${DB.miembros.filter(m=>m.activo!==false).length}</div><div class="sub">activos registrados</div></div>
-    <div class="stat-card" style="border:2px solid #dbeafe;"><div class="label">Bautizados</div><div class="value" style="font-size:1.6rem;">${totalBautizadosMiembros}</div><div class="sub">en lista de miembros</div></div>
-    ${evKpi('Bautizos', totalBautizosEv)}
-    ${evKpi('Presentaciones', totalPresentaciones)}
-    ${evKpi('Matrimonios', totalMatrimonios)}
+    <div class="stat-card" onclick="document.querySelector('nav button:nth-child(4)').click()" style="cursor:pointer;border:2px solid var(--gold);"><div class="label">Miembros ↗</div><div class="value">${DB.miembros.filter(m=>m.activo!==false).length}</div><div class="sub">activos</div></div>
+    <div class="stat-card"><div class="label">Bautizados</div><div class="value" style="font-size:1.5rem;">${totalBautizadosMiembros}</div><div class="sub">en lista</div></div>
+    ${evKpi('Bautizos',totalBautizosEv)}
+    ${evKpi('Presentaciones',totalPresentaciones)}
+    ${evKpi('Matrimonios',totalMatrimonios)}
   `;
   const minL=Object.keys(byMin);
   const servL=Object.keys(byServ);
   const dateL=Object.keys(byDate).sort();
-  dChart('chartMin','bar',{labels:minL,datasets:[{data:minL.map(l=>byMin[l]||0),backgroundColor:minL.map(l=>CMIN[l]||'#888'),borderRadius:6}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280'}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
+  dChart('chartMin','bar',{labels:minL,datasets:[{data:minL.map(l=>byMin[l]||0),backgroundColor:minL.map(l=>CMIN[l]||'#888'),borderRadius:6}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
   if(totalCena>0){
-    dChart('chartCena','doughnut',{labels:Object.keys(byCena),datasets:[{data:Object.values(byCena),backgroundColor:Object.keys(byCena).map(l=>CMIN[l]||'#888'),borderWidth:3}]},{cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}}});
+    dChart('chartCena','doughnut',{labels:Object.keys(byCena),datasets:[{data:Object.values(byCena),backgroundColor:Object.keys(byCena).map(l=>CMIN[l]||'#888'),borderWidth:3}]},{cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}});
   } else {
     resetCanvas('chartCena');
-    document.getElementById('chartCena').parentElement.innerHTML='<p style="text-align:center;color:var(--gray);padding:4rem 0;font-size:0.88rem">Sin datos de Santa Cena en este período</p>';
+    const el=document.getElementById('chartCena');
+    if(el) el.parentElement.innerHTML='<p style="text-align:center;color:var(--gray);padding:3rem 0;font-size:0.88rem">Sin datos de Santa Cena</p>';
   }
   dChart('chartServ','bar',{labels:servL,datasets:[{data:servL.map(l=>byServ[l]||0),backgroundColor:servL.map(l=>CSERV[l]||'#888'),borderRadius:6}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
-  dChart('chartTrend','line',{labels:dateL.map(d=>formatDateShort(d)),datasets:[{data:dateL.map(d=>byDate[d]),borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#c9a84c',pointRadius:4}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280'}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
+  dChart('chartTrend','line',{labels:dateL.map(d=>formatDateShort(d)),datasets:[{data:dateL.map(d=>byDate[d]),borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#c9a84c',pointRadius:4}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
   bindDashboardChartClicks();
 }
 
 function bindDashboardChartClicks(){
-  const list = [
-    {id:'chartMin', title:'Asistencia por Ministerio'},
-    {id:'chartCena', title:'Santa Cena por Ministerio'},
-    {id:'chartServ', title:'Asistencia por Servicio'},
-    {id:'chartTrend', title:'Tendencia de Asistencia'}
-  ];
-  list.forEach(item=>{
-    const canvas = document.getElementById(item.id);
+  [['chartMin','Asistencia por Ministerio'],['chartCena','Santa Cena por Ministerio'],['chartServ','Asistencia por Servicio'],['chartTrend','Tendencia de Asistencia']].forEach(([id,title])=>{
+    const canvas=document.getElementById(id);
     if(!canvas) return;
-    canvas.style.cursor = 'zoom-in';
-    canvas.onclick = () => openChartModal(item.id, item.title);
+    canvas.style.cursor='zoom-in';
+    canvas.onclick=()=>openChartModal(id,title);
   });
 }
 
-function openChartModal(chartId, title){
-  const src = charts[chartId];
-  if(!src){
-    showToast('No hay datos para ampliar este grafico','error');
-    return;
-  }
+function openChartModal(chartId,title){
+  const src=charts[chartId];
+  if(!src){ showToast('No hay datos para ampliar','error'); return; }
   document.getElementById('modalChart').classList.add('open');
-
-  if(modalChart){ modalChart.destroy(); modalChart = null; }
-  const canvas = document.getElementById('modalChartCanvas');
-  const data = JSON.parse(JSON.stringify(src.config.data));
-  const options = JSON.parse(JSON.stringify(src.config.options || {}));
-  options.responsive = true;
-  options.maintainAspectRatio = false;
-  options.plugins = options.plugins || {};
-  options.plugins.legend = options.plugins.legend || {};
-  options.plugins.legend.display = false;
-  modalChart = new Chart(canvas, { type: src.config.type, data, options });
+  if(modalChart){ modalChart.destroy(); modalChart=null; }
+  const canvas=document.getElementById('modalChartCanvas');
+  const data=JSON.parse(JSON.stringify(src.config.data));
+  const options=JSON.parse(JSON.stringify(src.config.options||{}));
+  options.responsive=true;options.maintainAspectRatio=false;
+  options.plugins=options.plugins||{};
+  options.plugins.legend=options.plugins.legend||{};
+  options.plugins.legend.display=false;
+  modalChart=new Chart(canvas,{type:src.config.type,data,options});
 }
-
-function closeChartModal(){
-  document.getElementById('modalChart').classList.remove('open');
-  if(modalChart){ modalChart.destroy(); modalChart = null; }
-}
+function closeChartModal(){ document.getElementById('modalChart').classList.remove('open'); if(modalChart){modalChart.destroy();modalChart=null;} }
 
 function dChart(id,type,data,extraOptions={}){
   if(charts[id]){charts[id].destroy();delete charts[id];}
-  const canvas=document.getElementById(id);
-  if(!canvas)return;
+  const canvas=document.getElementById(id);if(!canvas)return;
   charts[id]=new Chart(canvas,{type,data,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},...extraOptions}});
 }
 function resetCanvas(id){
@@ -1848,7 +1761,7 @@ function resetCanvas(id){
 }
 
 // ============================================================
-// EXPORT
+// EXPORT EXCEL GENERAL
 // ============================================================
 function exportExcel(){
   const mmap={};DB.miembros.forEach(m=>mmap[m.id]={nombre:m.nombre+' '+m.apellido,ministerio:m.ministerio,cedula:m.cedula||''});
@@ -1865,9 +1778,10 @@ function exportExcel(){
 // ============================================================
 // UTILS
 // ============================================================
-function formatDate(d){if(!d)return '';const[y,m,day]=d.split('-');const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return `${day} ${months[parseInt(m)-1]} ${y}`;}
-function formatDateShort(d){if(!d)return '';const[y,m,day]=d.split('-');return `${day}/${m}`;}
-function formatTs(ts){if(!ts)return '';const d=new Date(ts);return d.toLocaleDateString('es-CO')+' '+d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});}
+function formatDate(d){ if(!d)return ''; const[y,m,day]=d.split('-');const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return `${day} ${months[parseInt(m)-1]} ${y}`; }
+function formatDateShort(d){ if(!d)return ''; const[y,m,day]=d.split('-');return `${day}/${m}`; }
+function formatTs(ts){ if(!ts)return ''; const d=new Date(ts);return d.toLocaleDateString('es-CO')+' '+d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}); }
+function fmtCOP(v){ return '$'+Number(v||0).toLocaleString('es-CO',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 function showToast(msg,type=''){
   const t=document.getElementById('toast');
@@ -1878,10 +1792,10 @@ function showToast(msg,type=''){
 
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{
-    if(e.target!==m) return;
+    if(e.target!==m)return;
     if(m.id==='modalChart') closeChartModal();
-    else if(m.id==='modalAddEvento'){ editEventoId=null; m.classList.remove('open'); }
-    else if(m.id==='modalAddCont'){ editContId=null; m.classList.remove('open'); }
+    else if(m.id==='modalAddEvento'){ editEventoId=null;m.classList.remove('open'); }
+    else if(m.id==='modalAddCont'){ editContId=null;m.classList.remove('open'); }
     else m.classList.remove('open');
   });
 });
@@ -1889,21 +1803,15 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 // ============================================================
 // VISITANTES (contador por ministerio)
 // ============================================================
-let visitorCounts = {}; // { Jovenes: 3, Damas: 5, ... }
-
-//const VISITOR_MINISTERIOS = ['Jovenes','Caballeros','Damas','Adolescentes','General'];
-const VISITOR_MINISTERIOS = ['Jovenes','Caballeros','Damas','Adolescentes','Biblias','Niños','Intermedios'];
+let visitorCounts={};
 
 function renderVisitorCounters(){
-  const cont = document.getElementById('visitorCounters');
-  if(!cont) return;
-  // Si es líder, solo su ministerio
-  let mins = VISITOR_MINISTERIOS;
-  if(currentUser && currentUser.rol === 'Lider'){
-    mins = [currentUser.ministerio];
-  }
-  cont.innerHTML = mins.map(m=>{
-    const n = visitorCounts[m] || 0;
+  const cont=document.getElementById('visitorCounters');
+  if(!cont)return;
+  let mins=VISITOR_MINISTERIOS;
+  if(currentUser&&currentUser.rol==='Lider') mins=[currentUser.ministerio];
+  cont.innerHTML=mins.map(m=>{
+    const n=visitorCounts[m]||0;
     return `<div class="vc-card ${n>0?'has-count':''}" id="vc-${m}">
       <div class="vc-min">${m}</div>
       <div class="vc-controls">
@@ -1916,367 +1824,290 @@ function renderVisitorCounters(){
   updateVisitorLabel();
 }
 
-function changeVisitor(min, delta){
-  visitorCounts[min] = Math.max(0, (visitorCounts[min]||0) + delta);
-  const countEl = document.getElementById('vc-count-'+min);
-  const card = document.getElementById('vc-'+min);
-  if(countEl) countEl.textContent = visitorCounts[min];
-  if(card) card.classList.toggle('has-count', visitorCounts[min] > 0);
+function changeVisitor(min,delta){
+  visitorCounts[min]=Math.max(0,(visitorCounts[min]||0)+delta);
+  const countEl=document.getElementById('vc-count-'+min);
+  const card=document.getElementById('vc-'+min);
+  if(countEl) countEl.textContent=visitorCounts[min];
+  if(card) card.classList.toggle('has-count',visitorCounts[min]>0);
   updateVisitorLabel();
 }
 
 function updateVisitorLabel(){
-  const total = Object.values(visitorCounts).reduce((a,b)=>a+b,0);
-  const lbl = document.getElementById('visitantesLabel');
-  if(lbl) lbl.textContent = total > 0 ? `(${total} en total)` : '';
+  const total=Object.values(visitorCounts).reduce((a,b)=>a+b,0);
+  const lbl=document.getElementById('visitantesLabel');
+  if(lbl) lbl.textContent=total>0?`(${total} en total)`:'';
 }
 
-// Compatibilidad: estas se llaman en otros lados, las dejamos vacías/redirigidas
 function renderVisitantesList(){ renderVisitorCounters(); }
-function toggleVisitorForm(){ /* ya no se usa */ }
 
 // ============================================================
-// SANTA CENA
+// SANTA CENA – CAMBIO 4: responsive tarjetas nombres largos
 // ============================================================
-let scPresentes = new Set();
-let scMinFilter = '';
+let scPresentes=new Set();
+let scMinFilter='';
 
-function getPrimerDomingo(year, month){
-  const d = new Date(year, month, 1);
-  const dow = d.getDay(); // 0=domingo
-  const diff = dow === 0 ? 0 : 7 - dow;
-  d.setDate(d.getDate() + diff);
+function getPrimerDomingo(year,month){
+  const d=new Date(year,month,1);
+  const dow=d.getDay();
+  const diff=dow===0?0:7-dow;
+  d.setDate(d.getDate()+diff);
   return d.toISOString().split('T')[0];
 }
 
 function getMostRecentPrimerDomingo(){
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  let pd = getPrimerDomingo(now.getFullYear(), now.getMonth());
-  if(pd > todayStr){
-    const prev = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-    pd = getPrimerDomingo(prevYear, prev);
+  const now=new Date();
+  const todayStr=now.toISOString().split('T')[0];
+  let pd=getPrimerDomingo(now.getFullYear(),now.getMonth());
+  if(pd>todayStr){
+    const prev=now.getMonth()===0?11:now.getMonth()-1;
+    const prevYear=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();
+    pd=getPrimerDomingo(prevYear,prev);
   }
   return pd;
 }
 
-function setSCPrimerDomingo(){
-  document.getElementById('scFecha').value = getMostRecentPrimerDomingo();
-  renderSantaCena();
-}
+function setSCPrimerDomingo(){ document.getElementById('scFecha').value=getMostRecentPrimerDomingo(); renderSantaCena(); }
 
-function toggleSCMember(id, el){
-  const yaEnBD = el.dataset.locked === 'true';
-  if(yaEnBD) return; // no se puede desmarcar lo ya guardado
+function toggleSCMember(id,el){
+  if(el.dataset.locked==='true') return;
   if(scPresentes.has(id)){
-    scPresentes.delete(id);
-    el.classList.remove('cena-si');
-    el.querySelector('.check').style.cssText = '';
+    scPresentes.delete(id); el.classList.remove('cena-si');
+    el.querySelector('.check').style.cssText='';
   } else {
-    scPresentes.add(id);
-    el.classList.add('cena-si');
-    el.querySelector('.check').style.cssText = 'background:var(--success);border-color:var(--success);';
+    scPresentes.add(id); el.classList.add('cena-si');
+    el.querySelector('.check').style.cssText='background:var(--success);border-color:var(--success);';
   }
 }
 
-function setScMinFilter(min, btn){
-  scMinFilter = min;
+function setScMinFilter(min,btn){
+  scMinFilter=min;
   document.querySelectorAll('#scMinFilterWrap .period-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderSantaCenaGrid();
 }
 
 function renderSantaCena(){
-  const fecha = document.getElementById('scFecha')?.value || '';
-  const asistieronFecha = new Set(
-    DB.asistencia.filter(a => a.fecha === fecha).map(a => a.miembro)
-  );
-  const yaRegistradosSC = new Set(
-    DB.santa_cena.filter(sc => sc.fecha === fecha && sc.miembro).map(sc => sc.miembro)
-  );
-  scPresentes = new Set([...yaRegistradosSC]);
-
-  const bautizados = DB.miembros.filter(m => m.activo !== false && m.bautizado === 'SI');
-  const totalAsistieron = bautizados.filter(m => asistieronFecha.has(m.id)).length;
-
-  // Renderizar filtros de ministerio
-  const filterWrap = document.getElementById('scMinFilterWrap');
+  const fecha=document.getElementById('scFecha')?.value||'';
+  const asistieronFecha=new Set(DB.asistencia.filter(a=>a.fecha===fecha).map(a=>a.miembro));
+  const yaRegistradosSC=new Set(DB.santa_cena.filter(sc=>sc.fecha===fecha&&sc.miembro).map(sc=>sc.miembro));
+  scPresentes=new Set([...yaRegistradosSC]);
+  const bautizados=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI');
+  const totalAsistieron=bautizados.filter(m=>asistieronFecha.has(m.id)).length;
+  const filterWrap=document.getElementById('scMinFilterWrap');
   if(filterWrap){
-    const ministerios = [...new Set(bautizados.map(m=>m.ministerio))].sort();
-    filterWrap.innerHTML =
-      `<button class="period-tab ${scMinFilter===''?'active':''}" onclick="setScMinFilter('',this)">Todos</button>` +
+    const ministerios=[...new Set(bautizados.map(m=>m.ministerio))].sort();
+    filterWrap.innerHTML=
+      `<button class="period-tab ${scMinFilter===''?'active':''}" onclick="setScMinFilter('',this)">Todos</button>`+
       ministerios.map(mn=>`<button class="period-tab ${scMinFilter===mn?'active':''}" onclick="setScMinFilter('${mn}',this)">${mn}</button>`).join('');
-    filterWrap.className = 'period-tabs';
-    filterWrap.style.marginBottom = '1rem';
+    filterWrap.className='period-tabs';
+    filterWrap.style.marginBottom='1rem';
   }
-
-  const statsEl = document.getElementById('scStats');
-  if(statsEl) statsEl.innerHTML = `
+  const statsEl=document.getElementById('scStats');
+  if(statsEl) statsEl.innerHTML=`
     <div class="stat-card"><div class="label">Bautizados activos</div><div class="value">${bautizados.length}</div></div>
     <div class="stat-card"><div class="label">Asistieron</div><div class="value">${totalAsistieron}</div></div>
     <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${yaRegistradosSC.size}</div></div>
   `;
-
   renderSantaCenaGrid();
 }
 
 function renderSantaCenaGrid(){
-  const fecha = document.getElementById('scFecha')?.value || '';
-  const asistieronFecha = new Set(
-    DB.asistencia.filter(a => a.fecha === fecha).map(a => a.miembro)
-  );
-  const yaRegistradosSC = new Set(
-    DB.santa_cena.filter(sc => sc.fecha === fecha && sc.miembro).map(sc => sc.miembro)
-  );
-
-  let bautizados = DB.miembros.filter(m => m.activo !== false && m.bautizado === 'SI');
-  if(scMinFilter) bautizados = bautizados.filter(m => m.ministerio === scMinFilter);
-
-  const grid = document.getElementById('scMembersGrid');
-  if(!grid) return;
-  grid.innerHTML = bautizados.map(m => {
-    const locked  = yaRegistradosSC.has(m.id);
-    const selected = scPresentes.has(m.id);
-    const asistio = asistieronFecha.has(m.id);
-    const init = m.nombre[0] + (m.apellido[0]||'');
-    let cls = locked ? 'cena-si cena-lock' : (selected ? 'cena-si' : (asistio ? '' : 'cena-no'));
-    return `<div class="member-card ${cls}" onclick="toggleSCMember('${m.id}',this)" data-id="${m.id}" data-locked="${locked}">
-      <div class="member-avatar">${init}</div>
-      <div class="member-info">
+  const fecha=document.getElementById('scFecha')?.value||'';
+  const asistieronFecha=new Set(DB.asistencia.filter(a=>a.fecha===fecha).map(a=>a.miembro));
+  const yaRegistradosSC=new Set(DB.santa_cena.filter(sc=>sc.fecha===fecha&&sc.miembro).map(sc=>sc.miembro));
+  let bautizados=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI');
+  if(scMinFilter) bautizados=bautizados.filter(m=>m.ministerio===scMinFilter);
+  const grid=document.getElementById('scMembersGrid');
+  if(!grid)return;
+  // CAMBIO 4: tarjetas responsive para nombres largos — flex-direction column en nombres muy largos
+  grid.innerHTML=bautizados.map(m=>{
+    const locked=yaRegistradosSC.has(m.id);
+    const selected=scPresentes.has(m.id);
+    const asistio=asistieronFecha.has(m.id);
+    const init=m.nombre[0]+(m.apellido[0]||'');
+    let cls=locked?'cena-si cena-lock':(selected?'cena-si':(asistio?'':'cena-no'));
+    return `<div class="member-card ${cls}" onclick="toggleSCMember('${m.id}',this)" data-id="${m.id}" data-locked="${locked}" style="align-items:flex-start;">
+      <div class="member-avatar" style="flex-shrink:0;">${init}</div>
+      <div class="member-info" style="flex:1;min-width:0;">
         <div class="mname">${m.nombre} ${m.apellido}${locked?'<span class="already-badge">guardado</span>':''}</div>
         <div class="mmin">${m.ministerio}</div>
       </div>
       <div class="check" style="${selected?'background:var(--success);border-color:var(--success);':''}"></div>
     </div>`;
-  }).join('') || '<p style="color:var(--gray);padding:1rem 0">Sin miembros bautizados activos</p>';
+  }).join('')||'<p style="color:var(--gray);padding:1rem 0">Sin miembros bautizados activos</p>';
 }
 
 async function guardarSantaCena(){
-  const fecha = document.getElementById('scFecha').value;
+  const fecha=document.getElementById('scFecha').value;
   if(!fecha){ showToast('Selecciona una fecha','error'); return; }
-  const yaRegistrados = new Set(DB.santa_cena.filter(sc => sc.fecha === fecha && sc.miembro).map(sc => sc.miembro));
-  const nuevos = [];
-  scPresentes.forEach(mid => {
-    if(!yaRegistrados.has(mid)) nuevos.push(mid);
-  });
-  if(nuevos.length === 0){ showToast('Sin registros nuevos para guardar','error'); return; }
+  const yaRegistrados=new Set(DB.santa_cena.filter(sc=>sc.fecha===fecha&&sc.miembro).map(sc=>sc.miembro));
+  const nuevos=[];
+  scPresentes.forEach(mid=>{ if(!yaRegistrados.has(mid)) nuevos.push(mid); });
+  if(nuevos.length===0){ showToast('Sin registros nuevos para guardar','error'); return; }
   showLoader('Guardando Santa Cena...');
- const rowsToSave = nuevos.map(mid => {
-    const id = 'sc' + Date.now() + Math.random().toString(36).slice(2);
-    const ts = new Date().toISOString();
-    DB.santa_cena.push({ id, fecha, miembro:mid, nombre_visitante:'', asistio:true, registrado_por:currentUser.nombre, ts });
-    return { ID:id, Fecha:fecha, ID_Miembro:mid, Nombre_Visitante:'', Asistio:true, Registrado_Por:currentUser.nombre, Timestamp:ts };
+  const rowsToSave=nuevos.map(mid=>{
+    const id='sc'+Date.now()+Math.random().toString(36).slice(2);
+    const ts=new Date().toISOString();
+    DB.santa_cena.push({id,fecha,miembro:mid,nombre_visitante:'',asistio:true,registrado_por:currentUser.nombre,ts});
+    return{ID:id,Fecha:fecha,ID_Miembro:mid,Nombre_Visitante:'',Asistio:true,Registrado_Por:currentUser.nombre,Timestamp:ts};
   });
-  await apiAddBatch('SANTA_CENA', rowsToSave);
+  await apiAddBatch('SANTA_CENA',rowsToSave);
   hideLoader();
   addLog('asistencia',`${currentUser.nombre} registró Santa Cena: ${nuevos.length} personas — ${fecha}`,'success');
-  saveDB();
-  renderSantaCena();
+  saveDB();renderSantaCena();
   showToast(`✓ ${nuevos.length} registros de Santa Cena guardados`,'success');
 }
 
 // ============================================================
 // EVENTOS
 // ============================================================
-let currentEventoTab = 'bautizo';
-let editEventoId = null;
+let currentEventoTab='bautizo';
+let editEventoId=null;
 
-function setModalEventoTab(tab, btn){
-  currentEventoTab = tab;
+function setModalEventoTab(tab,btn){
+  currentEventoTab=tab;
   document.querySelectorAll('#modalEventoTabs .sub-tab').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  document.getElementById('evBautizoForm').style.display      = tab==='bautizo'      ? 'block' : 'none';
-  document.getElementById('evPresentacionForm').style.display  = tab==='presentacion' ? 'block' : 'none';
-  document.getElementById('evMatrimonioForm').style.display    = tab==='matrimonio'   ? 'block' : 'none';
+  document.getElementById('evBautizoForm').style.display=tab==='bautizo'?'block':'none';
+  document.getElementById('evPresentacionForm').style.display=tab==='presentacion'?'block':'none';
+  document.getElementById('evMatrimonioForm').style.display=tab==='matrimonio'?'block':'none';
   if(tab==='presentacion') renderTestigosFields('P');
   if(tab==='matrimonio')   renderTestigosFields('M');
 }
 
 function openAddEvento(tipo='bautizo'){
-  editEventoId = null;
-  document.getElementById('modalEventoTitle').textContent = 'Registrar Evento';
-  document.getElementById('evSaveBtn').textContent = 'Guardar';
-  document.getElementById('modalEventoTabs').style.display = '';
-  const tabBtn = document.querySelector(`#modalEventoTabs .sub-tab[onclick*="'${tipo}'"]`);
-  setModalEventoTab(tipo, tabBtn);
+  editEventoId=null;
+  document.getElementById('modalEventoTitle').textContent='Registrar Evento';
+  document.getElementById('evSaveBtn').textContent='Guardar';
+  document.getElementById('modalEventoTabs').style.display='';
+  const tabBtn=document.querySelector(`#modalEventoTabs .sub-tab[onclick*="'${tipo}'"]`);
+  setModalEventoTab(tipo,tabBtn);
   clearEventoForm(tipo);
   document.getElementById('modalAddEvento').classList.add('open');
 }
 
 function renderTestigosFields(prefix){
-  const countEl = document.getElementById(`ev${prefix}Testigos`);
-  if(!countEl) return;
-  const count = parseInt(countEl.value) || 0;
-  const container = document.getElementById(`ev${prefix}TestigosFields`);
-  if(count === 0){ container.innerHTML = ''; return; }
-  let html = `<label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Testigos</label>`;
-  html += `<div class="events-grid">`;
-  for(let i=1; i<=count; i++){
-    html += `<div class="form-group" style="margin:0;"><label>Testigo ${i} — Nombre</label><input type="text" id="ev${prefix}T${i}Nombre"></div>`;
-    html += `<div class="form-group" style="margin:0;"><label>Testigo ${i} — Apellido</label><input type="text" id="ev${prefix}T${i}Apellido"></div>`;
+  const countEl=document.getElementById(`ev${prefix}Testigos`);if(!countEl)return;
+  const count=parseInt(countEl.value)||0;
+  const container=document.getElementById(`ev${prefix}TestigosFields`);
+  if(count===0){container.innerHTML='';return;}
+  let html=`<label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);display:block;margin-bottom:8px;">Testigos</label><div class="events-grid">`;
+  for(let i=1;i<=count;i++){
+    html+=`<div class="form-group" style="margin:0;"><label>Testigo ${i} — Nombre</label><input type="text" id="ev${prefix}T${i}Nombre"></div>`;
+    html+=`<div class="form-group" style="margin:0;"><label>Testigo ${i} — Apellido</label><input type="text" id="ev${prefix}T${i}Apellido"></div>`;
   }
-  html += '</div>';
-  container.innerHTML = html;
+  html+='</div>';
+  container.innerHTML=html;
 }
 
 async function guardarEvento(tipo){
-  let datos = {}, fecha = '';
-  if(tipo === 'bautizo'){
-    fecha = document.getElementById('evBFecha').value;
-    const cedula   = document.getElementById('evBCedula').value.trim();
-    const nombre   = toTitleCaseName(document.getElementById('evBNombre').value);
-    const apellido = toTitleCaseName(document.getElementById('evBApellido').value);
-    if(!fecha||!nombre||!apellido){ showToast('Fecha, nombre y apellido son requeridos','error'); return; }
-    datos = { cedula, nombre, apellido };
-  } else if(tipo === 'presentacion'){
-    fecha = document.getElementById('evPFecha').value;
-    const nombreBebe   = toTitleCaseName(document.getElementById('evPNombreBebe').value);
-    const apellidoBebe = toTitleCaseName(document.getElementById('evPApellidoBebe').value);
-    const nombrePapa   = toTitleCaseName(document.getElementById('evPNombrePapa').value);
-    const nombreMama   = toTitleCaseName(document.getElementById('evPNombreMama').value);
-    if(!fecha||!nombreBebe||!apellidoBebe){ showToast('Fecha y nombre del bebé son requeridos','error'); return; }
-    const count = parseInt(document.getElementById('evPTestigos').value)||0;
-    const testigos = [];
-    for(let i=1;i<=count;i++){
-      const tn = (document.getElementById(`evPT${i}Nombre`)?.value||'').trim();
-      const ta = (document.getElementById(`evPT${i}Apellido`)?.value||'').trim();
-      if(tn) testigos.push({nombre:tn,apellido:ta});
-    }
-    datos = { nombre_bebe:nombreBebe, apellido_bebe:apellidoBebe, nombre_papa:nombrePapa, nombre_mama:nombreMama, testigos };
-  } else if(tipo === 'matrimonio'){
-    fecha = document.getElementById('evMFecha').value;
-    const nE = toTitleCaseName(document.getElementById('evMNombreEsposo').value);
-    const aE = toTitleCaseName(document.getElementById('evMApellidoEsposo').value);
-    const nA = toTitleCaseName(document.getElementById('evMNombreEsposa').value);
-    const aA = toTitleCaseName(document.getElementById('evMApellidoEsposa').value);
-    if(!fecha||!nE||!nA){ showToast('Fecha y nombres de los esposos son requeridos','error'); return; }
-    const count = parseInt(document.getElementById('evMTestigos').value)||0;
-    const testigos = [];
-    for(let i=1;i<=count;i++){
-      const tn = (document.getElementById(`evMT${i}Nombre`)?.value||'').trim();
-      const ta = (document.getElementById(`evMT${i}Apellido`)?.value||'').trim();
-      if(tn) testigos.push({nombre:tn,apellido:ta});
-    }
-    datos = { nombre_esposo:nE, apellido_esposo:aE, nombre_esposa:nA, apellido_esposa:aA, testigos };
+  let datos={},fecha='';
+  if(tipo==='bautizo'){
+    fecha=document.getElementById('evBFecha').value;
+    const cedula=document.getElementById('evBCedula').value.trim();
+    const nombre=toTitleCaseName(document.getElementById('evBNombre').value);
+    const apellido=toTitleCaseName(document.getElementById('evBApellido').value);
+    if(!fecha||!nombre||!apellido){showToast('Fecha, nombre y apellido son requeridos','error');return;}
+    datos={cedula,nombre,apellido};
+  } else if(tipo==='presentacion'){
+    fecha=document.getElementById('evPFecha').value;
+    const nombreBebe=toTitleCaseName(document.getElementById('evPNombreBebe').value);
+    const apellidoBebe=toTitleCaseName(document.getElementById('evPApellidoBebe').value);
+    const nombrePapa=toTitleCaseName(document.getElementById('evPNombrePapa').value);
+    const nombreMama=toTitleCaseName(document.getElementById('evPNombreMama').value);
+    if(!fecha||!nombreBebe||!apellidoBebe){showToast('Fecha y nombre del bebé son requeridos','error');return;}
+    const count=parseInt(document.getElementById('evPTestigos').value)||0;
+    const testigos=[];
+    for(let i=1;i<=count;i++){const tn=(document.getElementById(`evPT${i}Nombre`)?.value||'').trim();const ta=(document.getElementById(`evPT${i}Apellido`)?.value||'').trim();if(tn) testigos.push({nombre:tn,apellido:ta});}
+    datos={nombre_bebe:nombreBebe,apellido_bebe:apellidoBebe,nombre_papa:nombrePapa,nombre_mama:nombreMama,testigos};
+  } else if(tipo==='matrimonio'){
+    fecha=document.getElementById('evMFecha').value;
+    const nE=toTitleCaseName(document.getElementById('evMNombreEsposo').value);
+    const aE=toTitleCaseName(document.getElementById('evMApellidoEsposo').value);
+    const nA=toTitleCaseName(document.getElementById('evMNombreEsposa').value);
+    const aA=toTitleCaseName(document.getElementById('evMApellidoEsposa').value);
+    if(!fecha||!nE||!nA){showToast('Fecha y nombres de los esposos son requeridos','error');return;}
+    const count=parseInt(document.getElementById('evMTestigos').value)||0;
+    const testigos=[];
+    for(let i=1;i<=count;i++){const tn=(document.getElementById(`evMT${i}Nombre`)?.value||'').trim();const ta=(document.getElementById(`evMT${i}Apellido`)?.value||'').trim();if(tn) testigos.push({nombre:tn,apellido:ta});}
+    datos={nombre_esposo:nE,apellido_esposo:aE,nombre_esposa:nA,apellido_esposa:aA,testigos};
   }
-  showLoader(editEventoId ? 'Actualizando evento...' : 'Guardando evento...');
+  showLoader(editEventoId?'Actualizando evento...':'Guardando evento...');
   if(editEventoId){
-    const idx = DB.eventos.findIndex(x=>x.id===editEventoId);
-    if(idx>=0){ DB.eventos[idx].fecha=fecha; DB.eventos[idx].datos=datos; }
-    await apiUpdate('EVENTOS', editEventoId, { Fecha:fecha, Datos_JSON:JSON.stringify(datos) });
+    const idx=DB.eventos.findIndex(x=>x.id===editEventoId);
+    if(idx>=0){DB.eventos[idx].fecha=fecha;DB.eventos[idx].datos=datos;}
+    await apiUpdate('EVENTOS',editEventoId,{Fecha:fecha,Datos_JSON:JSON.stringify(datos)});
     addLog('evento',`${currentUser.nombre} editó ${tipo}`,'info');
     showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} actualizado`,'success');
   } else {
-    const id = 'ev' + Date.now();
-    const evento = { id, tipo, fecha, datos, registrado_por:currentUser.nombre, ts:new Date().toISOString() };
+    const id='ev'+Date.now();
+    const evento={id,tipo,fecha,datos,registrado_por:currentUser.nombre,ts:new Date().toISOString()};
     DB.eventos.push(evento);
-    await apiAdd('EVENTOS', { ID:id, Tipo:tipo, Fecha:fecha, Datos_JSON:JSON.stringify(datos), Registrado_Por:currentUser.nombre, Timestamp:evento.ts });
+    await apiAdd('EVENTOS',{ID:id,Tipo:tipo,Fecha:fecha,Datos_JSON:JSON.stringify(datos),Registrado_Por:currentUser.nombre,Timestamp:evento.ts});
     addLog('evento',`${currentUser.nombre} registró ${tipo}`,'success');
     showToast(`✓ ${tipo.charAt(0).toUpperCase()+tipo.slice(1)} registrado`,'success');
-    if(tipo==='bautizo' && datos.cedula){
-      const cedNorm = normalizeCedulaValue(datos.cedula);
-      const miembroB = DB.miembros.find(m=>normalizeCedulaValue(m.cedula||'')===cedNorm && m.activo!==false);
-      if(miembroB && miembroB.bautizado!=='SI'){
-        miembroB.bautizado = 'SI';
-        await apiUpdate('MIEMBROS', miembroB.id, {Bautizado:'SI'});
-        addLog('miembro',`${currentUser.nombre} actualizó bautismo de ${miembroB.nombre} ${miembroB.apellido} al registrar bautizo`,'info');
-        showToast(`✓ Miembro ${miembroB.nombre} ${miembroB.apellido} actualizado a Bautizado: SI`,'success');
+    if(tipo==='bautizo'&&datos.cedula){
+      const cedNorm=normalizeCedulaValue(datos.cedula);
+      const miembroB=DB.miembros.find(m=>normalizeCedulaValue(m.cedula||'')===cedNorm&&m.activo!==false);
+      if(miembroB&&miembroB.bautizado!=='SI'){
+        miembroB.bautizado='SI';
+        await apiUpdate('MIEMBROS',miembroB.id,{Bautizado:'SI'});
+        showToast(`✓ Miembro ${miembroB.nombre} actualizado a Bautizado: SI`,'success');
       }
     }
   }
-  hideLoader();
-  saveDB();
-  editEventoId = null;
-  clearEventoForm(tipo);
+  hideLoader();saveDB();editEventoId=null;clearEventoForm(tipo);
   document.getElementById('modalAddEvento').classList.remove('open');
   renderEventosList();
 }
 
 function clearEventoForm(tipo){
-  if(tipo==='bautizo'){
-    ['evBFecha','evBCedula','evBNombre','evBApellido'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  } else if(tipo==='presentacion'){
-    ['evPFecha','evPNombreBebe','evPApellidoBebe','evPNombrePapa','evPNombreMama'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-    document.getElementById('evPTestigos').value='2'; renderTestigosFields('P');
-  } else if(tipo==='matrimonio'){
-    ['evMFecha','evMNombreEsposo','evMApellidoEsposo','evMNombreEsposa','evMApellidoEsposa'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-    document.getElementById('evMTestigos').value='2'; renderTestigosFields('M');
-  }
+  if(tipo==='bautizo') ['evBFecha','evBCedula','evBNombre','evBApellido'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  else if(tipo==='presentacion'){['evPFecha','evPNombreBebe','evPApellidoBebe','evPNombrePapa','evPNombreMama'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('evPTestigos').value='2';renderTestigosFields('P');}
+  else if(tipo==='matrimonio'){['evMFecha','evMNombreEsposo','evMApellidoEsposo','evMNombreEsposa','evMApellidoEsposa'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('evMTestigos').value='2';renderTestigosFields('M');}
 }
 
 function editEvento(id){
-  const e = DB.eventos.find(x=>x.id===id);
-  if(!e) return;
-  editEventoId = id;
-  currentEventoTab = e.tipo;
-  document.getElementById('modalEventoTitle').textContent = 'Editar Evento';
-  document.getElementById('evSaveBtn').textContent = 'Actualizar';
-  document.getElementById('modalEventoTabs').style.display = 'none';
-  document.getElementById('evBautizoForm').style.display      = e.tipo==='bautizo'      ? 'block' : 'none';
-  document.getElementById('evPresentacionForm').style.display  = e.tipo==='presentacion' ? 'block' : 'none';
-  document.getElementById('evMatrimonioForm').style.display    = e.tipo==='matrimonio'   ? 'block' : 'none';
-  if(e.tipo==='bautizo'){
-    document.getElementById('evBFecha').value    = e.fecha;
-    document.getElementById('evBCedula').value   = e.datos.cedula||'';
-    document.getElementById('evBNombre').value   = e.datos.nombre||'';
-    document.getElementById('evBApellido').value = e.datos.apellido||'';
-  } else if(e.tipo==='presentacion'){
-    document.getElementById('evPFecha').value        = e.fecha;
-    document.getElementById('evPNombreBebe').value   = e.datos.nombre_bebe||'';
-    document.getElementById('evPApellidoBebe').value = e.datos.apellido_bebe||'';
-    document.getElementById('evPNombrePapa').value   = e.datos.nombre_papa||'';
-    document.getElementById('evPNombreMama').value   = e.datos.nombre_mama||'';
-    const tsP = e.datos.testigos||[];
-    document.getElementById('evPTestigos').value = tsP.length;
-    renderTestigosFields('P');
-    tsP.forEach((t,i)=>{ const tn=document.getElementById(`evPT${i+1}Nombre`); const ta=document.getElementById(`evPT${i+1}Apellido`); if(tn) tn.value=t.nombre||''; if(ta) ta.value=t.apellido||''; });
-  } else if(e.tipo==='matrimonio'){
-    document.getElementById('evMFecha').value          = e.fecha;
-    document.getElementById('evMNombreEsposo').value   = e.datos.nombre_esposo||'';
-    document.getElementById('evMApellidoEsposo').value = e.datos.apellido_esposo||'';
-    document.getElementById('evMNombreEsposa').value   = e.datos.nombre_esposa||'';
-    document.getElementById('evMApellidoEsposa').value = e.datos.apellido_esposa||'';
-    const tsM = e.datos.testigos||[];
-    document.getElementById('evMTestigos').value = tsM.length;
-    renderTestigosFields('M');
-    tsM.forEach((t,i)=>{ const tn=document.getElementById(`evMT${i+1}Nombre`); const ta=document.getElementById(`evMT${i+1}Apellido`); if(tn) tn.value=t.nombre||''; if(ta) ta.value=t.apellido||''; });
-  }
+  const e=DB.eventos.find(x=>x.id===id);if(!e)return;
+  editEventoId=id;currentEventoTab=e.tipo;
+  document.getElementById('modalEventoTitle').textContent='Editar Evento';
+  document.getElementById('evSaveBtn').textContent='Actualizar';
+  document.getElementById('modalEventoTabs').style.display='none';
+  document.getElementById('evBautizoForm').style.display=e.tipo==='bautizo'?'block':'none';
+  document.getElementById('evPresentacionForm').style.display=e.tipo==='presentacion'?'block':'none';
+  document.getElementById('evMatrimonioForm').style.display=e.tipo==='matrimonio'?'block':'none';
+  if(e.tipo==='bautizo'){document.getElementById('evBFecha').value=e.fecha;document.getElementById('evBCedula').value=e.datos.cedula||'';document.getElementById('evBNombre').value=e.datos.nombre||'';document.getElementById('evBApellido').value=e.datos.apellido||'';}
+  else if(e.tipo==='presentacion'){document.getElementById('evPFecha').value=e.fecha;document.getElementById('evPNombreBebe').value=e.datos.nombre_bebe||'';document.getElementById('evPApellidoBebe').value=e.datos.apellido_bebe||'';document.getElementById('evPNombrePapa').value=e.datos.nombre_papa||'';document.getElementById('evPNombreMama').value=e.datos.nombre_mama||'';const tsP=e.datos.testigos||[];document.getElementById('evPTestigos').value=tsP.length;renderTestigosFields('P');tsP.forEach((t,i)=>{const tn=document.getElementById(`evPT${i+1}Nombre`);const ta=document.getElementById(`evPT${i+1}Apellido`);if(tn)tn.value=t.nombre||'';if(ta)ta.value=t.apellido||'';});}
+  else if(e.tipo==='matrimonio'){document.getElementById('evMFecha').value=e.fecha;document.getElementById('evMNombreEsposo').value=e.datos.nombre_esposo||'';document.getElementById('evMApellidoEsposo').value=e.datos.apellido_esposo||'';document.getElementById('evMNombreEsposa').value=e.datos.nombre_esposa||'';document.getElementById('evMApellidoEsposa').value=e.datos.apellido_esposa||'';const tsM=e.datos.testigos||[];document.getElementById('evMTestigos').value=tsM.length;renderTestigosFields('M');tsM.forEach((t,i)=>{const tn=document.getElementById(`evMT${i+1}Nombre`);const ta=document.getElementById(`evMT${i+1}Apellido`);if(tn)tn.value=t.nombre||'';if(ta)ta.value=t.apellido||'';});}
   document.getElementById('modalAddEvento').classList.add('open');
 }
 
-function cancelEditEvento(){
-  editEventoId = null;
-  document.getElementById('modalAddEvento').classList.remove('open');
-}
+function cancelEditEvento(){ editEventoId=null; document.getElementById('modalAddEvento').classList.remove('open'); }
 
 function deleteEvento(id){
-  const e = DB.eventos.find(x=>x.id===id);
-  if(!e) return;
+  const e=DB.eventos.find(x=>x.id===id);if(!e)return;
   const lbl={bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
-  showConfirm(`¿Eliminar el registro de ${lbl[e.tipo]||e.tipo} del ${formatDate(e.fecha)}?`, async ()=>{
+  showConfirm(`¿Eliminar el registro de ${lbl[e.tipo]||e.tipo} del ${formatDate(e.fecha)}?`,async()=>{
     showLoader('Eliminando...');
-    DB.eventos = DB.eventos.filter(x=>x.id!==id);
-    await apiDelete('EVENTOS', id);
-    hideLoader();
-    addLog('evento',`${currentUser.nombre} eliminó ${e.tipo} del ${e.fecha}`,'warn');
-    saveDB(); renderEventosList();
-    showToast('Evento eliminado','success');
+    DB.eventos=DB.eventos.filter(x=>x.id!==id);
+    await apiDelete('EVENTOS',id);
+    hideLoader();addLog('evento',`${currentUser.nombre} eliminó ${e.tipo} del ${e.fecha}`,'warn');
+    saveDB();renderEventosList();showToast('Evento eliminado','success');
   });
 }
 
 function renderEventosList(){
-  const filtTipo  = document.getElementById('filtEventoTipo')?.value || '';
-  const filtFecha = document.getElementById('filtEventoFecha')?.value || '';
-  let list = [...DB.eventos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  if(filtTipo)  list = list.filter(e=>e.tipo===filtTipo);
-  if(filtFecha) list = list.filter(e=>e.fecha===filtFecha);
-  const labels = {bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
-  const body = document.getElementById('eventosBody');
-  if(!body) return;
-  body.innerHTML = list.map(e=>{
-    let det = '';
-    if(e.tipo==='bautizo')       det=`${e.datos.nombre||''} ${e.datos.apellido||''} (Cédula: ${e.datos.cedula||'—'})`;
+  const filtTipo=document.getElementById('filtEventoTipo')?.value||'';
+  const filtFecha=document.getElementById('filtEventoFecha')?.value||'';
+  let list=[...DB.eventos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(filtTipo) list=list.filter(e=>e.tipo===filtTipo);
+  if(filtFecha) list=list.filter(e=>e.fecha===filtFecha);
+  const labels={bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
+  const body=document.getElementById('eventosBody');if(!body)return;
+  body.innerHTML=list.map(e=>{
+    let det='';
+    if(e.tipo==='bautizo') det=`${e.datos.nombre||''} ${e.datos.apellido||''} (Cédula: ${e.datos.cedula||'—'})`;
     else if(e.tipo==='presentacion') det=`${e.datos.nombre_bebe||''} ${e.datos.apellido_bebe||''} — Papá: ${e.datos.nombre_papa||'—'}, Mamá: ${e.datos.nombre_mama||'—'}`;
     else if(e.tipo==='matrimonio') det=`${e.datos.nombre_esposo||''} ${e.datos.apellido_esposo||''} ♥ ${e.datos.nombre_esposa||''} ${e.datos.apellido_esposa||''}`;
     return `<tr>
@@ -2284,7 +2115,7 @@ function renderEventosList(){
       <td><span class="badge" style="background:#e0f2fe;color:#075985;">${labels[e.tipo]||e.tipo}</span></td>
       <td style="font-size:0.85rem;">${det}</td>
       <td>${e.registrado_por}</td>
-      <td style="display:flex;gap:4px;">
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
         <button class="btn btn-warn btn-sm" onclick="editEvento('${e.id}')">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="deleteEvento('${e.id}')">Eliminar</button>
       </td>
@@ -2293,258 +2124,314 @@ function renderEventosList(){
 }
 
 function exportExcelEventos(){
-  const filtTipo  = document.getElementById('filtEventoTipo')?.value || '';
-  const filtFecha = document.getElementById('filtEventoFecha')?.value || '';
-  let list = [...DB.eventos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  if(filtTipo)  list = list.filter(e=>e.tipo===filtTipo);
-  if(filtFecha) list = list.filter(e=>e.fecha===filtFecha);
-  const labels = {bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
-  const data = list.map(e=>{
-    let detalle = '';
-    if(e.tipo==='bautizo')
-      detalle = `${e.datos.nombre||''} ${e.datos.apellido||''} — Cédula: ${e.datos.cedula||'—'}`;
-    else if(e.tipo==='presentacion')
-      detalle = `${e.datos.nombre_bebe||''} ${e.datos.apellido_bebe||''} — Papá: ${e.datos.nombre_papa||'—'}, Mamá: ${e.datos.nombre_mama||'—'}`;
-    else if(e.tipo==='matrimonio')
-      detalle = `${e.datos.nombre_esposo||''} ${e.datos.apellido_esposo||''} ♥ ${e.datos.nombre_esposa||''} ${e.datos.apellido_esposa||''}`;
-    return { 'Fecha': e.fecha, 'Tipo': labels[e.tipo]||e.tipo, 'Detalle': detalle, 'Registrado por': e.registrado_por };
+  const filtTipo=document.getElementById('filtEventoTipo')?.value||'';
+  const filtFecha=document.getElementById('filtEventoFecha')?.value||'';
+  let list=[...DB.eventos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(filtTipo) list=list.filter(e=>e.tipo===filtTipo);
+  if(filtFecha) list=list.filter(e=>e.fecha===filtFecha);
+  const labels={bautizo:'Bautizo',presentacion:'Presentación',matrimonio:'Matrimonio'};
+  const data=list.map(e=>{
+    let detalle='';
+    if(e.tipo==='bautizo') detalle=`${e.datos.nombre||''} ${e.datos.apellido||''} — Cédula: ${e.datos.cedula||'—'}`;
+    else if(e.tipo==='presentacion') detalle=`${e.datos.nombre_bebe||''} ${e.datos.apellido_bebe||''} — Papá: ${e.datos.nombre_papa||'—'}, Mamá: ${e.datos.nombre_mama||'—'}`;
+    else if(e.tipo==='matrimonio') detalle=`${e.datos.nombre_esposo||''} ${e.datos.apellido_esposo||''} ♥ ${e.datos.nombre_esposa||''} ${e.datos.apellido_esposa||''}`;
+    return{'Fecha':e.fecha,'Tipo':labels[e.tipo]||e.tipo,'Detalle':detalle,'Registrado por':e.registrado_por};
   });
-  if(data.length === 0){ showToast('Sin eventos para exportar','error'); return; }
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Eventos');
-  XLSX.writeFile(wb, 'ICAEP_Eventos.xlsx');
-  addLog('evento',`${currentUser.nombre} exportó Eventos Excel`,'info');
-  showToast('✓ Excel exportado','success');
+  if(data.length===0){showToast('Sin eventos para exportar','error');return;}
+  const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Eventos');XLSX.writeFile(wb,'ICAEP_Eventos.xlsx');
+  addLog('evento',`${currentUser.nombre} exportó Eventos Excel`,'info');showToast('✓ Excel exportado','success');
 }
 
 // ============================================================
-// CONTABILIDAD
+// CONTABILIDAD – CAMBIO 3: Libro de 3 columnas con saldo acumulado
 // ============================================================
-let contPeriod = 'month';
-let contFrom = null, contTo = null;
-let chartContInstance = null;
-let editContId = null;
+let chartContInstance=null;
+let editContId=null;
 
-function setContPeriod(p, btn){
-  contPeriod=p; contFrom=null; contTo=null;
-  document.getElementById('contFrom').value='';
-  document.getElementById('contTo').value='';
-  document.querySelectorAll('#contPeriodTabs .period-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderContabilidad();
+// Obtener saldo inicial configurado por el usuario
+function getSaldoInicial(){
+  return parseFloat(document.getElementById('saldoInicial')?.value)||0;
 }
 
-function setContRange(){
-  contFrom = document.getElementById('contFrom').value||null;
-  contTo   = document.getElementById('contTo').value||null;
-  document.querySelectorAll('#contPeriodTabs .period-tab').forEach(b=>b.classList.remove('active'));
-  renderContabilidad();
-}
+// Devuelve movimientos filtrados y ordenados cronológicamente
+function getContMovimientos(){
+  const desde=document.getElementById('contFiltDesde')?.value||'';
+  const hasta=document.getElementById('contFiltHasta')?.value||'';
+  const concepto=(document.getElementById('contFiltConcepto')?.value||'').toLowerCase();
 
-function getContFilteredRows(){
-  const today = new Date();
-  let rows = [...DB.contabilidad];
-  if(contFrom||contTo){
-    rows=rows.filter(r=>{const d=new Date(r.fecha+'T12:00:00');return(!contFrom||d>=new Date(contFrom))&&(!contTo||d<=new Date(contTo));});
-  } else {
-    rows=rows.filter(r=>{
-      const d=new Date(r.fecha+'T12:00:00');
-      if(contPeriod==='week')    return (today-d)/86400000<=7;
-      if(contPeriod==='month')   return d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear();
-      if(contPeriod==='quarter') return Math.floor(d.getMonth()/3)===Math.floor(today.getMonth()/3)&&d.getFullYear()===today.getFullYear();
-      if(contPeriod==='year')    return d.getFullYear()===today.getFullYear();
-      return true;
-    });
-  }
+  // Ordenar todos cronológicamente (por fecha y timestamp)
+  let rows=[...DB.contabilidad].sort((a,b)=>{
+    const fd=a.fecha.localeCompare(b.fecha);
+    if(fd!==0) return fd;
+    return (a.ts||'').localeCompare(b.ts||'');
+  });
+
+  // Calcular saldo acumulado sobre TODOS los movimientos primero
+  let saldoAcum=getSaldoInicial();
+  rows=rows.map(r=>{
+    if(!r.anulado){
+      if(r.tipo==='Ingreso') saldoAcum+=r.monto;
+      else saldoAcum-=r.monto;
+    }
+    return {...r, saldoAcum};
+  });
+
+  // Luego filtrar para la vista (el saldo acumulado ya está calculado sobre todos)
+  if(desde) rows=rows.filter(r=>r.fecha>=desde);
+  if(hasta) rows=rows.filter(r=>r.fecha<=hasta);
+  if(concepto) rows=rows.filter(r=>(r.descripcion||'').toLowerCase().includes(concepto)||(r.comprobante||'').toLowerCase().includes(concepto));
+
   return rows;
 }
 
+function clearContFiltros(){
+  document.getElementById('contFiltDesde').value='';
+  document.getElementById('contFiltHasta').value='';
+  document.getElementById('contFiltConcepto').value='';
+  renderContabilidad();
+}
+
 async function guardarContabilidad(){
-  const fecha = document.getElementById('contFecha').value;
-  const tipo  = document.getElementById('contTipo').value;
-  const desc  = document.getElementById('contDesc').value.trim();
-  const monto = parseFloat(document.getElementById('contMonto').value);
-  const obs   = document.getElementById('contObs').value.trim();
-  if(!fecha||!desc||isNaN(monto)||monto<=0){ showToast('Fecha, descripción y monto son requeridos','error'); return; }
-  showLoader(editContId ? 'Actualizando movimiento...' : 'Guardando movimiento...');
+  const fecha=document.getElementById('contFecha').value;
+  const tipo=document.getElementById('contTipo').value;
+  const comp=document.getElementById('contComp').value.trim();
+  const desc=document.getElementById('contDesc').value.trim();
+  const monto=parseFloat(document.getElementById('contMonto').value);
+  const obs=document.getElementById('contObs').value.trim();
+  if(!fecha||!desc||isNaN(monto)||monto<=0){showToast('Fecha, concepto y monto son requeridos','error');return;}
+  const ts=new Date().toISOString();
+  showLoader(editContId?'Actualizando movimiento...':'Guardando movimiento...');
   if(editContId){
-    const idx = DB.contabilidad.findIndex(x=>x.id===editContId);
-    if(idx>=0) DB.contabilidad[idx] = {...DB.contabilidad[idx], fecha, tipo, descripcion:desc, monto, observacion:obs};
-    await apiUpdate('CONTABILIDAD', editContId, {Fecha:fecha, Tipo:tipo, Descripcion:desc, Monto:monto, Observacion:obs});
-    addLog('contabilidad',`${currentUser.nombre} editó ${tipo}: ${desc} — $${monto.toFixed(2)}`,'info');
-    showToast(`✓ Movimiento actualizado`,'success');
+    // No se editan: se anula y se crea uno nuevo (regla del libro contable)
+    // Aquí permitimos edición directa solo de observación y comprobante para correcciones menores
+    const idx=DB.contabilidad.findIndex(x=>x.id===editContId);
+    if(idx>=0){
+      DB.contabilidad[idx]={...DB.contabilidad[idx],fecha,tipo,descripcion:desc,monto,observacion:obs,comprobante:comp};
+    }
+    await apiUpdate('CONTABILIDAD',editContId,{Fecha:fecha,Tipo:tipo,Descripcion:desc,Monto:monto,Observacion:obs,Comprobante:comp});
+    addLog('contabilidad',`${currentUser.nombre} editó movimiento: ${desc} — ${fmtCOP(monto)}`,'info');
+    showToast('✓ Movimiento actualizado','success');
   } else {
-    const id = 'c'+Date.now();
-    const row = { id, fecha, tipo, descripcion:desc, monto, observacion:obs, registrado_por:currentUser.nombre };
+    const id='c'+Date.now();
+    const row={id,fecha,tipo,descripcion:desc,monto,observacion:obs,comprobante:comp,registrado_por:currentUser.nombre,anulado:false,ts};
     DB.contabilidad.push(row);
-    await apiAdd('CONTABILIDAD',{ ID:id, Fecha:fecha, Tipo:tipo, Descripcion:desc, Monto:monto, Observacion:obs, Registrado_Por:currentUser.nombre });
-    addLog('contabilidad',`${currentUser.nombre} registró ${tipo}: ${desc} — $${monto.toFixed(2)}`,'info');
+    await apiAdd('CONTABILIDAD',{ID:id,Fecha:fecha,Tipo:tipo,Descripcion:desc,Monto:monto,Observacion:obs,Comprobante:comp,Registrado_Por:currentUser.nombre,Anulado:false,Timestamp:ts});
+    addLog('contabilidad',`${currentUser.nombre} registró ${tipo}: ${desc} — ${fmtCOP(monto)}`,'info');
     showToast(`✓ ${tipo} registrado`,'success');
   }
-  hideLoader();
-  saveDB();
-  editContId = null;
+  hideLoader();saveDB();editContId=null;
   document.getElementById('modalAddCont').classList.remove('open');
   renderContabilidad();
 }
 
 function renderContabilidad(){
-  const rows = getContFilteredRows().sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  const totalIngr = rows.filter(r=>r.tipo==='Ingreso').reduce((s,r)=>s+r.monto,0);
-  const totalEgr  = rows.filter(r=>r.tipo==='Egreso').reduce((s,r)=>s+r.monto,0);
-  const saldo = totalIngr - totalEgr;
-  const fmt = v => '$'+v.toLocaleString('es-CO',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const rows=getContMovimientos();
+  // Totales solo de movimientos activos (no anulados), sobre todos los datos no filtrados
+  const allActivos=DB.contabilidad.filter(r=>!r.anulado);
+  const totalIngr=allActivos.filter(r=>r.tipo==='Ingreso').reduce((s,r)=>s+r.monto,0);
+  const totalEgr=allActivos.filter(r=>r.tipo==='Egreso').reduce((s,r)=>s+r.monto,0);
+  const saldoFinal=getSaldoInicial()+totalIngr-totalEgr;
 
-  const statsEl = document.getElementById('contStats');
-  if(statsEl) statsEl.innerHTML = `
-    <div class="fin-card"><div class="label">Total Ingresos</div><div class="value" style="color:#4ade80;">${fmt(totalIngr)}</div></div>
-    <div class="fin-card"><div class="label">Total Egresos</div><div class="value" style="color:#f87171;">${fmt(totalEgr)}</div></div>
-    <div class="fin-card"><div class="label">Saldo</div><div class="value" style="color:${saldo>=0?'#4ade80':'#f87171'};">${fmt(saldo)}</div></div>
-    <div class="fin-card"><div class="label">Movimientos</div><div class="value">${rows.length}</div></div>
+  // Tarjetas resumen
+  const statsEl=document.getElementById('contStats');
+  if(statsEl) statsEl.innerHTML=`
+    <div class="fin-card"><div class="label">Saldo Inicial</div><div class="value" style="color:#e8c97a;">${fmtCOP(getSaldoInicial())}</div></div>
+    <div class="fin-card"><div class="label">Total Entradas</div><div class="value" style="color:#4ade80;">${fmtCOP(totalIngr)}</div></div>
+    <div class="fin-card"><div class="label">Total Salidas</div><div class="value" style="color:#f87171;">${fmtCOP(totalEgr)}</div></div>
+    <div class="fin-card"><div class="label">Saldo Final</div><div class="value" style="color:${saldoFinal>=0?'#4ade80':'#f87171'};">${fmtCOP(saldoFinal)}</div></div>
+    <div class="fin-card"><div class="label">Movimientos</div><div class="value">${allActivos.length}</div></div>
   `;
 
-  // Gráfico: todos los datos por mes
-  const meses = {};
-  DB.contabilidad.forEach(r=>{
-    const key = r.fecha.slice(0,7);
+  // Gráfico por mes
+  const meses={};
+  DB.contabilidad.filter(r=>!r.anulado).forEach(r=>{
+    const key=r.fecha.slice(0,7);
     if(!meses[key]) meses[key]={ingr:0,egr:0};
     if(r.tipo==='Ingreso') meses[key].ingr+=r.monto;
     else meses[key].egr+=r.monto;
   });
-  const sortedMeses = Object.keys(meses).sort();
-  const canvas = document.getElementById('chartCont');
+  const sortedMeses=Object.keys(meses).sort();
+  const canvas=document.getElementById('chartCont');
   if(canvas){
-    if(chartContInstance){ chartContInstance.destroy(); chartContInstance=null; }
+    if(chartContInstance){chartContInstance.destroy();chartContInstance=null;}
     if(sortedMeses.length>0){
       const mNames=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-      chartContInstance = new Chart(canvas,{
+      chartContInstance=new Chart(canvas,{
         type:'bar',
         data:{
           labels:sortedMeses.map(m=>{const[y,mo]=m.split('-');return`${mNames[parseInt(mo)-1]} ${y}`;}),
           datasets:[
-            {label:'Ingresos',data:sortedMeses.map(m=>meses[m].ingr),backgroundColor:'rgba(74,222,128,0.75)',borderRadius:4},
-            {label:'Egresos', data:sortedMeses.map(m=>meses[m].egr), backgroundColor:'rgba(248,113,113,0.75)',borderRadius:4}
+            {label:'Entradas',data:sortedMeses.map(m=>meses[m].ingr),backgroundColor:'rgba(74,222,128,0.75)',borderRadius:4},
+            {label:'Salidas',data:sortedMeses.map(m=>meses[m].egr),backgroundColor:'rgba(248,113,113,0.75)',borderRadius:4}
           ]
         },
         options:{responsive:true,maintainAspectRatio:false,
           plugins:{legend:{display:true,position:'top',labels:{color:'#6b7280',font:{size:11}}}},
-          scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',callback:v=>'$'+v.toLocaleString('es-CO')}}}}
+          scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',callback:v=>fmtCOP(v)}}}}
       });
     }
   }
 
-  const body = document.getElementById('contabilidadBody');
-  if(body) body.innerHTML = rows.map(r=>`
-    <tr class="${r.tipo==='Ingreso'?'ingreso-row':'egreso-row'}">
-      <td>${formatDate(r.fecha)}</td>
-      <td><span class="badge badge-${r.tipo.toLowerCase()}">${r.tipo}</span></td>
-      <td>${r.descripcion}</td>
-      <td style="font-weight:700;">${fmt(r.monto)}</td>
-      <td>${r.observacion||'—'}</td>
-      <td>${r.registrado_por}</td>
-      <td style="display:flex;gap:4px;">
-        <button class="btn btn-warn btn-sm" onclick="editCont('${r.id}')">Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteCont('${r.id}')">Eliminar</button>
+  // Tabla libro 3 columnas
+  const body=document.getElementById('libroBody');
+  if(!body) return;
+
+  // Fila de saldo inicial
+  const si=getSaldoInicial();
+  let html=`<tr class="saldo-inicial">
+    <td>${formatDate(rows[0]?.fecha||new Date().toISOString().split('T')[0])}</td>
+    <td style="color:var(--gray);font-size:0.78rem;">—</td>
+    <td><strong>Saldo Inicial</strong></td>
+    <td class="num" style="color:var(--success);">${si>0?fmtCOP(si):''}</td>
+    <td class="num"></td>
+    <td class="saldo-col ${si>=0?'saldo-pos':'saldo-neg'}">${fmtCOP(si)}</td>
+    <td></td>
+  </tr>`;
+
+  html+=rows.map(r=>{
+    const esIngreso=r.tipo==='Ingreso';
+    const anulBadge=r.anulado?'<span class="badge-anulado">Anulado</span>':'';
+    return `<tr class="${r.anulado?'anulado':''}">
+      <td style="white-space:nowrap;">${formatDate(r.fecha)}</td>
+      <td style="font-size:0.8rem;color:var(--gray);">${r.comprobante||'—'}</td>
+      <td>${r.descripcion}${anulBadge}${r.observacion?`<div style="font-size:0.72rem;color:var(--gray);margin-top:2px;">${r.observacion}</div>`:''}</td>
+      <td class="num" style="color:var(--success);">${esIngreso&&!r.anulado?fmtCOP(r.monto):''}</td>
+      <td class="num" style="color:var(--danger);">${!esIngreso&&!r.anulado?fmtCOP(r.monto):''}</td>
+      <td class="saldo-col ${r.saldoAcum>=0?'saldo-pos':'saldo-neg'}">${fmtCOP(r.saldoAcum)}</td>
+      <td>
+        ${!r.anulado?`<div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn btn-warn btn-sm" onclick="editCont('${r.id}')">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="anularCont('${r.id}')">Anular</button>
+        </div>`:'<span style="font-size:0.75rem;color:var(--gray);">Anulado</span>'}
       </td>
-    </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:2rem">Sin movimientos</td></tr>';
-  const total = document.getElementById('contTotal');
-  if(total) total.textContent=`Total filtrado: ${rows.length} movimiento${rows.length!==1?'s':''}`;
+    </tr>`;
+  }).join('');
+  body.innerHTML=html||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:2rem">Sin movimientos</td></tr>';
+
+  // Pie de tabla totales de la vista filtrada
+  const vistaIngr=rows.filter(r=>!r.anulado&&r.tipo==='Ingreso').reduce((s,r)=>s+r.monto,0);
+  const vistaEgr=rows.filter(r=>!r.anulado&&r.tipo==='Egreso').reduce((s,r)=>s+r.monto,0);
+  const vistaSaldo=rows.length>0?rows[rows.length-1].saldoAcum:si;
+  const foot=document.getElementById('libroFoot');
+  if(foot) foot.innerHTML=`<tr>
+    <td colspan="3">Totales (vista)</td>
+    <td style="text-align:right;color:#4ade80;">${fmtCOP(vistaIngr)}</td>
+    <td style="text-align:right;color:#f87171;">${fmtCOP(vistaEgr)}</td>
+    <td style="text-align:right;color:${vistaSaldo>=0?'#4ade80':'#f87171'};">${fmtCOP(vistaSaldo)}</td>
+    <td></td>
+  </tr>`;
 }
 
 function exportExcelContabilidad(){
-  const rows = getContFilteredRows().sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  const data = rows.map(r=>({'Fecha':r.fecha,'Tipo':r.tipo,'Descripción':r.descripcion,'Monto':r.monto,'Observación':r.observacion||'','Registrado por':r.registrado_por}));
+  const rows=getContMovimientos();
+  const si=getSaldoInicial();
+  const data=[
+    {'Fecha':'','N° Comprobante':'','Concepto':'SALDO INICIAL','Entrada':si,'Salida':'','Saldo':si,'Observación':'','Registrado por':''},
+    ...rows.map(r=>({
+      'Fecha':r.fecha,
+      'N° Comprobante':r.comprobante||'',
+      'Concepto':r.descripcion+(r.anulado?' (ANULADO)':''),
+      'Entrada':r.tipo==='Ingreso'&&!r.anulado?r.monto:'',
+      'Salida':r.tipo==='Egreso'&&!r.anulado?r.monto:'',
+      'Saldo':r.saldoAcum,
+      'Observación':r.observacion||'',
+      'Registrado por':r.registrado_por
+    }))
+  ];
   const ws=XLSX.utils.json_to_sheet(data);
+  // Anchos de columna
+  ws['!cols']=[{wch:14},{wch:12},{wch:30},{wch:16},{wch:16},{wch:16},{wch:24},{wch:18}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Contabilidad');
-  XLSX.writeFile(wb,'ICAEP_Contabilidad.xlsx');
-  addLog('contabilidad',`${currentUser.nombre} exportó Contabilidad Excel`,'info');
+  XLSX.utils.book_append_sheet(wb,ws,'Libro Contable');
+  XLSX.writeFile(wb,'ICAEP_LibroContable.xlsx');
+  addLog('contabilidad',`${currentUser.nombre} exportó Libro Contable Excel`,'info');
   showToast('✓ Excel exportado','success');
 }
 
+function imprimirLibro(){
+  window.print();
+}
+
 function openAddCont(){
-  editContId = null;
-  document.getElementById('modalContTitle').textContent = 'Registrar Movimiento';
-  document.getElementById('contSaveBtn').textContent = 'Registrar';
-  document.getElementById('contFecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('contTipo').value  = 'Ingreso';
-  document.getElementById('contDesc').value  = '';
-  document.getElementById('contMonto').value = '';
-  document.getElementById('contObs').value   = '';
+  editContId=null;
+  document.getElementById('modalContTitle').textContent='Registrar Movimiento';
+  document.getElementById('contSaveBtn').textContent='Registrar';
+  document.getElementById('contFecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('contTipo').value='Ingreso';
+  document.getElementById('contComp').value='';
+  document.getElementById('contDesc').value='';
+  document.getElementById('contMonto').value='';
+  document.getElementById('contObs').value='';
   document.getElementById('modalAddCont').classList.add('open');
 }
 
 function editCont(id){
-  const r = DB.contabilidad.find(x=>x.id===id);
-  if(!r) return;
-  editContId = id;
-  document.getElementById('modalContTitle').textContent = 'Editar Movimiento';
-  document.getElementById('contSaveBtn').textContent = 'Actualizar';
-  document.getElementById('contFecha').value  = r.fecha;
-  document.getElementById('contTipo').value   = r.tipo;
-  document.getElementById('contDesc').value   = r.descripcion;
-  document.getElementById('contMonto').value  = r.monto;
-  document.getElementById('contObs').value    = r.observacion||'';
+  const r=DB.contabilidad.find(x=>x.id===id);if(!r)return;
+  editContId=id;
+  document.getElementById('modalContTitle').textContent='Editar Movimiento';
+  document.getElementById('contSaveBtn').textContent='Actualizar';
+  document.getElementById('contFecha').value=r.fecha;
+  document.getElementById('contTipo').value=r.tipo;
+  document.getElementById('contComp').value=r.comprobante||'';
+  document.getElementById('contDesc').value=r.descripcion;
+  document.getElementById('contMonto').value=r.monto;
+  document.getElementById('contObs').value=r.observacion||'';
   document.getElementById('modalAddCont').classList.add('open');
 }
 
-function cancelEditCont(){
-  editContId = null;
-  document.getElementById('modalAddCont').classList.remove('open');
-}
+function cancelEditCont(){ editContId=null; document.getElementById('modalAddCont').classList.remove('open'); }
 
-function deleteCont(id){
-  const r = DB.contabilidad.find(x=>x.id===id);
-  if(!r) return;
-  showConfirm(`¿Eliminar "${r.descripcion}" del ${formatDate(r.fecha)}?`, async ()=>{
-    showLoader('Eliminando...');
-    DB.contabilidad = DB.contabilidad.filter(x=>x.id!==id);
-    await apiDelete('CONTABILIDAD', id);
-    hideLoader();
-    addLog('contabilidad',`${currentUser.nombre} eliminó ${r.tipo}: ${r.descripcion}`,'warn');
-    saveDB(); renderContabilidad();
-    showToast('Movimiento eliminado','success');
-  });
+// Anular en lugar de eliminar (regla del libro contable)
+function anularCont(id){
+  const r=DB.contabilidad.find(x=>x.id===id);if(!r)return;
+  showConfirm(
+    `¿Anular el movimiento "${r.descripcion}" del ${formatDate(r.fecha)} por ${fmtCOP(r.monto)}?\n\nEl registro quedará marcado como anulado y no afectará el saldo. Esta acción no se puede deshacer.`,
+    async()=>{
+      showLoader('Anulando...');
+      r.anulado=true;
+      await apiUpdate('CONTABILIDAD',id,{Anulado:true});
+      hideLoader();
+      addLog('contabilidad',`${currentUser.nombre} anuló ${r.tipo}: ${r.descripcion} — ${fmtCOP(r.monto)}`,'warn');
+      saveDB();renderContabilidad();
+      showToast('Movimiento anulado','success');
+    }
+  );
 }
 
 // ============================================================
 // CERTIFICADOS
 // ============================================================
-let certMiembroId = null;
+let certMiembroId=null;
 
 function openCertificado(id){
-  const m = DB.miembros.find(x=>x.id===id);
-  if(!m) return;
-  certMiembroId = id;
-  document.getElementById('certMiembroNombre').textContent = m.nombre+' '+m.apellido;
-  document.getElementById('certTipo').value = 'bautizo';
+  const m=DB.miembros.find(x=>x.id===id);if(!m)return;
+  certMiembroId=id;
+  document.getElementById('certMiembroNombre').textContent=m.nombre+' '+m.apellido;
+  document.getElementById('certTipo').value='bautizo';
   previewCertificado();
   document.getElementById('modalCertificado').classList.add('open');
 }
 
 function previewCertificado(){
-  const m = DB.miembros.find(x=>x.id===certMiembroId);
-  if(!m) return;
-  document.getElementById('certPreviewInner').innerHTML = getCertHTML(m);
+  const m=DB.miembros.find(x=>x.id===certMiembroId);if(!m)return;
+  document.getElementById('certPreviewInner').innerHTML=getCertHTML(m);
 }
 
 function printCertificado(){
-  const m = DB.miembros.find(x=>x.id===certMiembroId);
-  if(!m) return;
-  document.getElementById('certPrintContent').innerHTML = getCertHTML(m);
+  const m=DB.miembros.find(x=>x.id===certMiembroId);if(!m)return;
+  document.getElementById('certPrintContent').innerHTML=getCertHTML(m);
   window.print();
 }
 
 function getCertHTML(m){
-  const nombre = m.nombre+' '+m.apellido;
-  const hoy = new Date();
-  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  const fechaStr = hoy.getDate()+' de '+meses[hoy.getMonth()]+' de '+hoy.getFullYear();
+  const nombre=m.nombre+' '+m.apellido;
+  const hoy=new Date();
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaStr=hoy.getDate()+' de '+meses[hoy.getMonth()]+' de '+hoy.getFullYear();
   return `<div style="width:297mm;height:210mm;background:#fff;box-sizing:border-box;display:flex;align-items:stretch;font-family:Georgia,serif;">
   <div style="flex:1;border:6px solid #0F1F3D;margin:5mm;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9mm 14mm;position:relative;">
     <div style="position:absolute;inset:4px;border:1.5px solid #c9a84c;pointer-events:none;"></div>
-
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:5mm;z-index:1;">
       <img src="logo_iglesia.png" style="height:52px;filter:url(#certNavyFilter);" onerror="this.style.display='none'">
       <div>
@@ -2552,33 +2439,19 @@ function getCertHTML(m){
         <div style="font-size:7pt;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Iglesia Cristiana Apostólica Evangélica</div>
       </div>
     </div>
-
     <div style="width:52%;height:1.5px;background:#c9a84c;margin-bottom:5mm;"></div>
-
     <div style="font-family:'Cinzel',Georgia,serif;font-size:18pt;color:#0F1F3D;letter-spacing:4px;text-transform:uppercase;margin-bottom:5mm;text-align:center;">Certificado de Bautismo</div>
-
     <div style="font-size:11pt;color:#333;text-align:center;line-height:2;margin-bottom:1mm;">Este documento certifica que</div>
     <div style="font-family:'Cinzel',Georgia,serif;font-size:17pt;color:#0F1F3D;font-weight:700;padding:1mm 20mm;border-bottom:1.5px solid #c9a84c;margin-bottom:4mm;text-align:center;">${nombre}</div>
     <div style="font-size:11pt;color:#333;text-align:center;line-height:2;margin-bottom:5mm;">en obediencia a Dios y a su Palabra ha recibido el bautismo.</div>
-
     <div style="font-size:8pt;color:#555;font-style:italic;max-width:80%;line-height:1.75;margin-bottom:6mm;padding:6px 14px;border-left:3px solid #c9a84c;background:#fdf8ee;">
       "Por tanto, id, y haced discípulos a todas las naciones, bautizándolos en el nombre del Padre, y del Hijo, y del Espíritu Santo; enseñándoles que guarden todas las cosas que os he mandado; y he aquí yo estoy con vosotros todos los días, hasta el fin del mundo."
       <span style="font-style:normal;font-weight:700;"> Mateo 28:19-20</span>
     </div>
-
     <div style="display:flex;justify-content:space-around;width:88%;">
-      <div style="text-align:center;">
-        <div style="height:24px;"></div>
-        <div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Pastor</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:9.5pt;color:#0F1F3D;margin-bottom:3px;font-weight:600;">${fechaStr}</div>
-        <div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Fecha</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="height:24px;"></div>
-        <div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Sello de la Iglesia</div>
-      </div>
+      <div style="text-align:center;"><div style="height:24px;"></div><div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Pastor</div></div>
+      <div style="text-align:center;"><div style="font-size:9.5pt;color:#0F1F3D;margin-bottom:3px;font-weight:600;">${fechaStr}</div><div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Fecha</div></div>
+      <div style="text-align:center;"><div style="height:24px;"></div><div style="border-top:1px solid #0F1F3D;padding-top:3px;font-size:7.5pt;color:#555;width:115px;margin:0 auto;">Sello de la Iglesia</div></div>
     </div>
   </div>
 </div>`;
