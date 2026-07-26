@@ -2690,7 +2690,7 @@ function renderTablaServidores(grupo){
     body+=`<tr><td class="fel">${r}</td>`+
       `<td><input type="text" class="wide" id="if_sv_${r}_nombre"></td>`+
       `<td><input type="text" class="wide" id="if_sv_${r}_cargo"></td>`+
-      SV_SEMANAS.map(w=>SV_COLS.map(c=>`<td><input type="text" id="if_sv_${r}_${c}_${w}"></td>`).join('')).join('')+
+      SV_SEMANAS.map(w=>SV_COLS.map(c=>`<td><input type="text" maxlength="4" id="if_sv_${r}_${c}_${w}"></td>`).join('')).join('')+
       `</tr>`;
   }
   tabla.innerHTML=head+body;
@@ -2805,6 +2805,17 @@ function leerInformeDelForm(){
   return d;
 }
 
+// Una celda de Google Sheets admite 50.000 caracteres. La tabla de servidores
+// de Diáconos tiene 540 campos, así que no guardamos los vacíos: al cargar,
+// un campo ausente se muestra vacío igual.
+const CELDA_MAX=50000;
+function informeParaGuardar(){
+  const d=leerInformeDelForm();
+  const limpio={};
+  Object.keys(d).forEach(k=>{ if(d[k]!=='' && d[k]!=null) limpio[k]=d[k]; });
+  return limpio;
+}
+
 function recalcularInforme(){
   const {grupo,mes,anio}=informeActualKey();
   const stats=plantillaDe(grupo)==='D'?calcInformeStatsD(mes,anio):calcInformeStats(grupo,mes,anio);
@@ -2818,18 +2829,23 @@ function recalcularInforme(){
 async function guardarInforme(){
   const {grupo,mes,anio}=informeActualKey();
   if(!grupo){ showToast('Selecciona un ministerio','error'); return; }
-  const datos=leerInformeDelForm();
+  const datos=informeParaGuardar();
+  const json=JSON.stringify(datos);
+  if(json.length>CELDA_MAX){
+    showAlertModal(`El informe ocupa ${json.length.toLocaleString('es-CO')} caracteres y el máximo por celda es ${CELDA_MAX.toLocaleString('es-CO')}. Acorta los textos más largos antes de guardar.`,'Informe demasiado extenso');
+    return;
+  }
   const ts=new Date().toISOString();
   const existente=buscarInformeGuardado(grupo,mes,anio);
   showLoader('Guardando informe...');
   if(existente){
     existente.datos=datos; existente.registrado_por=currentUser.nombre; existente.ts=ts;
-    await apiUpdate('INFORMES',existente.id,{Datos_JSON:JSON.stringify(datos),Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
+    await apiUpdate('INFORMES',existente.id,{Datos_JSON:json,Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
   } else {
     const id='inf'+Date.now();
     const plantilla=plantillaDe(grupo);
     DB.informes.push({id,grupo,mes:String(mes),anio:String(anio),plantilla,datos,estado:'Borrador',registrado_por:currentUser.nombre,ts});
-    await apiAdd('INFORMES',{ID:id,Ministerio:grupo,Mes:mes,'Año':anio,Plantilla:plantilla,Datos_JSON:JSON.stringify(datos),Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
+    await apiAdd('INFORMES',{ID:id,Ministerio:grupo,Mes:mes,'Año':anio,Plantilla:plantilla,Datos_JSON:json,Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
   }
   hideLoader();
   addLog('informe',`${currentUser.nombre} guardó el informe de ${grupo} — ${MESES_NOM[mes-1]} ${anio}`,'success');
@@ -2892,7 +2908,12 @@ function infDocCSS(){
   .firmas td{text-align:center;font-size:9pt;width:33.3%;padding:0 8px;vertical-align:bottom;}
   .firmas .sig{height:40px;}
   .firmas .line{border-top:1px solid #000;padding-top:3px;}
-  .obs u{display:block;min-height:14px;}`;
+  .obs u{display:block;min-height:14px;}
+  /* Impresión: repetir cabeceras en cada página y no partir filas ni bloques */
+  thead{display:table-header-group;}
+  tr{page-break-inside:avoid;break-inside:avoid;}
+  table.grid,table.fin,.firmas{page-break-inside:avoid;break-inside:avoid;}
+  .sec-title{page-break-after:avoid;break-after:avoid;}`;
 }
 
 function infDocHead(logo){
@@ -2924,8 +2945,8 @@ function buildInformeA(opts={}){
   const bloqueMonitoreo=(titulo,b)=>`
     <div class="sec-title">${titulo}</div>
     <table class="grid">
-      <tr><th colspan="2">ESPIRITUALES</th><th colspan="2">MATERIALES</th></tr>
-      ${[1,2,3,4].map(n=>`<tr><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_esp_${n}`]||'')}</td><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_mat_${n}`]||'')}</td></tr>`).join('')}
+      <thead><tr><th colspan="2">ESPIRITUALES</th><th colspan="2">MATERIALES</th></tr></thead>
+      <tbody>${[1,2,3,4].map(n=>`<tr><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_esp_${n}`]||'')}</td><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_mat_${n}`]||'')}</td></tr>`).join('')}</tbody>
     </table>`;
 
   // Tabla de servidores: N° | NOMBRES | CARGO | 4 semanas x 4 servicios
@@ -2940,9 +2961,11 @@ function buildInformeA(opts={}){
     }
     tablaServ=`<div class="sec-title">${cfg.servidores.titulo}</div>
 <table class="mtz">
-  <tr><th rowspan="2">N°</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO O FUNCION</th>${cabSem}</tr>
-  <tr>${cabCol}</tr>
-  ${filas}
+  <thead>
+    <tr><th rowspan="2">N°</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO O FUNCION</th>${cabSem}</tr>
+    <tr>${cabCol}</tr>
+  </thead>
+  <tbody>${filas}</tbody>
 </table>`;
   }
 
@@ -2985,8 +3008,8 @@ ${cfg.monitoreo?bloqueMonitoreo('Monitoreo de actividades realizadas','mon'):''}
 ${cfg.monitoreo?bloqueMonitoreo('Proyección para este mes','pro'):''}
 ${cfg.financiero?`<div class="sec-title">Informe financiero</div>
 <table class="fin">
-  <tr><th>SALDO ANTERIOR</th><th>ENTRADAS</th><th>SALIDAS</th><th>SALDO ACTUAL</th></tr>
-  <tr><td>${money(d.saldo_ant)}</td><td>${money(d.entradas)}</td><td>${money(d.salidas)}</td><td>${money(d.saldo_act)}</td></tr>
+  <thead><tr><th>SALDO ANTERIOR</th><th>ENTRADAS</th><th>SALIDAS</th><th>SALDO ACTUAL</th></tr></thead>
+  <tbody><tr><td>${money(d.saldo_ant)}</td><td>${money(d.entradas)}</td><td>${money(d.salidas)}</td><td>${money(d.saldo_act)}</td></tr></tbody>
 </table>`:''}
 <div style="margin-top:12px;">
 ${cfg.oracion?linea('PIDO ORACION POR',d.oracion):''}
@@ -3059,19 +3082,25 @@ ${infDocHead(logo)}
 <div class="linea">${dato('CUANTAS BIBLIAS PROMEDIO POR CULTOS',d.d_biblias)}</div>
 <div class="sec-title">Promedio de asistencia por culto en el mes</div>
 <table class="mtz">
-  <tr><th rowspan="2">FELIGRESIA</th>${cabSem}<th rowspan="2">%</th></tr>
-  <tr>${cabCol}</tr>
-  ${filas}
-  <tr class="total"><td class="fel">TOTAL</td>${totales}<td>${pctGen}</td></tr>
+  <thead>
+    <tr><th rowspan="2">FELIGRESIA</th>${cabSem}<th rowspan="2">%</th></tr>
+    <tr>${cabCol}</tr>
+  </thead>
+  <tbody>
+    ${filas}
+    <tr class="total"><td class="fel">TOTAL</td>${totales}<td>${pctGen}</td></tr>
+  </tbody>
 </table>
 <div class="linea" style="margin-top:10px;"><b>NOMBRES DE PREDICADORES INVITADOS EN EL MES:</b> <u>${infEsc(d.d_predicadores||'')}</u></div>
 <div class="linea"><b>MINISTERIO DE ALABANZA O MINISTRO INVITADO:</b> <u>${infEsc(d.d_alabanza||'')}</u></div>
 <div class="linea obs"><b>TEMAS TRATADOS EN EL MES DE CADA SERVICIO:</b> <u>${infEsc(d.d_temas||'')}</u></div>
 <div class="sec-title">Monitoreo de la escuela dominical para niños, intermedios y adolescentes</div>
 <table class="mtz">
-  <tr><th rowspan="2">NOMBRE DE MAESTRAS DE LOS NIÑOS</th>${cabEscSem}</tr>
-  <tr>${cabEscCol}</tr>
-  ${escuela}
+  <thead>
+    <tr><th rowspan="2">NOMBRE DE MAESTRAS DE LOS NIÑOS</th>${cabEscSem}</tr>
+    <tr>${cabEscCol}</tr>
+  </thead>
+  <tbody>${escuela}</tbody>
 </table>
 <div class="linea obs" style="margin-top:10px;"><b>TEMAS TRATADOS EN EL MES PARA LOS NIÑOS, INTERMEDIOS Y ADOLECENTES:</b> <u>${infEsc(d.d_temas_ninos||'')}</u></div>
 <div class="linea obs"><b>OBSERVACION:</b> <u>${infEsc(d.observacion||'')}</u></div>
