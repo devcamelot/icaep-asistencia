@@ -2886,8 +2886,10 @@ function infDocCSS(){
   body{font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:var(--tinta);margin:0;line-height:1.3;}
 
   /* ---- Encabezado institucional ---- */
-  .head{text-align:center;padding-bottom:5px;border-bottom:2px solid var(--navy);}
-  .head img{height:50px;margin-bottom:2px;filter:url(#logoNavy);}
+  .head{display:flex;align-items:center;gap:11px;text-align:left;
+        padding-bottom:5px;border-bottom:2px solid var(--navy);}
+  .head img{height:52px;flex-shrink:0;filter:url(#logoNavy);}
+  .head-txt{flex:1;min-width:0;}
   .head .n1{font-family:Georgia,'Times New Roman',serif;font-weight:bold;font-size:10pt;color:var(--navy);}
   .head .n2{font-size:6.5pt;color:#5a5a5a;line-height:1.28;}
   .head .city{font-family:Georgia,serif;font-size:7pt;font-weight:bold;color:var(--navy);letter-spacing:2.2px;margin-top:2px;}
@@ -2981,11 +2983,13 @@ function infDocHead(){
 </defs></svg>
 <div class="head">
   <img src="logo_iglesia.png" alt="">
-  <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
-  <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
-  <div class="n2">Resolución 990 de 11 de julio de 2013 · Nit 900729217-6</div>
-  <div class="n2">Personería jurídica especial 1779 del Ministerio del Interior</div>
-  <div class="city">CIUDAD CAMELOT</div>
+  <div class="head-txt">
+    <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
+    <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
+    <div class="n2">Resolución 990 de 11 de julio de 2013 · Nit 900729217-6</div>
+    <div class="n2">Personería jurídica especial 1779 del Ministerio del Interior</div>
+    <div class="city">CIUDAD CAMELOT</div>
+  </div>
 </div>
 <div class="rule-gold"></div>`;
 }
