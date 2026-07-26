@@ -132,6 +132,8 @@ tr:hover td{background:#fafaf7;}
 .kpi-min-num{font-size:1.25rem;font-weight:700;line-height:1;}
 .kpi-min-num.si{color:#166534;}
 .kpi-min-num.no{color:#991b1b;}
+.kpi-min-label.vis{color:#92400e;}
+.kpi-min-num.vis{color:#92400e;}
 .kpi-min-total{margin-top:0.6rem;padding-top:0.5rem;border-top:1px dashed var(--lightgray);font-size:0.72rem;color:var(--gray);font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.5px;}
 .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
 .chart-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(201,168,76,0.15);}
@@ -1284,7 +1286,7 @@ function renderHistorial(){
     if(!visGrupos[key]) visGrupos[key]={fecha:v.fecha,servicio:v.servicio,ministerio:v.ministerio,count:0};
     visGrupos[key].count++;
   });
-  let visRows=Object.values(visGrupos).map(g=>({esVisitante:true,fecha:g.fecha,nombre:`Visitantes (${g.count})`,ministerio:g.ministerio,servicio:g.servicio}));
+  let visRows=Object.values(visGrupos).map(g=>({esVisitante:true,fecha:g.fecha,nombre:`Visitantes (${g.count})`,ministerio:g.ministerio,servicio:g.servicio,count:g.count}));
   if(currentUser&&currentUser.rol==='Lider') visRows=visRows.filter(r=>r.ministerio===currentUser.ministerio);
   if(filtFecha)   visRows=visRows.filter(r=>r.fecha===filtFecha);
   if(filtServ)    visRows=visRows.filter(r=>r.servicio===filtServ||r.servicio.startsWith(filtServ));
@@ -1316,12 +1318,14 @@ function renderHistorial(){
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
   document.getElementById('historialTotal').textContent=`Total: ${allRows.length} registro${allRows.length!==1?'s':''}`;
-  renderHistorialKpis(rows);
+  const visPorMin={};
+  visRows.forEach(r=>{ const min=r.ministerio||'General'; visPorMin[min]=(visPorMin[min]||0)+r.count; });
+  renderHistorialKpis(rows,visPorMin);
 }
 
 // KPI por ministerio: cuenta PERSONAS únicas (bautizadas / no bautizadas)
 // según los filtros activos del historial.
-function renderHistorialKpis(rows){
+function renderHistorialKpis(rows,visPorMin={}){
   const cont=document.getElementById('historialKpis');
   if(!cont) return;
   const kpi={}; // {ministerio:{si:Set,no:Set}}
@@ -1332,27 +1336,29 @@ function renderHistorialKpis(rows){
     if(!kpi[min]) kpi[min]={si:new Set(),no:new Set()};
     (m.bautizado==='SI'?kpi[min].si:kpi[min].no).add(m.id);
   });
-  const ministerios=Object.keys(kpi).sort();
+  // ministerios que solo tienen visitantes también deben aparecer
+  const ministerios=[...new Set([...Object.keys(kpi),...Object.keys(visPorMin)])].sort();
   if(!ministerios.length){
     cont.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--gray);padding:1rem;font-size:0.85rem;">Sin personas para los filtros seleccionados</div>';
     return;
   }
-  let totSi=0,totNo=0;
-  const card=(titulo,color,si,no)=>{
+  let totSi=0,totNo=0,totVis=0;
+  const card=(titulo,color,si,no,vis)=>{
     const total=si+no;
     return `<div class="kpi-min-card${color==='navy'?' kpi-total':''}" ${color!=='navy'?`style="border-top-color:${color}"`:''}>
       <div class="kpi-min-title"><span class="kpi-dot" style="background:${color==='navy'?'var(--navy)':color}"></span>${titulo}</div>
       <div class="kpi-min-row"><span class="kpi-min-label si"><span class="dot" style="background:#166534"></span>Bautizados</span><span class="kpi-min-num si">${si}</span></div>
       <div class="kpi-min-row"><span class="kpi-min-label no"><span class="dot" style="background:#991b1b"></span>No bautizados</span><span class="kpi-min-num no">${no}</span></div>
-      <div class="kpi-min-total">Total: ${total} persona${total!==1?'s':''}</div>
+      <div class="kpi-min-row"><span class="kpi-min-label vis"><span class="dot" style="background:#92400e"></span>Visitantes</span><span class="kpi-min-num vis">${vis}</span></div>
+      <div class="kpi-min-total">Total: ${total} persona${total!==1?'s':''}${vis?` + ${vis} visitante${vis!==1?'s':''}`:''}</div>
     </div>`;
   };
   const cards=ministerios.map(min=>{
-    const si=kpi[min].si.size, no=kpi[min].no.size;
-    totSi+=si; totNo+=no;
-    return card(min,(CMIN[min]||'#888780'),si,no);
+    const si=kpi[min]?kpi[min].si.size:0, no=kpi[min]?kpi[min].no.size:0, vis=visPorMin[min]||0;
+    totSi+=si; totNo+=no; totVis+=vis;
+    return card(min,(CMIN[min]||'#888780'),si,no,vis);
   });
-  const totalCard=ministerios.length>1?card('Total general','navy',totSi,totNo):'';
+  const totalCard=ministerios.length>1?card('Total general','navy',totSi,totNo,totVis):'';
   cont.innerHTML=totalCard+cards.join('');
 }
 
