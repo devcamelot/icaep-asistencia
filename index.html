@@ -1937,31 +1937,44 @@ function setScMinFilter(min,btn){
   scMinFilter=min;
   document.querySelectorAll('#scMinFilterWrap .period-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  renderSCStats();
   renderSantaCenaGrid();
+}
+
+function renderSCStats(){
+  const statsEl=document.getElementById('scStats');
+  if(!statsEl)return;
+  const fecha=document.getElementById('scFecha')?.value||'';
+  const asistieronFecha=new Set(DB.asistencia.filter(a=>a.fecha===fecha).map(a=>a.miembro));
+  const yaRegistradosSC=new Set(DB.santa_cena.filter(sc=>sc.fecha===fecha&&sc.miembro).map(sc=>sc.miembro));
+  let bautizados=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI');
+  if(scMinFilter) bautizados=bautizados.filter(m=>m.ministerio===scMinFilter);
+  const totalAsistieron=bautizados.filter(m=>asistieronFecha.has(m.id)).length;
+  const totalCena=bautizados.filter(m=>yaRegistradosSC.has(m.id)).length;
+  const sub=scMinFilter||'Todos los ministerios';
+  statsEl.innerHTML=`
+    <div class="stat-card"><div class="label">Bautizados activos</div><div class="value">${bautizados.length}</div><div class="sub">${sub}</div></div>
+    <div class="stat-card"><div class="label">Asistieron</div><div class="value">${totalAsistieron}</div><div class="sub">${sub}</div></div>
+    <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${totalCena}</div><div class="sub">${sub}</div></div>
+  `;
 }
 
 function renderSantaCena(){
   const fecha=document.getElementById('scFecha')?.value||'';
-  const asistieronFecha=new Set(DB.asistencia.filter(a=>a.fecha===fecha).map(a=>a.miembro));
   const yaRegistradosSC=new Set(DB.santa_cena.filter(sc=>sc.fecha===fecha&&sc.miembro).map(sc=>sc.miembro));
   scPresentes=new Set([...yaRegistradosSC]);
   const bautizados=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI');
-  const totalAsistieron=bautizados.filter(m=>asistieronFecha.has(m.id)).length;
   const filterWrap=document.getElementById('scMinFilterWrap');
   if(filterWrap){
     const ministerios=[...new Set(bautizados.map(m=>m.ministerio))].sort();
+    if(scMinFilter && !ministerios.includes(scMinFilter)) scMinFilter='';
     filterWrap.innerHTML=
       `<button class="period-tab ${scMinFilter===''?'active':''}" onclick="setScMinFilter('',this)">Todos</button>`+
       ministerios.map(mn=>`<button class="period-tab ${scMinFilter===mn?'active':''}" onclick="setScMinFilter('${mn}',this)">${mn}</button>`).join('');
     filterWrap.className='period-tabs';
     filterWrap.style.marginBottom='1rem';
   }
-  const statsEl=document.getElementById('scStats');
-  if(statsEl) statsEl.innerHTML=`
-    <div class="stat-card"><div class="label">Bautizados activos</div><div class="value">${bautizados.length}</div></div>
-    <div class="stat-card"><div class="label">Asistieron</div><div class="value">${totalAsistieron}</div></div>
-    <div class="stat-card"><div class="label">Santa Cena</div><div class="value">${yaRegistradosSC.size}</div></div>
-  `;
+  renderSCStats();
   renderSantaCenaGrid();
 }
 
