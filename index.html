@@ -119,6 +119,20 @@ tr:hover td{background:#fafaf7;}
 .badge-no,.badge-false{background:#fee2e2;color:#991b1b;}
 .badge-admin{background:#fef3c7;color:#92400e;}
 .badge-lider{background:#e0f2fe;color:#075985;}
+.kpi-min-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:1.2rem;}
+.kpi-min-card{background:var(--white);border:1px solid var(--lightgray);border-top:4px solid var(--gold);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow);}
+.kpi-min-card.kpi-total{border-top-color:var(--navy);background:#fdfbf6;}
+.kpi-min-title{font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:0.7rem;display:flex;align-items:center;gap:7px;}
+.kpi-min-title .kpi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.kpi-min-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;}
+.kpi-min-label{font-size:0.76rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;}
+.kpi-min-label .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.kpi-min-label.si{color:#166534;}
+.kpi-min-label.no{color:#991b1b;}
+.kpi-min-num{font-size:1.25rem;font-weight:700;line-height:1;}
+.kpi-min-num.si{color:#166534;}
+.kpi-min-num.no{color:#991b1b;}
+.kpi-min-total{margin-top:0.6rem;padding-top:0.5rem;border-top:1px dashed var(--lightgray);font-size:0.72rem;color:var(--gray);font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.5px;}
 .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
 .chart-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(201,168,76,0.15);}
 .chart-card h3{font-family:'Cinzel',serif;font-size:0.92rem;color:var(--navy);margin-bottom:1rem;}
@@ -399,6 +413,7 @@ tr:hover td{background:#fafaf7;}
             <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="M8 11l4 4 4-4"></path><path d="M4 21h16"></path></svg>
           </button>
         </div>
+        <div id="historialKpis" class="kpi-min-grid"></div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Fecha</th><th>Miembro</th><th>Ministerio</th><th>Servicio</th><th>Santa Cena</th></tr></thead>
@@ -1301,6 +1316,44 @@ function renderHistorial(){
     </tr>`;
   }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:2rem">Sin registros</td></tr>';
   document.getElementById('historialTotal').textContent=`Total: ${allRows.length} registro${allRows.length!==1?'s':''}`;
+  renderHistorialKpis(rows);
+}
+
+// KPI por ministerio: cuenta PERSONAS únicas (bautizadas / no bautizadas)
+// según los filtros activos del historial.
+function renderHistorialKpis(rows){
+  const cont=document.getElementById('historialKpis');
+  if(!cont) return;
+  const kpi={}; // {ministerio:{si:Set,no:Set}}
+  rows.forEach(r=>{
+    const m=DB.miembros.find(x=>x.id===r.miembro);
+    if(!m) return;
+    const min=m.ministerio||'General';
+    if(!kpi[min]) kpi[min]={si:new Set(),no:new Set()};
+    (m.bautizado==='SI'?kpi[min].si:kpi[min].no).add(m.id);
+  });
+  const ministerios=Object.keys(kpi).sort();
+  if(!ministerios.length){
+    cont.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--gray);padding:1rem;font-size:0.85rem;">Sin personas para los filtros seleccionados</div>';
+    return;
+  }
+  let totSi=0,totNo=0;
+  const card=(titulo,color,si,no)=>{
+    const total=si+no;
+    return `<div class="kpi-min-card${color==='navy'?' kpi-total':''}" ${color!=='navy'?`style="border-top-color:${color}"`:''}>
+      <div class="kpi-min-title"><span class="kpi-dot" style="background:${color==='navy'?'var(--navy)':color}"></span>${titulo}</div>
+      <div class="kpi-min-row"><span class="kpi-min-label si"><span class="dot" style="background:#166534"></span>Bautizados</span><span class="kpi-min-num si">${si}</span></div>
+      <div class="kpi-min-row"><span class="kpi-min-label no"><span class="dot" style="background:#991b1b"></span>No bautizados</span><span class="kpi-min-num no">${no}</span></div>
+      <div class="kpi-min-total">Total: ${total} persona${total!==1?'s':''}</div>
+    </div>`;
+  };
+  const cards=ministerios.map(min=>{
+    const si=kpi[min].si.size, no=kpi[min].no.size;
+    totSi+=si; totNo+=no;
+    return card(min,(CMIN[min]||'#888780'),si,no);
+  });
+  const totalCard=ministerios.length>1?card('Total general','navy',totSi,totNo):'';
+  cont.innerHTML=totalCard+cards.join('');
 }
 
 function clearHistorialFilters(isInit=false){
