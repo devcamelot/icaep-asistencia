@@ -2887,7 +2887,7 @@ function infDocCSS(){
 
   /* ---- Encabezado institucional ---- */
   .head{text-align:center;padding-bottom:7px;border-bottom:2.5px solid var(--navy);}
-  .head img{height:66px;margin-bottom:3px;}
+  .head img{height:66px;margin-bottom:3px;filter:url(#logoNavy);}
   .head .n1{font-family:Georgia,'Times New Roman',serif;font-weight:bold;font-size:12.5pt;color:var(--navy);letter-spacing:0.2px;}
   .head .n2{font-size:8pt;color:#555;line-height:1.3;}
   .head .city{font-family:Georgia,serif;font-size:9pt;font-weight:bold;color:var(--navy);letter-spacing:2.5px;margin-top:3px;}
@@ -2970,7 +2970,14 @@ function infPie(grupo,mes,anio){
 }
 
 function infDocHead(){
-  return `<div class="head">
+  // El logo es blanco con transparencia: sobre papel se perdería.
+  // feColorMatrix fuerza el RGB a #0F1F3D y conserva el canal alfa.
+  return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="logoNavy" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values="0 0 0 0 0.0588  0 0 0 0 0.1216  0 0 0 0 0.2392  0 0 0 1 0"/>
+  </filter>
+</defs></svg>
+<div class="head">
   <img src="logo_iglesia.png" alt="">
   <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
   <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
