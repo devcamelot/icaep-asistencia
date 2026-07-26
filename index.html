@@ -138,6 +138,7 @@ tr:hover td{background:#fafaf7;}
 .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem;}
 .chart-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(201,168,76,0.15);}
 .chart-card h3{font-family:'Cinzel',serif;font-size:0.92rem;color:var(--navy);margin-bottom:1rem;}
+.chart-sub{font-family:'Inter',sans-serif;font-size:0.68rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;margin-left:6px;white-space:nowrap;}
 .period-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem;}
 .period-tab{padding:6px 14px;border:1.5px solid var(--lightgray);border-radius:20px;background:transparent;font-family:'Lato',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;color:var(--gray);}
 .period-tab.active{background:var(--navy);color:var(--gold);border-color:var(--navy);}
@@ -319,10 +320,10 @@ tr:hover td{background:#fafaf7;}
       </div>
       <div class="stats-grid" id="statsGrid"></div>
       <div class="charts-grid">
-        <div class="chart-card"><h3>Asistencia por Ministerio</h3><div style="position:relative;height:220px;"><canvas id="chartMin"></canvas></div></div>
-        <div class="chart-card"><h3>Santa Cena por Ministerio</h3><div style="position:relative;height:220px;"><canvas id="chartCena"></canvas></div></div>
-        <div class="chart-card"><h3>Asistencia por Servicio</h3><div style="position:relative;height:220px;"><canvas id="chartServ"></canvas></div></div>
-        <div class="chart-card"><h3>Tendencia de Asistencia</h3><div style="position:relative;height:220px;"><canvas id="chartTrend"></canvas></div></div>
+        <div class="chart-card"><h3>Asistencia por Ministerio <span class="chart-sub">% de bautizados</span></h3><div id="chartMinWrap" style="position:relative;height:220px;"><canvas id="chartMin"></canvas></div></div>
+        <div class="chart-card"><h3>Santa Cena por Ministerio <span class="chart-sub">% de bautizados</span></h3><div id="chartCenaWrap" style="position:relative;height:220px;"><canvas id="chartCena"></canvas></div></div>
+        <div class="chart-card"><h3>Asistencia por Servicio <span class="chart-sub">% de bautizados</span></h3><div id="chartServWrap" style="position:relative;height:220px;"><canvas id="chartServ"></canvas></div></div>
+        <div class="chart-card"><h3>Tendencia de Asistencia <span class="chart-sub">% de bautizados</span></h3><div id="chartTrendWrap" style="position:relative;height:220px;"><canvas id="chartTrend"></canvas></div></div>
       </div>
       <div style="text-align:right">
         <button class="btn btn-gold" onclick="exportExcel()">Exportar Excel</button>
@@ -1733,22 +1734,49 @@ function getFilteredSantaCena(){
 
 function renderDashboard(){
   const rows=getFilteredRows();
+  const cenaRows=getFilteredSantaCena();
   const mmap={};DB.miembros.forEach(m=>mmap[m.id]=m.ministerio);
-  const byMin={},byCena={},byServ={},byDate={};
+
+  // ---- KPI: siguen contando a TODAS las personas registradas ----
+  const fechasUnicas=new Set(rows.map(r=>r.fecha)).size;
+  const totalCena=cenaRows.filter(sc=>sc.asistio&&sc.miembro).length;
+
+  // ---- Gráficos: SOLO bautizados activos, expresados en % de participación ----
+  const bautMiembros=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI');
+  const bautSet=new Set(bautMiembros.map(m=>m.id));
+  const totalBaut=bautMiembros.length;
+  const baseMin={}; // bautizados activos por ministerio = denominador de cada barra
+  bautMiembros.forEach(m=>{const min=m.ministerio||'General';baseMin[min]=(baseMin[min]||0)+1;});
+
+  // personas únicas presentes, agrupadas por fecha (una fecha = una ocasión de servicio)
+  const porFecha={},porMinFecha={},porServFecha={},porCenaMinFecha={};
+  const addU=(cont,k1,k2,id)=>{cont[k1]=cont[k1]||{};(cont[k1][k2]=cont[k1][k2]||new Set()).add(id);};
   rows.forEach(r=>{
+    if(!bautSet.has(r.miembro)) return;
     const min=mmap[r.miembro]||'General';
-    byMin[min]=(byMin[min]||0)+1;
     const sk=r.servicio.startsWith('Extra')?'Extra':r.servicio;
-    byServ[sk]=(byServ[sk]||0)+1;
-    byDate[r.fecha]=(byDate[r.fecha]||0)+1;
+    (porFecha[r.fecha]=porFecha[r.fecha]||new Set()).add(r.miembro);
+    addU(porMinFecha,min,r.fecha,r.miembro);
+    addU(porServFecha,sk,r.fecha,r.miembro);
   });
-  getFilteredSantaCena().forEach(sc=>{
-    if(!sc.asistio||!sc.miembro) return;
-    const min=mmap[sc.miembro]||'General';
-    byCena[min]=(byCena[min]||0)+1;
+  cenaRows.forEach(sc=>{
+    if(!sc.asistio||!sc.miembro||!bautSet.has(sc.miembro)) return;
+    addU(porCenaMinFecha,mmap[sc.miembro]||'General',sc.fecha,sc.miembro);
   });
-  const totalCena=Object.values(byCena).reduce((a,b)=>a+b,0);
-  const fechasUnicas=Object.keys(byDate).length;
+  const r1=n=>Math.round(n*10)/10;
+  // promedio del % de participación por ocasión, para que el valor no dependa
+  // de cuántas fechas tenga el período seleccionado
+  const promPct=(porFechas,base)=>{
+    const fechas=Object.keys(porFechas||{});
+    if(!fechas.length||!base) return 0;
+    return r1(fechas.reduce((a,f)=>a+Math.min(porFechas[f].size/base*100,100),0)/fechas.length);
+  };
+  const byMin={},byServ={},byDate={},byCena={};
+  Object.keys(porMinFecha).forEach(min=>{byMin[min]=promPct(porMinFecha[min],baseMin[min]);});
+  Object.keys(porServFecha).forEach(sk=>{byServ[sk]=promPct(porServFecha[sk],totalBaut);});
+  Object.keys(porCenaMinFecha).forEach(min=>{byCena[min]=promPct(porCenaMinFecha[min],baseMin[min]);});
+  Object.keys(porFecha).forEach(f=>{byDate[f]=totalBaut?r1(Math.min(porFecha[f].size/totalBaut*100,100)):0;});
+
   const isAdmin=currentUser&&currentUser.rol==='Admin';
   const totalBautizadosMiembros=DB.miembros.filter(m=>m.activo!==false&&m.bautizado==='SI').length;
   const totalBautizosEv=DB.eventos.filter(e=>e.tipo==='bautizo').length;
@@ -1770,16 +1798,28 @@ function renderDashboard(){
   const minL=Object.keys(byMin);
   const servL=Object.keys(byServ);
   const dateL=Object.keys(byDate).sort();
-  dChart('chartMin','bar',{labels:minL,datasets:[{data:minL.map(l=>byMin[l]||0),backgroundColor:minL.map(l=>CMIN[l]||'#888'),borderRadius:6}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
-  if(totalCena>0){
-    dChart('chartCena','doughnut',{labels:Object.keys(byCena),datasets:[{data:Object.values(byCena),backgroundColor:Object.keys(byCena).map(l=>CMIN[l]||'#888'),borderWidth:3}]},{cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}});
-  } else {
-    resetCanvas('chartCena');
-    const el=document.getElementById('chartCena');
-    if(el) el.parentElement.innerHTML='<p style="text-align:center;color:var(--gray);padding:3rem 0;font-size:0.88rem">Sin datos de Santa Cena</p>';
-  }
-  dChart('chartServ','bar',{labels:servL,datasets:[{data:servL.map(l=>byServ[l]||0),backgroundColor:servL.map(l=>CSERV[l]||'#888'),borderRadius:6}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
-  dChart('chartTrend','line',{labels:dateL.map(d=>formatDateShort(d)),datasets:[{data:dateL.map(d=>byDate[d]),borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#c9a84c',pointRadius:4}]},{scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},y:{beginAtZero:true,ticks:{color:'#6b7280',stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}}}});
+  // eje de valores fijo 0–100 % (objeto nuevo por gráfico: Chart.js muta las opciones)
+  const pctOpts=()=>({
+    scales:{
+      x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:10}}},
+      y:{beginAtZero:true,max:100,ticks:{color:'#6b7280',stepSize:20,callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.05)'}}
+    },
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'% de bautizados'}}}
+  });
+  const sinBaut='Sin bautizados con asistencia en el período';
+  if(minL.length) dChart('chartMin','bar',{labels:minL,datasets:[{data:minL.map(l=>byMin[l]),backgroundColor:minL.map(l=>CMIN[l]||'#888'),borderRadius:6}]},pctOpts());
+  else emptyChart('chartMin',sinBaut);
+
+  const cenaL=Object.keys(byCena);
+  if(cenaL.length) dChart('chartCena','bar',{labels:cenaL,datasets:[{data:cenaL.map(l=>byCena[l]),backgroundColor:cenaL.map(l=>CMIN[l]||'#888'),borderRadius:6}]},pctOpts());
+  else emptyChart('chartCena','Sin datos de Santa Cena');
+
+  if(servL.length) dChart('chartServ','bar',{labels:servL,datasets:[{data:servL.map(l=>byServ[l]),backgroundColor:servL.map(l=>CSERV[l]||'#888'),borderRadius:6}]},pctOpts());
+  else emptyChart('chartServ',sinBaut);
+
+  if(dateL.length) dChart('chartTrend','line',{labels:dateL.map(d=>formatDateShort(d)),datasets:[{data:dateL.map(d=>byDate[d]),borderColor:'#c9a84c',backgroundColor:'rgba(201,168,76,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#c9a84c',pointRadius:4}]},pctOpts());
+  else emptyChart('chartTrend',sinBaut);
+
   bindDashboardChartClicks();
 }
 
@@ -1804,19 +1844,32 @@ function openChartModal(chartId,title){
   options.plugins=options.plugins||{};
   options.plugins.legend=options.plugins.legend||{};
   options.plugins.legend.display=false;
+  // el clon JSON pierde las funciones: reponemos el formato de porcentaje
+  if(options.scales&&options.scales.y&&options.scales.y.max===100){
+    options.scales.y.ticks=options.scales.y.ticks||{};
+    options.scales.y.ticks.callback=v=>v+'%';
+    options.plugins.tooltip={callbacks:{label:c=>' '+c.parsed.y+'% de bautizados'}};
+  }
   modalChart=new Chart(canvas,{type:src.config.type,data,options});
 }
 function closeChartModal(){ document.getElementById('modalChart').classList.remove('open'); if(modalChart){modalChart.destroy();modalChart=null;} }
 
+// Restaura el <canvas> si un "Sin datos" previo lo reemplazó por texto
+function ensureCanvas(id){
+  if(document.getElementById(id)) return;
+  const wrap=document.getElementById(id+'Wrap');
+  if(wrap) wrap.innerHTML=`<canvas id="${id}"></canvas>`;
+}
+function emptyChart(id,msg){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const wrap=document.getElementById(id+'Wrap')||document.getElementById(id)?.parentElement;
+  if(wrap) wrap.innerHTML=`<p style="text-align:center;color:var(--gray);padding:3rem 0;font-size:0.88rem">${msg}</p>`;
+}
 function dChart(id,type,data,extraOptions={}){
   if(charts[id]){charts[id].destroy();delete charts[id];}
+  ensureCanvas(id);
   const canvas=document.getElementById(id);if(!canvas)return;
   charts[id]=new Chart(canvas,{type,data,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},...extraOptions}});
-}
-function resetCanvas(id){
-  if(charts[id]){charts[id].destroy();delete charts[id];}
-  const parent=document.getElementById(id)?.parentElement;
-  if(parent) parent.innerHTML=`<canvas id="${id}"></canvas>`;
 }
 
 // ============================================================
