@@ -1344,13 +1344,13 @@ function renderHistorialKpis(rows,visPorMin={}){
   }
   let totSi=0,totNo=0,totVis=0;
   const card=(titulo,color,si,no,vis)=>{
-    const total=si+no;
+    const total=si+no+vis;
     return `<div class="kpi-min-card${color==='navy'?' kpi-total':''}" ${color!=='navy'?`style="border-top-color:${color}"`:''}>
       <div class="kpi-min-title"><span class="kpi-dot" style="background:${color==='navy'?'var(--navy)':color}"></span>${titulo}</div>
       <div class="kpi-min-row"><span class="kpi-min-label si"><span class="dot" style="background:#166534"></span>Bautizados</span><span class="kpi-min-num si">${si}</span></div>
       <div class="kpi-min-row"><span class="kpi-min-label no"><span class="dot" style="background:#991b1b"></span>No bautizados</span><span class="kpi-min-num no">${no}</span></div>
       <div class="kpi-min-row"><span class="kpi-min-label vis"><span class="dot" style="background:#92400e"></span>Visitantes</span><span class="kpi-min-num vis">${vis}</span></div>
-      <div class="kpi-min-total">Total: ${total} persona${total!==1?'s':''}${vis?` + ${vis} visitante${vis!==1?'s':''}`:''}</div>
+      <div class="kpi-min-total">Total: ${total} persona${total!==1?'s':''}</div>
     </div>`;
   };
   const cards=ministerios.map(min=>{
