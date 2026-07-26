@@ -206,6 +206,23 @@ tr:hover td{background:#fafaf7;}
 .period-tab.sin-asist{border-color:var(--warn);color:var(--warn);}
 .period-tab.sin-asist.active{background:var(--warn);color:var(--white);border-color:var(--warn);}
 
+/* ── INFORMES ── */
+.inf-block{border-top:1px dashed var(--lightgray);padding-top:1rem;margin-top:1rem;}
+.inf-block:first-child{border-top:0;padding-top:0;margin-top:0;}
+.inf-block h4{font-family:'Cinzel',serif;font-size:0.88rem;color:var(--navy);margin-bottom:0.8rem;}
+.inf-auto{font-family:'Lato',sans-serif;font-size:0.68rem;font-weight:400;color:var(--gray);text-transform:none;letter-spacing:0;margin-left:8px;}
+.inf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:0 12px;}
+.inf-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.inf-cols input{width:100%;margin-bottom:7px;}
+.inf-collabel{display:block;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--navy);margin-bottom:6px;}
+.inf-comites{display:flex;flex-wrap:wrap;gap:6px;}
+.inf-comites label{display:flex;align-items:center;gap:5px;font-size:0.78rem;font-weight:400;text-transform:none;letter-spacing:0;background:#f7f7f5;border:1px solid var(--lightgray);border-radius:6px;padding:5px 9px;cursor:pointer;margin:0;}
+.inf-comites input{width:auto;margin:0;}
+.inf-badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:5px;}
+.inf-badge.borrador{background:#fef3c7;color:#92400e;}
+.inf-badge.nuevo{background:#e0e7ff;color:#3730a3;}
+@media(max-width:768px){.inf-cols{grid-template-columns:1fr;}}
+
 #printArea{display:none;}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
@@ -293,6 +310,7 @@ tr:hover td{background:#fafaf7;}
     <button onclick="showSection('historial',this)">Historial</button>
     <button onclick="showSection('miembros',this)">Miembros</button>
     <button id="navUsuarios" onclick="showSection('usuarios',this)" style="display:none">Usuarios</button>
+    <button id="navInformes" onclick="showSection('informes',this)">Informes</button>
     <button id="navEventos" onclick="showSection('eventos',this)" style="display:none">Eventos</button>
     <button id="navContabilidad" onclick="showSection('contabilidad',this)" style="display:none">Contabilidad</button>
     <button id="navLog" onclick="showSection('log',this)" style="display:none">Log</button>
@@ -486,6 +504,7 @@ tr:hover td{background:#fafaf7;}
           <option value="miembro">Miembros</option>
           <option value="usuario">Usuarios</option>
           <option value="evento">Eventos</option>
+          <option value="informe">Informes</option>
           <option value="contabilidad">Contabilidad</option>
         </select>
         <button class="btn btn-danger btn-sm" onclick="clearLog()">Limpiar Log</button>
@@ -519,6 +538,122 @@ tr:hover td{background:#fafaf7;}
         <div class="members-grid" id="scMembersGrid"></div>
         <div style="margin-top:1.2rem;">
           <button class="btn btn-primary" style="width:100%;" onclick="guardarSantaCena()">Guardar Santa Cena</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFORMES -->
+    <div id="sec-informes" class="section">
+      <div class="section-header section-head-row">
+        <div><h2>Informes</h2><p>Informe eclesiástico mensual por departamento o sociedad</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('informes')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
+
+      <!-- Selector -->
+      <div class="card" style="margin-bottom:1rem;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="form-group" style="margin:0;flex:1;min-width:170px;">
+            <label>Ministerio / Comité</label>
+            <select id="infGrupo" onchange="onInformeSelectorChange()"></select>
+          </div>
+          <div class="form-group" style="margin:0;width:150px;">
+            <label>Mes</label>
+            <select id="infMes" onchange="onInformeSelectorChange()"></select>
+          </div>
+          <div class="form-group" style="margin:0;width:110px;">
+            <label>Año</label>
+            <select id="infAnio" onchange="onInformeSelectorChange()"></select>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="recalcularInforme()" title="Vuelve a leer los datos del sistema y sobrescribe los estadísticos">Recalcular</button>
+        </div>
+        <div id="infEstado" style="margin-top:0.8rem;font-size:0.82rem;"></div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="card" id="infFormCard">
+        <div class="inf-block">
+          <h4>Datos estadísticos <span class="inf-auto">calculados por el sistema — editables</span></h4>
+          <div class="inf-grid">
+            <div class="form-group"><label>Cuántos miembros tiene</label><input type="number" id="if_miembros" min="0"></div>
+            <div class="form-group"><label>Bautizados</label><input type="number" id="if_bautizados" min="0"></div>
+            <div class="form-group"><label>No bautizados</label><input type="number" id="if_nobautizados" min="0"></div>
+            <div class="form-group"><label>Tomaron Santa Cena</label><input type="number" id="if_cena" min="0"></div>
+            <div class="form-group"><label>Nuevos convertidos</label><input type="number" id="if_convertidos" min="0" placeholder="manual"></div>
+            <div class="form-group"><label>Cultos realizados en el mes</label><input type="number" id="if_cultos" min="0"></div>
+            <div class="form-group"><label>Asistencia por culto (promedio)</label><input type="number" id="if_asistencia" min="0"></div>
+          </div>
+          <div class="form-group"><label>Predicadores invitados</label><textarea id="if_predicadores" rows="2" placeholder="Nombres separados por coma"></textarea></div>
+          <div class="form-group"><label>Temas tratados en el mes</label><textarea id="if_temas" rows="3"></textarea></div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Monitoreo de actividades realizadas</h4>
+          <div class="inf-cols">
+            <div>
+              <label class="inf-collabel">Espirituales</label>
+              <input type="text" id="if_mon_esp_1" placeholder="1."><input type="text" id="if_mon_esp_2" placeholder="2.">
+              <input type="text" id="if_mon_esp_3" placeholder="3."><input type="text" id="if_mon_esp_4" placeholder="4.">
+            </div>
+            <div>
+              <label class="inf-collabel">Materiales</label>
+              <input type="text" id="if_mon_mat_1" placeholder="1."><input type="text" id="if_mon_mat_2" placeholder="2.">
+              <input type="text" id="if_mon_mat_3" placeholder="3."><input type="text" id="if_mon_mat_4" placeholder="4.">
+            </div>
+          </div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Proyección para este mes</h4>
+          <div class="inf-cols">
+            <div>
+              <label class="inf-collabel">Espirituales</label>
+              <input type="text" id="if_pro_esp_1" placeholder="1."><input type="text" id="if_pro_esp_2" placeholder="2.">
+              <input type="text" id="if_pro_esp_3" placeholder="3."><input type="text" id="if_pro_esp_4" placeholder="4.">
+            </div>
+            <div>
+              <label class="inf-collabel">Materiales</label>
+              <input type="text" id="if_pro_mat_1" placeholder="1."><input type="text" id="if_pro_mat_2" placeholder="2.">
+              <input type="text" id="if_pro_mat_3" placeholder="3."><input type="text" id="if_pro_mat_4" placeholder="4.">
+            </div>
+          </div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Informe financiero <span class="inf-auto" id="infFinNota"></span></h4>
+          <div class="inf-grid">
+            <div class="form-group"><label>Saldo anterior</label><input type="number" id="if_saldo_ant" step="0.01"></div>
+            <div class="form-group"><label>Entradas</label><input type="number" id="if_entradas" step="0.01"></div>
+            <div class="form-group"><label>Salidas</label><input type="number" id="if_salidas" step="0.01"></div>
+            <div class="form-group"><label>Saldo actual</label><input type="number" id="if_saldo_act" step="0.01"></div>
+          </div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Cierre</h4>
+          <div class="form-group"><label>Pido oración por</label><textarea id="if_oracion" rows="2"></textarea></div>
+          <div class="form-group"><label>Observación</label><textarea id="if_observacion" rows="3"></textarea></div>
+          <div class="inf-grid">
+            <div class="form-group"><label>Pastor(a)</label><input type="text" id="if_pastor"></div>
+            <div class="form-group"><label>Secretaria(o) General</label><input type="text" id="if_secretaria"></div>
+            <div class="form-group"><label>Líder o Presidente(a)</label><input type="text" id="if_lider"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1.2rem;">
+          <button class="btn btn-primary" onclick="guardarInforme()">Guardar informe</button>
+          <button class="btn btn-outline" onclick="imprimirInforme()">Imprimir / PDF</button>
+          <button class="btn btn-gold" onclick="descargarInformeWord()">Descargar Word</button>
+        </div>
+      </div>
+
+      <!-- Historial de informes -->
+      <div class="card" style="margin-top:1.2rem;">
+        <h3 style="font-family:'Cinzel',serif;font-size:0.92rem;color:var(--navy);margin-bottom:0.8rem;">Informes guardados</h3>
+        <div class="table-wrap">
+          <table><thead><tr><th>Ministerio / Comité</th><th>Período</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+          <tbody id="infHistBody"></tbody></table>
         </div>
       </div>
     </div>
@@ -643,6 +778,10 @@ tr:hover td{background:#fafaf7;}
     <div class="form-group"><label>Punto de Crecimiento</label>
       <select id="mPunto"><option>CENTRAL</option><option>SAN VICENTE</option><option>ICIEDA CIUDAD CAMELOT</option><option>N/A</option></select>
     </div>
+    <div class="form-group"><label>Comités <span class="inf-auto">además de su ministerio</span></label>
+      <div class="inf-comites" id="mComitesWrap"></div>
+    </div>
+    <div class="form-group"><label>Cargo o función</label><input type="text" id="mCargo" placeholder="Ej: Tesorera, Operador de audio"></div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveMember()">Guardar</button>
       <button class="btn btn-outline" onclick="closeModal('addMember')">Cancelar</button>
@@ -756,6 +895,9 @@ tr:hover td{background:#fafaf7;}
     <div class="form-group"><label>Tipo</label>
       <select id="contTipo"><option value="Ingreso">Entrada (Ingreso)</option><option value="Egreso">Salida (Egreso)</option></select>
     </div>
+    <div class="form-group"><label>Ministerio / Comité <span style="font-weight:400;text-transform:none;color:var(--gray)">(para el informe mensual)</span></label>
+      <select id="contMinisterio"></select>
+    </div>
     <div class="form-group"><label>Concepto / Descripción</label><input type="text" id="contDesc" placeholder="Ej: Diezmos, Ofrendas, Pago servicios..."></div>
     <div class="form-group"><label>Monto</label><input type="number" id="contMonto" min="0" step="0.01" placeholder="0.00"></div>
     <div class="form-group"><label>Observación <span style="font-weight:400;text-transform:none;color:var(--gray)">(opcional)</span></label><input type="text" id="contObs" placeholder="Opcional"></div>
@@ -803,7 +945,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxo0QvDU14xDPLmrmblDQrS
 // ============================================================
 // BASE DE DATOS
 // ============================================================
-let DB = { usuarios:[], miembros:[], asistencia:[], log:[], santa_cena:[], visitantes:[], eventos:[], contabilidad:[] };
+let DB = { usuarios:[], miembros:[], asistencia:[], log:[], santa_cena:[], visitantes:[], eventos:[], contabilidad:[], informes:[] };
 let DB_READY = false;
 
 function showLoader(msg='Cargando datos...'){
@@ -825,6 +967,8 @@ function normalizeSheet(data){
       nombre:String(r.Nombre||''), apellido:String(r.Apellido||''),
       ministerio:String(r.Ministerio||''), tipo:String(r.Tipo||''),
       bautizado:String(r.Bautizado||'NO'), punto:String(r.Punto||'N/A'),
+      comite:String(r.Comite||'').split(',').map(s=>s.trim()).filter(Boolean),
+      cargo:String(r.Cargo||''),
       activo:String(r.Activo).toLowerCase()!=='false'
     })),
     asistencia: (data.ASISTENCIA||[]).filter(r=>r.ID).map(r=>({
@@ -861,8 +1005,17 @@ function normalizeSheet(data){
       monto:parseFloat(r.Monto)||0, observacion:String(r.Observacion||''),
       registrado_por:String(r.Registrado_Por||''),
       comprobante:String(r.Comprobante||''),
+      ministerio:String(r.Ministerio||''),
       anulado:String(r.Anulado||'false').toLowerCase()==='true',
       ts:String(r.Timestamp||r.Fecha||'')
+    })),
+    informes: (data.INFORMES||[]).filter(r=>r.ID).map(r=>({
+      id:String(r.ID), grupo:String(r.Ministerio||''),
+      mes:String(r.Mes||''), anio:String(r['Año']||r.Anio||r.Ano||''),
+      plantilla:String(r.Plantilla||'A'),
+      datos:(()=>{try{return JSON.parse(String(r.Datos_JSON||'{}'));}catch(e){return {};}})(),
+      estado:String(r.Estado||'Borrador'),
+      registrado_por:String(r.Registrado_Por||''), ts:String(r.Timestamp||'')
     }))
   };
 }
@@ -986,6 +1139,7 @@ function initApp(){
   renderSantaCena();
   renderTestigosFields('P');
   renderTestigosFields('M');
+  initInformes();
   bindDashboardChartClicks();
 }
 
@@ -1002,6 +1156,7 @@ function showSection(id,btn){
   if(id==='santacena')    syncAndRender('santacena');
   if(id==='eventos')      syncAndRender('eventos');
   if(id==='contabilidad') syncAndRender('contabilidad');
+  if(id==='informes')     syncAndRender('informes');
 }
 
 async function syncAndRender(section){
@@ -1014,6 +1169,7 @@ async function syncAndRender(section){
       if(n.log.length) DB.log=n.log;
       DB.santa_cena=n.santa_cena; DB.visitantes=n.visitantes;
       DB.eventos=n.eventos; DB.contabilidad=n.contabilidad;
+      DB.informes=n.informes;
     }
   }catch(e){}
   if(section==='dashboard')     renderDashboard();
@@ -1024,6 +1180,7 @@ async function syncAndRender(section){
   if(section==='santacena')     renderSantaCena();
   if(section==='eventos')       renderEventosList();
   if(section==='contabilidad')  renderContabilidad();
+  if(section==='informes'){ onInformeSelectorChange(); renderInformesHist(); }
 }
 
 async function refreshSectionData(section){
@@ -1461,7 +1618,20 @@ function openAddMember(){
   document.getElementById('mTipo').value='Miembro Activo';
   document.getElementById('mBautizado').value='SI';
   document.getElementById('mPunto').value='CENTRAL';
+  document.getElementById('mCargo').value='';
+  renderComitesCheckboxes([]);
   openModal('addMember');
+}
+
+function renderComitesCheckboxes(seleccionados=[]){
+  const wrap=document.getElementById('mComitesWrap');
+  if(!wrap) return;
+  wrap.innerHTML=COMITES.map(c=>
+    `<label><input type="checkbox" value="${c}" ${seleccionados.includes(c)?'checked':''}> ${c}</label>`
+  ).join('');
+}
+function getComitesSeleccionados(){
+  return [...document.querySelectorAll('#mComitesWrap input:checked')].map(i=>i.value);
 }
 
 function openEditMember(id){
@@ -1476,6 +1646,8 @@ function openEditMember(id){
   document.getElementById('mTipo').value=m.tipo;
   document.getElementById('mBautizado').value=m.bautizado;
   document.getElementById('mPunto').value=m.punto;
+  document.getElementById('mCargo').value=m.cargo||'';
+  renderComitesCheckboxes(m.comite||[]);
   openModal('addMember');
 }
 
@@ -1497,18 +1669,21 @@ async function saveMember(){
   const tipo=document.getElementById('mTipo').value;
   const bautizado=document.getElementById('mBautizado').value;
   const punto=document.getElementById('mPunto').value;
+  const comite=getComitesSeleccionados();
+  const cargo=(document.getElementById('mCargo').value||'').trim();
   showLoader('Guardando miembro...');
   if(editMemberId){
     const m=DB.miembros.find(x=>x.id===editMemberId);
     m.cedula=cedula;m.nombre=n;m.apellido=a;m.ministerio=ministerio;m.tipo=tipo;m.bautizado=bautizado;m.punto=punto;
-    await apiUpdate('MIEMBROS',editMemberId,{Cedula:cedula,Nombre:n,Apellido:a,Ministerio:ministerio,Tipo:tipo,Bautizado:bautizado,Punto:punto});
+    m.comite=comite;m.cargo=cargo;
+    await apiUpdate('MIEMBROS',editMemberId,{Cedula:cedula,Nombre:n,Apellido:a,Ministerio:ministerio,Tipo:tipo,Bautizado:bautizado,Punto:punto,Comite:comite.join(', '),Cargo:cargo});
     addLog('miembro',`${currentUser.nombre} editó miembro: ${n} ${a}`,'info');
     showToast('✓ Miembro actualizado','success');
   } else {
     const id='m'+Date.now();
-    const m={id,cedula,nombre:n,apellido:a,ministerio,tipo,bautizado,punto,activo:true};
+    const m={id,cedula,nombre:n,apellido:a,ministerio,tipo,bautizado,punto,comite,cargo,activo:true};
     DB.miembros.push(m);
-    await apiAdd('MIEMBROS',{ID:id,Cedula:cedula,Nombre:n,Apellido:a,Ministerio:ministerio,Tipo:tipo,Bautizado:bautizado,Punto:punto,Activo:true});
+    await apiAdd('MIEMBROS',{ID:id,Cedula:cedula,Nombre:n,Apellido:a,Ministerio:ministerio,Tipo:tipo,Bautizado:bautizado,Punto:punto,Comite:comite.join(', '),Cargo:cargo,Activo:true});
     addLog('miembro',`${currentUser.nombre} agregó miembro: ${n} ${a} (${ministerio})`,'success');
     showToast('✓ Miembro agregado','success');
   }
@@ -2085,6 +2260,322 @@ async function guardarSantaCena(){
 }
 
 // ============================================================
+// INFORMES ECLESIÁSTICOS MENSUALES
+// ============================================================
+const MINISTERIOS=['Jovenes','Caballeros','Damas','Adolescentes'];
+const COMITES=['Diaconos','Alabanza','Sonido','Visual','Decoracion'];
+const MESES_NOM=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+// Plantilla A = ministerio/sociedad. B, C y D se agregan después.
+const PLANTILLA_GRUPO={Jovenes:'A',Caballeros:'A',Damas:'A',Adolescentes:'A',Diaconos:'A',Alabanza:'B',Sonido:'C',Visual:'C',Decoracion:'C'};
+
+function infEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Grupos que el usuario actual puede informar
+function gruposDisponibles(){
+  const todos=[...MINISTERIOS,...COMITES];
+  if(currentUser&&currentUser.rol==='Lider'){
+    // su ministerio + los comités donde tenga miembros a cargo
+    return todos.filter(g=>g===currentUser.ministerio);
+  }
+  return todos;
+}
+
+function llenarSelectGrupos(selectId,incluirGeneral=false){
+  const sel=document.getElementById(selectId);
+  if(!sel) return;
+  const prev=sel.value;
+  const opts=[...MINISTERIOS,...COMITES];
+  sel.innerHTML=(incluirGeneral?'<option value="General">General (iglesia)</option>':'')+
+    opts.map(g=>`<option value="${g}">${g}</option>`).join('');
+  if(prev) sel.value=prev;
+}
+
+function initInformes(){
+  const selG=document.getElementById('infGrupo');
+  if(!selG) return;
+  const grupos=gruposDisponibles();
+  selG.innerHTML=grupos.map(g=>`<option value="${g}">${g}</option>`).join('');
+  const hoy=new Date();
+  // por defecto el mes anterior, que es el que normalmente se informa
+  // getMonth() es 0-based, así que su valor ya es el número del mes anterior (1-12)
+  let m=hoy.getMonth(), y=hoy.getFullYear();
+  if(m===0){ m=12; y--; }
+  document.getElementById('infMes').innerHTML=MESES_NOM.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('');
+  document.getElementById('infMes').value=m;
+  const anios=[];
+  for(let a=hoy.getFullYear()+1;a>=hoy.getFullYear()-4;a--) anios.push(a);
+  document.getElementById('infAnio').innerHTML=anios.map(a=>`<option value="${a}">${a}</option>`).join('');
+  document.getElementById('infAnio').value=y;
+  onInformeSelectorChange();
+  renderInformesHist();
+}
+
+// Miembros del grupo: por ministerio o por comité
+function miembrosDeGrupo(grupo){
+  return DB.miembros.filter(m=>m.activo!==false&&(m.ministerio===grupo||(m.comite||[]).includes(grupo)));
+}
+
+function calcInformeStats(grupo,mes,anio){
+  const pref=`${anio}-${String(mes).padStart(2,'0')}`;
+  const miembros=miembrosDeGrupo(grupo);
+  const ids=new Set(miembros.map(m=>m.id));
+  const bautizados=miembros.filter(m=>m.bautizado==='SI').length;
+
+  const cena=new Set(DB.santa_cena
+    .filter(sc=>sc.asistio&&sc.miembro&&ids.has(sc.miembro)&&(sc.fecha||'').startsWith(pref))
+    .map(sc=>sc.miembro)).size;
+
+  const porFecha={};
+  DB.asistencia.filter(a=>(a.fecha||'').startsWith(pref)&&ids.has(a.miembro))
+    .forEach(a=>{(porFecha[a.fecha]=porFecha[a.fecha]||new Set()).add(a.miembro);});
+  const fechas=Object.keys(porFecha);
+  const cultos=fechas.length;
+  const asistencia=cultos?Math.round(fechas.reduce((s,f)=>s+porFecha[f].size,0)/cultos):0;
+
+  // Financiero del grupo. Movimientos sin ministerio se consideran "General".
+  const movs=DB.contabilidad.filter(r=>!r.anulado&&(r.ministerio||'General')===grupo);
+  const antes=movs.filter(r=>(r.fecha||'')<`${pref}-01`);
+  const delMes=movs.filter(r=>(r.fecha||'').startsWith(pref));
+  const suma=(arr,t)=>arr.filter(r=>r.tipo===t).reduce((s,r)=>s+r.monto,0);
+  const saldoAnt=suma(antes,'Ingreso')-suma(antes,'Egreso');
+  const entradas=suma(delMes,'Ingreso');
+  const salidas=suma(delMes,'Egreso');
+
+  return {
+    miembros:miembros.length, bautizados, nobautizados:miembros.length-bautizados,
+    cena, cultos, asistencia,
+    saldo_ant:saldoAnt, entradas, salidas, saldo_act:saldoAnt+entradas-salidas
+  };
+}
+
+const INF_CAMPOS=['miembros','bautizados','nobautizados','cena','convertidos','cultos','asistencia',
+  'predicadores','temas','saldo_ant','entradas','salidas','saldo_act','oracion','observacion',
+  'pastor','secretaria','lider'];
+
+function infListaCampos(){
+  const l=[];
+  ['mon','pro'].forEach(b=>['esp','mat'].forEach(c=>[1,2,3,4].forEach(n=>l.push(`${b}_${c}_${n}`))));
+  return l;
+}
+
+function informeActualKey(){
+  return {
+    grupo:document.getElementById('infGrupo').value,
+    mes:document.getElementById('infMes').value,
+    anio:document.getElementById('infAnio').value
+  };
+}
+
+function buscarInformeGuardado(grupo,mes,anio){
+  return DB.informes.find(i=>i.grupo===grupo&&String(i.mes)===String(mes)&&String(i.anio)===String(anio));
+}
+
+function onInformeSelectorChange(){
+  const {grupo,mes,anio}=informeActualKey();
+  if(!grupo) return;
+  const guardado=buscarInformeGuardado(grupo,mes,anio);
+  const stats=calcInformeStats(grupo,mes,anio);
+  const datos=guardado?{...stats,...guardado.datos}:stats;
+  cargarInformeEnForm(datos);
+  const est=document.getElementById('infEstado');
+  if(est){
+    est.innerHTML=guardado
+      ? `<span class="inf-badge borrador">Guardado</span> <span style="color:var(--gray)">Última edición por ${infEsc(guardado.registrado_por)} — se cargaron los valores guardados.</span>`
+      : `<span class="inf-badge nuevo">Nuevo</span> <span style="color:var(--gray)">Sin informe previo para este período. Los estadísticos vienen del sistema.</span>`;
+  }
+  const nota=document.getElementById('infFinNota');
+  if(nota) nota.textContent=`movimientos de contabilidad marcados como "${grupo}"`;
+}
+
+function cargarInformeEnForm(d){
+  INF_CAMPOS.forEach(c=>{
+    const el=document.getElementById('if_'+c);
+    if(el) el.value=d[c]!==undefined&&d[c]!==null?d[c]:'';
+  });
+  infListaCampos().forEach(c=>{
+    const el=document.getElementById('if_'+c);
+    if(el) el.value=d[c]||'';
+  });
+}
+
+function leerInformeDelForm(){
+  const d={};
+  INF_CAMPOS.concat(infListaCampos()).forEach(c=>{
+    const el=document.getElementById('if_'+c);
+    if(el) d[c]=el.value;
+  });
+  return d;
+}
+
+function recalcularInforme(){
+  const {grupo,mes,anio}=informeActualKey();
+  const stats=calcInformeStats(grupo,mes,anio);
+  const actual=leerInformeDelForm();
+  cargarInformeEnForm({...actual,...stats});
+  showToast('Estadísticos recalculados desde el sistema','success');
+}
+
+async function guardarInforme(){
+  const {grupo,mes,anio}=informeActualKey();
+  if(!grupo){ showToast('Selecciona un ministerio','error'); return; }
+  const datos=leerInformeDelForm();
+  const ts=new Date().toISOString();
+  const existente=buscarInformeGuardado(grupo,mes,anio);
+  showLoader('Guardando informe...');
+  if(existente){
+    existente.datos=datos; existente.registrado_por=currentUser.nombre; existente.ts=ts;
+    await apiUpdate('INFORMES',existente.id,{Datos_JSON:JSON.stringify(datos),Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
+  } else {
+    const id='inf'+Date.now();
+    const plantilla=PLANTILLA_GRUPO[grupo]||'A';
+    DB.informes.push({id,grupo,mes:String(mes),anio:String(anio),plantilla,datos,estado:'Borrador',registrado_por:currentUser.nombre,ts});
+    await apiAdd('INFORMES',{ID:id,Ministerio:grupo,Mes:mes,'Año':anio,Plantilla:plantilla,Datos_JSON:JSON.stringify(datos),Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
+  }
+  hideLoader();
+  addLog('informe',`${currentUser.nombre} guardó el informe de ${grupo} — ${MESES_NOM[mes-1]} ${anio}`,'success');
+  saveDB(); onInformeSelectorChange(); renderInformesHist();
+  showToast('✓ Informe guardado','success');
+}
+
+function renderInformesHist(){
+  const body=document.getElementById('infHistBody');
+  if(!body) return;
+  const permitidos=gruposDisponibles();
+  const rows=DB.informes
+    .filter(i=>permitidos.includes(i.grupo))
+    .sort((a,b)=>(b.anio+String(b.mes).padStart(2,'0')).localeCompare(a.anio+String(a.mes).padStart(2,'0')));
+  body.innerHTML=rows.map(i=>`<tr>
+    <td>${infEsc(i.grupo)}</td>
+    <td>${MESES_NOM[parseInt(i.mes)-1]||i.mes} ${infEsc(i.anio)}</td>
+    <td>${infEsc(i.registrado_por)}</td>
+    <td><button class="btn btn-outline btn-sm" onclick="abrirInforme('${i.id}')">Abrir</button></td>
+  </tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:1.5rem">Sin informes guardados</td></tr>';
+}
+
+function abrirInforme(id){
+  const i=DB.informes.find(x=>x.id===id);
+  if(!i) return;
+  document.getElementById('infGrupo').value=i.grupo;
+  document.getElementById('infMes').value=i.mes;
+  document.getElementById('infAnio').value=i.anio;
+  onInformeSelectorChange();
+  document.getElementById('infFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ---------- Generación del documento ----------
+function buildInformeHTML(opts={}){
+  const {grupo,mes,anio}=informeActualKey();
+  const d=leerInformeDelForm();
+  const logo=opts.logo===false?'':'<img src="logo_iglesia.png" style="height:78px;" alt="">';
+  const money=v=>fmtCOP(parseFloat(v)||0);
+  const fila=b=>[1,2,3,4].map(n=>`<tr><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_esp_${n}`]||'')}</td><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_mat_${n}`]||'')}</td></tr>`).join('');
+  const bloque=(titulo,b)=>`
+    <div class="sec-title">${titulo}</div>
+    <table class="grid">
+      <tr><th colspan="2">ESPIRITUALES</th><th colspan="2">MATERIALES</th></tr>
+      ${fila(b)}
+    </table>`;
+  const dato=(lbl,val)=>`<span class="dato"><b>${lbl}:</b> <u>&nbsp;${infEsc(val===''||val==null?'':val)}&nbsp;</u></span>`;
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Informe ${infEsc(grupo)} ${MESES_NOM[mes-1]} ${anio}</title>
+<style>
+  @page{size:A4 portrait;margin:14mm 12mm;}
+  body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;color:#000;margin:0;}
+  .head{text-align:center;line-height:1.25;}
+  .head .n1{font-weight:bold;font-size:12pt;}
+  .head .n2{font-size:9.5pt;}
+  .head .city{font-weight:bold;font-size:11pt;margin-top:4px;}
+  h1{font-size:12pt;text-align:center;margin:14px 0 10px;text-transform:uppercase;}
+  .sec-title{font-weight:bold;font-size:10.5pt;margin:12px 0 5px;text-transform:uppercase;}
+  .dato{display:inline-block;margin:0 14px 6px 0;white-space:nowrap;}
+  .linea{margin:5px 0;}
+  .linea u{display:inline-block;min-width:60%;}
+  table{width:100%;border-collapse:collapse;}
+  table.grid td,table.grid th{border:1px solid #000;padding:4px 6px;font-size:10pt;vertical-align:top;}
+  table.grid th{background:#eee;text-align:center;font-size:9.5pt;}
+  table.grid td.num{width:22px;text-align:center;}
+  table.grid td.fill{height:20px;}
+  table.fin td,table.fin th{border:1px solid #000;padding:5px;text-align:center;font-size:10pt;}
+  table.fin th{background:#eee;font-size:9.5pt;}
+  .firmas{margin-top:30px;width:100%;}
+  .firmas td{text-align:center;font-size:9pt;width:33.3%;padding:0 8px;vertical-align:bottom;}
+  .firmas .sig{height:40px;}
+  .firmas .line{border-top:1px solid #000;padding-top:3px;}
+  .obs u{display:block;min-height:14px;}
+</style></head><body>
+<div class="head">
+  ${logo}
+  <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
+  <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
+  <div class="n2">Resolución 990 de 11 de julio de 2013, Nit 900729217-6</div>
+  <div class="n2">Personería jurídica especial 1779 del ministerio del interior</div>
+  <div class="city">CIUDAD CAMELOT</div>
+</div>
+<h1>Informe eclesiástico por departamentos o sociedades</h1>
+<div class="linea">
+  ${dato('MINISTERIO',grupo)} ${dato('MES',MESES_NOM[mes-1])} ${dato('AÑO',anio)}
+</div>
+<div class="sec-title">Datos estadísticos</div>
+<div class="linea">
+  ${dato('CUANTOS MIEMBROS TIENE',d.miembros)}
+  ${dato('BAUTIZADOS',d.bautizados)}
+  ${dato('NO BAUTIZADOS',d.nobautizados)}
+  ${dato('CUANTOS TOMARON SANTA CENA',d.cena)}
+  ${dato('NUEVOS CONVERTIDOS',d.convertidos)}
+  ${dato('CULTOS REALIZADOS EN EL MES',d.cultos)}
+  ${dato('ASISTENCIA POR CULTO',d.asistencia)}
+</div>
+<div class="linea"><b>PREDICADORES INVITADOS:</b> <u>${infEsc(d.predicadores||'')}</u></div>
+<div class="linea"><b>TEMAS TRATADOS EN EL MES:</b> <u>${infEsc(d.temas||'')}</u></div>
+${bloque('Monitoreo de actividades realizadas','mon')}
+${bloque('Proyección para este mes','pro')}
+<div class="sec-title">Informe financiero</div>
+<table class="fin">
+  <tr><th>SALDO ANTERIOR</th><th>ENTRADAS</th><th>SALIDAS</th><th>SALDO ACTUAL</th></tr>
+  <tr><td>${money(d.saldo_ant)}</td><td>${money(d.entradas)}</td><td>${money(d.salidas)}</td><td>${money(d.saldo_act)}</td></tr>
+</table>
+<div class="linea obs" style="margin-top:12px;"><b>PIDO ORACION POR:</b> <u>${infEsc(d.oracion||'')}</u></div>
+<div class="linea obs"><b>OBSERVACION:</b> <u>${infEsc(d.observacion||'')}</u></div>
+<table class="firmas">
+  <tr>
+    <td><div class="sig"></div><div class="line">${infEsc(d.pastor||'')}<br>PASTOR (A)</div></td>
+    <td><div class="sig"></div><div class="line">${infEsc(d.secretaria||'')}<br>SECRETARIA (O) GENERAL</div></td>
+    <td><div class="sig"></div><div class="line">${infEsc(d.lider||'')}<br>LIDER O PRESIDENTE (A)</div></td>
+  </tr>
+</table>
+</body></html>`;
+}
+
+function imprimirInforme(){
+  const html=buildInformeHTML();
+  let frame=document.getElementById('infPrintFrame');
+  if(frame) frame.remove();
+  frame=document.createElement('iframe');
+  frame.id='infPrintFrame';
+  frame.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+  document.body.appendChild(frame);
+  const doc=frame.contentWindow.document;
+  doc.open(); doc.write(html); doc.close();
+  // esperar a que cargue el logo antes de mandar a imprimir
+  setTimeout(()=>{ frame.contentWindow.focus(); frame.contentWindow.print(); },400);
+}
+
+function descargarInformeWord(){
+  const {grupo,mes,anio}=informeActualKey();
+  // Word no resuelve rutas relativas del navegador: se omite el logo
+  const html=buildInformeHTML({logo:false});
+  const blob=new Blob(['﻿',html],{type:'application/msword'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`Informe_${grupo}_${MESES_NOM[mes-1]}_${anio}.doc`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  showToast('✓ Documento Word descargado','success');
+}
+
+// ============================================================
 // EVENTOS
 // ============================================================
 let currentEventoTab='bautizo';
@@ -2324,6 +2815,7 @@ async function guardarContabilidad(){
   const desc=document.getElementById('contDesc').value.trim();
   const monto=parseFloat(document.getElementById('contMonto').value);
   const obs=document.getElementById('contObs').value.trim();
+  const min=document.getElementById('contMinisterio').value;
   if(!fecha||!desc||isNaN(monto)||monto<=0){showToast('Fecha, concepto y monto son requeridos','error');return;}
   const ts=new Date().toISOString();
   showLoader(editContId?'Actualizando movimiento...':'Guardando movimiento...');
@@ -2332,16 +2824,16 @@ async function guardarContabilidad(){
     // Aquí permitimos edición directa solo de observación y comprobante para correcciones menores
     const idx=DB.contabilidad.findIndex(x=>x.id===editContId);
     if(idx>=0){
-      DB.contabilidad[idx]={...DB.contabilidad[idx],fecha,tipo,descripcion:desc,monto,observacion:obs,comprobante:comp};
+      DB.contabilidad[idx]={...DB.contabilidad[idx],fecha,tipo,descripcion:desc,monto,observacion:obs,comprobante:comp,ministerio:min};
     }
-    await apiUpdate('CONTABILIDAD',editContId,{Fecha:fecha,Tipo:tipo,Descripcion:desc,Monto:monto,Observacion:obs,Comprobante:comp});
+    await apiUpdate('CONTABILIDAD',editContId,{Fecha:fecha,Tipo:tipo,Descripcion:desc,Monto:monto,Observacion:obs,Comprobante:comp,Ministerio:min});
     addLog('contabilidad',`${currentUser.nombre} editó movimiento: ${desc} — ${fmtCOP(monto)}`,'info');
     showToast('✓ Movimiento actualizado','success');
   } else {
     const id='c'+Date.now();
-    const row={id,fecha,tipo,descripcion:desc,monto,observacion:obs,comprobante:comp,registrado_por:currentUser.nombre,anulado:false,ts};
+    const row={id,fecha,tipo,descripcion:desc,monto,observacion:obs,comprobante:comp,ministerio:min,registrado_por:currentUser.nombre,anulado:false,ts};
     DB.contabilidad.push(row);
-    await apiAdd('CONTABILIDAD',{ID:id,Fecha:fecha,Tipo:tipo,Descripcion:desc,Monto:monto,Observacion:obs,Comprobante:comp,Registrado_Por:currentUser.nombre,Anulado:false,Timestamp:ts});
+    await apiAdd('CONTABILIDAD',{ID:id,Fecha:fecha,Tipo:tipo,Descripcion:desc,Monto:monto,Observacion:obs,Comprobante:comp,Ministerio:min,Registrado_Por:currentUser.nombre,Anulado:false,Timestamp:ts});
     addLog('contabilidad',`${currentUser.nombre} registró ${tipo}: ${desc} — ${fmtCOP(monto)}`,'info');
     showToast(`✓ ${tipo} registrado`,'success');
   }
@@ -2488,6 +2980,8 @@ function openAddCont(){
   document.getElementById('contDesc').value='';
   document.getElementById('contMonto').value='';
   document.getElementById('contObs').value='';
+  llenarSelectGrupos('contMinisterio',true);
+  document.getElementById('contMinisterio').value='General';
   document.getElementById('modalAddCont').classList.add('open');
 }
 
@@ -2502,6 +2996,8 @@ function editCont(id){
   document.getElementById('contDesc').value=r.descripcion;
   document.getElementById('contMonto').value=r.monto;
   document.getElementById('contObs').value=r.observacion||'';
+  llenarSelectGrupos('contMinisterio',true);
+  document.getElementById('contMinisterio').value=r.ministerio||'General';
   document.getElementById('modalAddCont').classList.add('open');
 }
 
