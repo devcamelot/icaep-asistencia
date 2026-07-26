@@ -709,8 +709,7 @@ tr:hover td{background:#fafaf7;}
 
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1.2rem;">
           <button class="btn btn-primary" onclick="guardarInforme()">Guardar informe</button>
-          <button class="btn btn-outline" onclick="imprimirInforme()">Imprimir / PDF</button>
-          <button class="btn btn-gold" onclick="descargarInformeWord()">Descargar Word</button>
+          <button class="btn btn-gold" onclick="imprimirInforme()">Imprimir / PDF</button>
         </div>
       </div>
 
@@ -2881,66 +2880,119 @@ function abrirInforme(id){
 // ---------- Generación del documento ----------
 function infDocCSS(){
   return `
-  @page{size:A4 portrait;margin:14mm 12mm;}
-  body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;color:#000;margin:0;}
-  .head{text-align:center;line-height:1.25;}
-  .head .n1{font-weight:bold;font-size:12pt;}
-  .head .n2{font-size:9.5pt;}
-  .head .city{font-weight:bold;font-size:11pt;margin-top:4px;}
-  h1{font-size:12pt;text-align:center;margin:14px 0 10px;text-transform:uppercase;}
-  .sec-title{font-weight:bold;font-size:10.5pt;margin:12px 0 5px;text-transform:uppercase;}
-  .dato{display:inline-block;margin:0 14px 6px 0;white-space:nowrap;}
+  :root{--navy:#0f1f3d;--gold:#c9a84c;--tinta:#1c1c1c;--suave:#f5f4ef;--linea:#c8c5ba;}
+  @page{size:A4 portrait;margin:11mm 10mm 13mm;}
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{font-family:Arial,Helvetica,sans-serif;font-size:9.5pt;color:var(--tinta);margin:0;line-height:1.35;}
+
+  /* ---- Encabezado institucional ---- */
+  .head{text-align:center;padding-bottom:7px;border-bottom:2.5px solid var(--navy);}
+  .head img{height:66px;margin-bottom:3px;}
+  .head .n1{font-family:Georgia,'Times New Roman',serif;font-weight:bold;font-size:12.5pt;color:var(--navy);letter-spacing:0.2px;}
+  .head .n2{font-size:8pt;color:#555;line-height:1.3;}
+  .head .city{font-family:Georgia,serif;font-size:9pt;font-weight:bold;color:var(--navy);letter-spacing:2.5px;margin-top:3px;}
+  .rule-gold{height:2.5px;background:var(--gold);margin-bottom:12px;}
+
+  /* ---- Título del informe ---- */
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:11pt;font-weight:bold;text-align:center;
+     text-transform:uppercase;letter-spacing:1.2px;color:#fff;background:var(--navy);
+     margin:0 0 12px;padding:7px 10px;border-bottom:2.5px solid var(--gold);}
+
+  /* ---- Encabezados de sección ---- */
+  .sec-title{font-family:Georgia,serif;font-weight:bold;font-size:9.5pt;color:var(--navy);
+             text-transform:uppercase;letter-spacing:0.8px;margin:13px 0 6px;
+             background:var(--suave);border-left:3.5px solid var(--gold);padding:4px 8px;}
+
+  /* ---- Campos ---- */
   .linea{margin:5px 0;}
-  .linea u{display:inline-block;min-width:60%;}
+  .dato{display:inline-block;margin:0 13px 6px 0;white-space:nowrap;font-size:9pt;}
+  .dato b{color:var(--navy);font-weight:bold;}
+  .dato .v{display:inline-block;min-width:36px;margin-left:3px;padding:0 7px 1px;
+           border-bottom:1.3px solid var(--navy);text-align:center;font-weight:bold;color:var(--navy);}
+  .campo{margin:6px 0;}
+  .campo .lbl{display:block;font-size:8pt;font-weight:bold;color:var(--navy);
+              text-transform:uppercase;letter-spacing:0.5px;margin-bottom:1px;}
+  .campo .val{display:block;min-height:15px;border-bottom:1px solid var(--linea);padding:1px 3px 2px;}
+
+  /* ---- Tablas ---- */
   table{width:100%;border-collapse:collapse;}
-  table.grid td,table.grid th{border:1px solid #000;padding:4px 6px;font-size:10pt;vertical-align:top;}
-  table.grid th{background:#eee;text-align:center;font-size:9.5pt;}
-  table.grid td.num{width:22px;text-align:center;}
-  table.grid td.fill{height:20px;}
-  table.fin td,table.fin th{border:1px solid #000;padding:5px;text-align:center;font-size:10pt;}
-  table.fin th{background:#eee;font-size:9.5pt;}
-  table.mtz td,table.mtz th{border:1px solid #000;padding:2px 3px;text-align:center;font-size:7.5pt;}
-  table.mtz th{background:#eee;}
-  table.mtz td.fel{text-align:left;font-weight:bold;padding:2px 5px;white-space:nowrap;}
-  table.mtz tr.total td{background:#eee;font-weight:bold;}
-  table.mtz td.nom{text-align:left;padding:2px 5px;min-width:130px;}
-  .firmas{margin-top:30px;width:100%;}
-  .firmas td{text-align:center;font-size:9pt;width:33.3%;padding:0 8px;vertical-align:bottom;}
-  .firmas .sig{height:40px;}
-  .firmas .line{border-top:1px solid #000;padding-top:3px;}
-  .obs u{display:block;min-height:14px;}
-  /* Impresión: repetir cabeceras en cada página y no partir filas ni bloques */
+  thead th{background:var(--navy);color:#fff;font-weight:bold;letter-spacing:0.4px;}
+  table.grid td,table.grid th{border:1px solid var(--linea);padding:4px 6px;font-size:9pt;vertical-align:top;}
+  table.grid th{text-align:center;font-size:8pt;text-transform:uppercase;padding:4px;}
+  table.grid td.num{width:20px;text-align:center;color:var(--navy);font-weight:bold;background:var(--suave);}
+  table.grid td.fill{height:19px;}
+  table.fin td,table.fin th{border:1px solid var(--linea);padding:5px;text-align:center;}
+  table.fin th{font-size:8pt;text-transform:uppercase;}
+  table.fin td{font-size:10pt;font-weight:bold;color:var(--navy);}
+  table.fin td:last-child{background:var(--suave);border:1.5px solid var(--gold);}
+  table.mtz td,table.mtz th{border:1px solid var(--linea);padding:2px 3px;text-align:center;font-size:7pt;}
+  table.mtz th{font-size:6.5pt;padding:3px 2px;}
+  table.mtz tbody tr:nth-child(even) td{background:#faf9f6;}
+  table.mtz td.fel{text-align:left;font-weight:bold;padding:2px 6px;white-space:nowrap;color:var(--navy);}
+  table.mtz td.nom{text-align:left;padding:2px 5px;min-width:118px;}
+  table.mtz tr.total td{background:var(--suave)!important;font-weight:bold;color:var(--navy);
+                        border-top:1.5px solid var(--navy);}
+
+  /* ---- Firmas ---- */
+  .firmas{margin-top:26px;width:100%;}
+  .firmas td{text-align:center;font-size:8pt;width:33.3%;padding:0 10px;vertical-align:bottom;}
+  .firmas .sig{height:38px;}
+  .firmas .line{border-top:1.3px solid var(--navy);padding-top:3px;color:var(--navy);
+                text-transform:uppercase;letter-spacing:0.4px;font-weight:bold;}
+  .firmas .line .nom{display:block;font-weight:normal;text-transform:none;letter-spacing:0;
+                     color:var(--tinta);font-size:8.5pt;min-height:11px;}
+
+  /* ---- Pie ---- */
+  .pie{margin-top:14px;padding-top:5px;border-top:1px solid var(--linea);
+       font-size:7pt;color:#8a8779;display:flex;justify-content:space-between;}
+
+  /* ---- Impresión ---- */
   thead{display:table-header-group;}
   tr{page-break-inside:avoid;break-inside:avoid;}
-  table.grid,table.fin,.firmas{page-break-inside:avoid;break-inside:avoid;}
+  table.grid,table.fin,.firmas,.campo{page-break-inside:avoid;break-inside:avoid;}
   .sec-title{page-break-after:avoid;break-after:avoid;}`;
 }
 
-function infDocHead(logo){
-  return `<div class="head">
-  ${logo}
-  <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
-  <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
-  <div class="n2">Resolución 990 de 11 de julio de 2013, Nit 900729217-6</div>
-  <div class="n2">Personería jurídica especial 1779 del ministerio del interior</div>
-  <div class="city">CIUDAD CAMELOT</div>
-</div>`;
+// Campo corto en línea:  ETIQUETA: [ valor ]
+function infDato(lbl,val){
+  return `<span class="dato"><b>${lbl}:</b><span class="v">${infEsc(val===''||val==null?'':val)}</span></span>`;
+}
+// Campo largo en bloque, con su renglón
+function infCampo(lbl,val){
+  return `<div class="campo"><span class="lbl">${lbl}</span><span class="val">${infEsc(val||'')}</span></div>`;
+}
+function infFirma(nombre,rol){
+  return `<td><div class="sig"></div><div class="line"><span class="nom">${infEsc(nombre||'')}</span>${rol}</div></td>`;
+}
+function infPie(grupo,mes,anio){
+  return `<div class="pie"><span>${infEsc(grupo||'')}</span><span>${MESES_NOM[mes-1]} ${infEsc(anio)}</span>
+  <span>Iglesia Catedral Apostólica Escalando Peldaños — Ciudad Camelot</span></div>`;
 }
 
-function buildInformeHTML(opts={}){
+function infDocHead(){
+  return `<div class="head">
+  <img src="logo_iglesia.png" alt="">
+  <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
+  <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
+  <div class="n2">Resolución 990 de 11 de julio de 2013 · Nit 900729217-6</div>
+  <div class="n2">Personería jurídica especial 1779 del Ministerio del Interior</div>
+  <div class="city">CIUDAD CAMELOT</div>
+</div>
+<div class="rule-gold"></div>`;
+}
+
+function buildInformeHTML(){
   const {grupo}=informeActualKey();
-  return plantillaDe(grupo)==='D'?buildInformeD(opts):buildInformeA(opts);
+  return plantillaDe(grupo)==='D'?buildInformeD():buildInformeA();
 }
 
 // Genera las plantillas A (ministerio), B (con tabla de servidores) y C (comités)
-function buildInformeA(opts={}){
+function buildInformeA(){
   const {grupo,mes,anio}=informeActualKey();
   const cfg=cfgDe(grupo);
   const d=leerInformeDelForm();
-  const logo=opts.logo===false?'':'<img src="logo_iglesia.png" style="height:78px;" alt="">';
   const money=v=>fmtCOP(parseFloat(v)||0);
-  const dato=(lbl,val)=>`<span class="dato"><b>${lbl}:</b> <u>&nbsp;${infEsc(val===''||val==null?'':val)}&nbsp;</u></span>`;
-  const linea=(lbl,val)=>`<div class="linea obs"><b>${lbl}:</b> <u>${infEsc(val||'')}</u></div>`;
+  const dato=infDato, linea=infCampo;
 
   const bloqueMonitoreo=(titulo,b)=>`
     <div class="sec-title">${titulo}</div>
@@ -2993,7 +3045,7 @@ function buildInformeA(opts={}){
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>Informe ${infEsc(grupo)} ${MESES_NOM[mes-1]} ${anio}</title>
 <style>${infDocCSS()}</style></head><body>
-${infDocHead(logo)}
+${infDocHead()}
 <h1>${cfg.titulo}</h1>
 <div class="linea">
   ${dato(cfg.etiqueta,grupo)} ${dato('MES',MESES_NOM[mes-1])} ${dato('AÑO',anio)}
@@ -3011,25 +3063,25 @@ ${cfg.financiero?`<div class="sec-title">Informe financiero</div>
   <thead><tr><th>SALDO ANTERIOR</th><th>ENTRADAS</th><th>SALIDAS</th><th>SALDO ACTUAL</th></tr></thead>
   <tbody><tr><td>${money(d.saldo_ant)}</td><td>${money(d.entradas)}</td><td>${money(d.salidas)}</td><td>${money(d.saldo_act)}</td></tr></tbody>
 </table>`:''}
-<div style="margin-top:12px;">
+<div style="margin-top:10px;">
 ${cfg.oracion?linea('PIDO ORACION POR',d.oracion):''}
 ${linea(cfg.obsPlural?'OBSERVACIONES GENERALES':'OBSERVACION',d.observacion)}
 </div>
 <table class="firmas">
   <tr>
-    <td><div class="sig"></div><div class="line">${infEsc(d.pastor||'')}<br>PASTOR (A)</div></td>
-    <td><div class="sig"></div><div class="line">${infEsc(d.secretaria||'')}<br>SECRETARIA (O) GENERAL</div></td>
-    <td><div class="sig"></div><div class="line">${infEsc(d.lider||'')}<br>LIDER O PRESIDENTE (A)</div></td>
+    ${infFirma(d.pastor,'PASTOR (A)')}
+    ${infFirma(d.secretaria,'SECRETARIA (O) GENERAL')}
+    ${infFirma(d.lider,'LIDER O PRESIDENTE (A)')}
   </tr>
 </table>
+${infPie(grupo,mes,anio)}
 </body></html>`;
 }
 
-function buildInformeD(opts={}){
+function buildInformeD(){
   const {mes,anio}=informeActualKey();
   const d=leerInformeDelForm();
-  const logo=opts.logo===false?'':'<img src="logo_iglesia.png" style="height:78px;" alt="">';
-  const dato=(lbl,val)=>`<span class="dato"><b>${lbl}:</b> <u>&nbsp;${infEsc(val===''||val==null?'':val)}&nbsp;</u></span>`;
+  const dato=infDato;
   const num=v=>{const n=parseInt(v);return isNaN(n)?0:n;};
 
   // Matriz de asistencia: la fila TOTAL y el % general se derivan de las celdas
@@ -3058,7 +3110,7 @@ function buildInformeD(opts={}){
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>Informe Superintendente ${MESES_NOM[mes-1]} ${anio}</title>
 <style>${infDocCSS()}</style></head><body>
-${infDocHead(logo)}
+${infDocHead()}
 <h1>Informe general eclesiástico del superintendente</h1>
 <div class="linea">${dato('MES',MESES_NOM[mes-1])} ${dato('AÑO',anio)}</div>
 <div class="sec-title">Datos estadísticos</div>
@@ -3091,9 +3143,11 @@ ${infDocHead(logo)}
     <tr class="total"><td class="fel">TOTAL</td>${totales}<td>${pctGen}</td></tr>
   </tbody>
 </table>
-<div class="linea" style="margin-top:10px;"><b>NOMBRES DE PREDICADORES INVITADOS EN EL MES:</b> <u>${infEsc(d.d_predicadores||'')}</u></div>
-<div class="linea"><b>MINISTERIO DE ALABANZA O MINISTRO INVITADO:</b> <u>${infEsc(d.d_alabanza||'')}</u></div>
-<div class="linea obs"><b>TEMAS TRATADOS EN EL MES DE CADA SERVICIO:</b> <u>${infEsc(d.d_temas||'')}</u></div>
+<div style="margin-top:10px;">
+${infCampo('NOMBRES DE PREDICADORES INVITADOS EN EL MES',d.d_predicadores)}
+${infCampo('MINISTERIO DE ALABANZA O MINISTRO INVITADO',d.d_alabanza)}
+${infCampo('TEMAS TRATADOS EN EL MES DE CADA SERVICIO',d.d_temas)}
+</div>
 <div class="sec-title">Monitoreo de la escuela dominical para niños, intermedios y adolescentes</div>
 <table class="mtz">
   <thead>
@@ -3102,15 +3156,18 @@ ${infDocHead(logo)}
   </thead>
   <tbody>${escuela}</tbody>
 </table>
-<div class="linea obs" style="margin-top:10px;"><b>TEMAS TRATADOS EN EL MES PARA LOS NIÑOS, INTERMEDIOS Y ADOLECENTES:</b> <u>${infEsc(d.d_temas_ninos||'')}</u></div>
-<div class="linea obs"><b>OBSERVACION:</b> <u>${infEsc(d.observacion||'')}</u></div>
+<div style="margin-top:10px;">
+${infCampo('TEMAS TRATADOS EN EL MES PARA LOS NIÑOS, INTERMEDIOS Y ADOLESCENTES',d.d_temas_ninos)}
+${infCampo('OBSERVACION',d.observacion)}
+</div>
 <table class="firmas">
   <tr>
-    <td><div class="sig"></div><div class="line">${infEsc(d.pastor||'')}<br>PASTOR (A)</div></td>
-    <td><div class="sig"></div><div class="line">${infEsc(d.secretaria||'')}<br>SECRETARIA (O) GENERAL</div></td>
-    <td><div class="sig"></div><div class="line">${infEsc(d.lider||'')}<br>SUPERINTENDENTE (A)</div></td>
+    ${infFirma(d.pastor,'PASTOR (A)')}
+    ${infFirma(d.secretaria,'SECRETARIA (O) GENERAL')}
+    ${infFirma(d.lider,'SUPERINTENDENTE (A)')}
   </tr>
 </table>
+${infPie('Superintendencia',mes,anio)}
 </body></html>`;
 }
 
@@ -3126,20 +3183,6 @@ function imprimirInforme(){
   doc.open(); doc.write(html); doc.close();
   // esperar a que cargue el logo antes de mandar a imprimir
   setTimeout(()=>{ frame.contentWindow.focus(); frame.contentWindow.print(); },400);
-}
-
-function descargarInformeWord(){
-  const {grupo,mes,anio}=informeActualKey();
-  // Word no resuelve rutas relativas del navegador: se omite el logo
-  const html=buildInformeHTML({logo:false});
-  const blob=new Blob(['﻿',html],{type:'application/msword'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`Informe_${grupo.replace(/\s+/g,'_')}_${MESES_NOM[mes-1]}_${anio}.doc`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),2000);
-  showToast('✓ Documento Word descargado','success');
 }
 
 // ============================================================
