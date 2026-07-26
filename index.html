@@ -221,6 +221,16 @@ tr:hover td{background:#fafaf7;}
 .inf-badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:5px;}
 .inf-badge.borrador{background:#fef3c7;color:#92400e;}
 .inf-badge.nuevo{background:#e0e7ff;color:#3730a3;}
+.inf-scroll{overflow-x:auto;}
+.inf-matriz{border-collapse:collapse;font-size:0.76rem;}
+.inf-matriz th,.inf-matriz td{border:1px solid var(--lightgray);padding:2px 3px;text-align:center;white-space:nowrap;}
+.inf-matriz th{background:#f7f7f5;color:var(--navy);font-size:0.68rem;font-weight:700;padding:4px 5px;}
+.inf-matriz th.sem{background:#eceae4;}
+.inf-matriz td.fel{text-align:left;font-weight:700;color:var(--navy);padding:2px 8px;background:#fbfbf9;}
+.inf-matriz input{width:42px;padding:3px 2px;text-align:center;border:1px solid var(--lightgray);border-radius:4px;font-size:0.76rem;}
+.inf-matriz input.wide{width:150px;text-align:left;padding-left:6px;}
+.inf-matriz input.auto{background:#f0fdf4;}
+.inf-matriz tr.total td{background:#f3f1ea;font-weight:700;color:var(--navy);}
 @media(max-width:768px){.inf-cols{grid-template-columns:1fr;}}
 
 #printArea{display:none;}
@@ -573,22 +583,77 @@ tr:hover td{background:#fafaf7;}
 
       <!-- Formulario -->
       <div class="card" id="infFormCard">
+
+      <!-- ===== PLANTILLA D · SUPERINTENDENTE ===== -->
+      <div id="infBloquesD" style="display:none;">
         <div class="inf-block">
+          <h4>Datos estadísticos generales <span class="inf-auto">calculados por el sistema — editables</span></h4>
+          <div class="inf-grid">
+            <div class="form-group"><label>Miembros activos</label><input type="number" id="if_d_miembros" min="0"></div>
+            <div class="form-group"><label>Bautizados</label><input type="number" id="if_d_bautizados" min="0"></div>
+            <div class="form-group"><label>No bautizados</label><input type="number" id="if_d_nobautizados" min="0"></div>
+            <div class="form-group"><label>Tomaron Santa Cena</label><input type="number" id="if_d_cena" min="0"></div>
+            <div class="form-group"><label>Servicios realizados en el mes</label><input type="number" id="if_d_servicios" min="0"></div>
+            <div class="form-group"><label>Apartados</label><input type="number" id="if_d_apartados" min="0" placeholder="manual"></div>
+            <div class="form-group"><label>Reconciliados</label><input type="number" id="if_d_reconciliados" min="0" placeholder="manual"></div>
+            <div class="form-group"><label>Nuevos convertidos</label><input type="number" id="if_d_convertidos" min="0" placeholder="manual"></div>
+            <div class="form-group"><label>Presentaciones de niños</label><input type="number" id="if_d_presentaciones" min="0"></div>
+            <div class="form-group"><label>Matrimonios realizados</label><input type="number" id="if_d_matrimonios" min="0"></div>
+            <div class="form-group"><label>Ceremonias fúnebres</label><input type="number" id="if_d_funebres" min="0" placeholder="manual"></div>
+            <div class="form-group"><label>Biblias promedio por culto</label><input type="number" id="if_d_biblias" min="0" placeholder="manual"></div>
+          </div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Promedio de asistencia por culto en el mes
+            <span class="inf-auto">M=Miércoles · J=Jueves · S=Sábado · D1=Domingo 1ra · D2=Domingo 2da — Intermedios y Niños se llenan a mano</span></h4>
+          <div class="inf-scroll"><table class="inf-matriz" id="infTablaAsistencia"></table></div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Predicadores y temas</h4>
+          <div class="form-group"><label>Nombres de predicadores invitados en el mes</label><textarea id="if_d_predicadores" rows="2"></textarea></div>
+          <div class="form-group"><label>Ministerio de alabanza o ministro invitado</label><textarea id="if_d_alabanza" rows="2"></textarea></div>
+          <div class="form-group"><label>Temas tratados en el mes de cada servicio</label><textarea id="if_d_temas" rows="3"></textarea></div>
+        </div>
+
+        <div class="inf-block">
+          <h4>Monitoreo de la escuela dominical <span class="inf-auto">niños, intermedios y adolescentes</span></h4>
+          <div class="inf-scroll"><table class="inf-matriz" id="infTablaEscuela"></table></div>
+          <div class="form-group" style="margin-top:0.9rem;"><label>Temas tratados en el mes para los niños, intermedios y adolescentes</label><textarea id="if_d_temas_ninos" rows="3"></textarea></div>
+        </div>
+      </div>
+
+      <!-- ===== PLANTILLAS A / B / C ===== -->
+      <div id="infBloquesA">
+        <div class="inf-block" id="infDatos">
           <h4>Datos estadísticos <span class="inf-auto">calculados por el sistema — editables</span></h4>
           <div class="inf-grid">
             <div class="form-group"><label>Cuántos miembros tiene</label><input type="number" id="if_miembros" min="0"></div>
             <div class="form-group"><label>Bautizados</label><input type="number" id="if_bautizados" min="0"></div>
             <div class="form-group"><label>No bautizados</label><input type="number" id="if_nobautizados" min="0"></div>
             <div class="form-group"><label>Tomaron Santa Cena</label><input type="number" id="if_cena" min="0"></div>
-            <div class="form-group"><label>Nuevos convertidos</label><input type="number" id="if_convertidos" min="0" placeholder="manual"></div>
-            <div class="form-group"><label>Cultos realizados en el mes</label><input type="number" id="if_cultos" min="0"></div>
-            <div class="form-group"><label>Asistencia por culto (promedio)</label><input type="number" id="if_asistencia" min="0"></div>
+            <div class="form-group" data-solo="A"><label>Nuevos convertidos</label><input type="number" id="if_convertidos" min="0" placeholder="manual"></div>
+            <div class="form-group" data-solo="A"><label>Cultos realizados en el mes</label><input type="number" id="if_cultos" min="0"></div>
+            <div class="form-group" data-solo="A"><label>Asistencia por culto (promedio)</label><input type="number" id="if_asistencia" min="0"></div>
+            <div class="form-group" id="infEnsayosWrap"><label>Ensayos realizados en el mes</label><input type="number" id="if_ensayos" min="0" placeholder="manual"></div>
           </div>
-          <div class="form-group"><label>Predicadores invitados</label><textarea id="if_predicadores" rows="2" placeholder="Nombres separados por coma"></textarea></div>
-          <div class="form-group"><label>Temas tratados en el mes</label><textarea id="if_temas" rows="3"></textarea></div>
+          <div class="form-group" id="infMusicalesWrap"><label>Temas musicales que se montaron en el mes</label><textarea id="if_musicales" rows="2"></textarea></div>
+          <div class="form-group" data-solo="A"><label>Predicadores invitados</label><textarea id="if_predicadores" rows="2" placeholder="Nombres separados por coma"></textarea></div>
+          <div class="form-group" data-solo="A"><label>Temas tratados en el mes</label><textarea id="if_temas" rows="3"></textarea></div>
         </div>
 
-        <div class="inf-block">
+        <!-- Tabla de servidores / integrantes (Diáconos, Alabanza, comités) -->
+        <div class="inf-block" id="infServidoresWrap">
+          <h4 id="infServidoresTitulo">Servidores por servicio
+            <span class="inf-auto">se precarga con los miembros del comité — M=Miércoles · J=Jueves · D1=Domingo 1ra · D2=Domingo 2da</span></h4>
+          <div class="inf-scroll"><table class="inf-matriz" id="infTablaServidores"></table></div>
+        </div>
+
+        <!-- Secciones narrativas (Sonido, Visual, Decoración) -->
+        <div id="infNarrativaWrap"></div>
+
+        <div class="inf-block" id="infMonitoreoWrap">
           <h4>Monitoreo de actividades realizadas</h4>
           <div class="inf-cols">
             <div>
@@ -604,7 +669,7 @@ tr:hover td{background:#fafaf7;}
           </div>
         </div>
 
-        <div class="inf-block">
+        <div class="inf-block" id="infProyeccionWrap">
           <h4>Proyección para este mes</h4>
           <div class="inf-cols">
             <div>
@@ -620,7 +685,7 @@ tr:hover td{background:#fafaf7;}
           </div>
         </div>
 
-        <div class="inf-block">
+        <div class="inf-block" id="infFinancieroWrap">
           <h4>Informe financiero <span class="inf-auto" id="infFinNota"></span></h4>
           <div class="inf-grid">
             <div class="form-group"><label>Saldo anterior</label><input type="number" id="if_saldo_ant" step="0.01"></div>
@@ -629,15 +694,16 @@ tr:hover td{background:#fafaf7;}
             <div class="form-group"><label>Saldo actual</label><input type="number" id="if_saldo_act" step="0.01"></div>
           </div>
         </div>
+      </div>
 
         <div class="inf-block">
           <h4>Cierre</h4>
-          <div class="form-group"><label>Pido oración por</label><textarea id="if_oracion" rows="2"></textarea></div>
+          <div class="form-group" id="infOracionWrap"><label>Pido oración por</label><textarea id="if_oracion" rows="2"></textarea></div>
           <div class="form-group"><label>Observación</label><textarea id="if_observacion" rows="3"></textarea></div>
           <div class="inf-grid">
             <div class="form-group"><label>Pastor(a)</label><input type="text" id="if_pastor"></div>
             <div class="form-group"><label>Secretaria(o) General</label><input type="text" id="if_secretaria"></div>
-            <div class="form-group"><label>Líder o Presidente(a)</label><input type="text" id="if_lider"></div>
+            <div class="form-group"><label id="infLiderLabel">Líder o Presidente(a)</label><input type="text" id="if_lider"></div>
           </div>
         </div>
 
@@ -2265,19 +2331,117 @@ async function guardarSantaCena(){
 const MINISTERIOS=['Jovenes','Caballeros','Damas','Adolescentes'];
 const COMITES=['Diaconos','Alabanza','Sonido','Visual','Decoracion'];
 const MESES_NOM=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-// Plantilla A = ministerio/sociedad. B, C y D se agregan después.
-const PLANTILLA_GRUPO={Jovenes:'A',Caballeros:'A',Damas:'A',Adolescentes:'A',Diaconos:'A',Alabanza:'B',Sonido:'C',Visual:'C',Decoracion:'C'};
+const GRUPO_SUPER='Superintendente';
+
+// ---- Secciones narrativas de los comités ----
+// Los textos replican los del formato oficial en Word.
+function narrativaEquipo(eq,calidad){
+  const E=eq.charAt(0).toUpperCase()+eq.slice(1);
+  return [
+    {campos:[{id:'nar_desc',l:`Breve descripción de los eventos, cultos o actividades recientes donde se utilizó el equipo de ${eq}`}]},
+    {campos:[{id:'nar_problemas',l:'Problemas o desafíos'}]},
+    {t:`Estado del equipo de ${eq}`,campos:[
+      {id:'nar_mant',l:'A. Mantenimiento'},
+      {id:'nar_rep',l:'B. Reparaciones'},
+      {id:'nar_inv',l:`C. Inventario de equipos de ${eq}`}]},
+    {t:'Desarrollo y capacitación',campos:[
+      {id:'nar_capr',l:'A. Capacitación reciente'},
+      {id:'nar_capn',l:'B. Necesidades de capacitación'}]},
+    {t:'Próximas actividades y eventos',campos:[
+      {id:'nar_plan',l:'A. Planificación'},
+      {id:'nar_equip',l:'B. Necesidades de equipamiento adicional'}]},
+    {t:'Comentarios y sugerencias',campos:[
+      {id:'nar_com',l:`A. Comentarios del equipo de ${eq}`},
+      {id:'nar_sug',l:`B. Sugerencias para mejoras (calidad ${calidad})`}]},
+    {t:'Próximos pasos',campos:[
+      {id:'nar_acc',l:'A. Acciones correctivas'},
+      {id:'nar_reu',l:'B. Próximas reuniones'}]}
+  ];
+}
+const NARRATIVA_DECORACION=[
+  {t:'I. Resumen general',campos:[
+    {id:'nar_desc',l:'A. Eventos y decoración reciente'},
+    {id:'nar_problemas',l:'B. Feedback y reacciones'}]},
+  {t:'II. Estado de los elementos decorativos',campos:[
+    {id:'nar_inv',l:'A. Inventario actualizado'},
+    {id:'nar_rep',l:'B. Necesidades de reposición'}]},
+  {t:'III. Desarrollo y diseño',campos:[
+    {id:'nar_temas',l:'A. Temas y conceptos'},
+    {id:'nar_prop',l:'B. Propuestas para próximos eventos'}]},
+  {t:'IV. Colaboración y voluntarios',campos:[
+    {id:'nar_capr',l:'A. Colaboradores actuales'},
+    {id:'nar_capn',l:'B. Necesidades de voluntarios'}]},
+  {t:'V. Presupuesto y recursos',campos:[
+    {id:'nar_pres',l:'A. Estado del presupuesto'},
+    {id:'nar_equip',l:'B. Necesidades de recursos'}]},
+  {t:'VI. Próximos proyectos',campos:[
+    {id:'nar_fut',l:'A. Eventos futuros'},
+    {id:'nar_plan',l:'B. Planificación'}]},
+  {t:'VII. Comentarios y sugerencias',campos:[
+    {id:'nar_com',l:'A. Comentarios de la congregación'},
+    {id:'nar_sug',l:'B. Sugerencias para mejoras'}]},
+  {t:'Próximos pasos',campos:[
+    {id:'nar_acc',l:'A. Acciones correctivas'},
+    {id:'nar_reu',l:'B. Próximas reuniones'}]}
+];
+
+// ---- Configuración de cada informe ----
+// datos: 'completo' = los 8 de la plantilla A | 'basico' = solo los 4 primeros
+const INF_CFG={
+  Damas:      {plantilla:'A',datos:'completo',titulo:'Informe eclesiástico por departamentos o sociedades',etiqueta:'MINISTERIO',monitoreo:true,financiero:true,oracion:true},
+  Caballeros: {plantilla:'A',datos:'completo',titulo:'Informe eclesiástico por departamentos o sociedades',etiqueta:'MINISTERIO',monitoreo:true,financiero:true,oracion:true},
+  Jovenes:    {plantilla:'A',datos:'completo',titulo:'Informe eclesiástico por departamentos o sociedades',etiqueta:'MINISTERIO',monitoreo:true,financiero:true,oracion:true},
+  Adolescentes:{plantilla:'A',datos:'completo',titulo:'Informe eclesiástico por departamentos o sociedades',etiqueta:'MINISTERIO',monitoreo:true,financiero:true,oracion:true},
+  Diaconos:   {plantilla:'B',datos:'basico',titulo:'Informe eclesiástico del ministerio de diáconos o ujieres',etiqueta:'NOMBRE DEL MINISTERIO',
+               servidores:{filas:30,titulo:'DIACONOS O UJIERES POR SERVICIO'},monitoreo:true,financiero:true,oracion:true},
+  Alabanza:   {plantilla:'B',datos:'basico',musical:true,titulo:'Informe eclesiástico ministerio musical',etiqueta:'NOMBRE DEL MINISTERIO',
+               servidores:{filas:20,titulo:'MINISTROS POR SERVICIO'},monitoreo:true,financiero:true,oracion:true},
+  Sonido:     {plantilla:'C',datos:'basico',titulo:'Informe eclesiástico del comité de audio',etiqueta:'NOMBRE DEL COMITE',
+               servidores:{filas:10,titulo:'SERVIDORES POR SERVICIO'},narrativa:narrativaEquipo('audio','del sonido'),
+               monitoreo:false,financiero:true,oracion:true,obsPlural:true},
+  Visual:     {plantilla:'C',datos:'basico',titulo:'Informe eclesiástico del comité de visual',etiqueta:'NOMBRE DEL COMITE',
+               servidores:{filas:10,titulo:'SERVIDORES POR SERVICIO'},narrativa:narrativaEquipo('visual','visual'),
+               monitoreo:false,financiero:true,oracion:true,obsPlural:true},
+  Decoracion: {plantilla:'C',datos:'basico',titulo:'Informe eclesiástico del comité de decoración y embellecimiento',etiqueta:'NOMBRE DEL COMITE',
+               servidores:{filas:10,titulo:'INTEGRANTES DEL COMITE'},narrativa:NARRATIVA_DECORACION,
+               monitoreo:false,financiero:true,oracion:true,obsPlural:true},
+  Superintendente:{plantilla:'D',titulo:'Informe general eclesiástico del superintendente',etiqueta:'',monitoreo:false,financiero:false,oracion:false}
+};
+function cfgDe(grupo){ return INF_CFG[grupo]||INF_CFG.Damas; }
+
+// Columnas de la tabla de servidores: 4 semanas x 4 servicios
+const SV_COLS=['M','J','D1','D2'];
+const SV_SEMANAS=[1,2,3,4];
+const SV_MAX_FILAS=30;
+
+// --- Matriz de asistencia del informe del superintendente ---
+const SD_FELIGRESIA=['Damas','Caballeros','Jovenes','Adolescentes','Intermedios','Ninos'];
+const SD_FEL_LABEL={Damas:'DAMAS',Caballeros:'CABALLEROS',Jovenes:'JOVENES',Adolescentes:'ADOLESCENTES',Intermedios:'INTERMEDIOS',Ninos:'NIÑOS'};
+// Feligresías que el sistema puede contar solo (las otras dos no existen como ministerio)
+const SD_FEL_AUTO=['Damas','Caballeros','Jovenes','Adolescentes'];
+const SD_COLS=['M','J','S','D1','D2'];
+const SD_SEMANAS=[1,2,3,4,5];
+const ED_FILAS=[1,2,3,4,5];
+
+function colDeServicio(serv){
+  if(!serv) return null;
+  if(serv==='Miercoles') return 'M';
+  if(serv==='Jueves') return 'J';
+  if(serv.startsWith('Sabado')) return 'S';
+  if(serv==='Domingo 1ra') return 'D1';
+  if(serv==='Domingo 2da') return 'D2';
+  return null; // los servicios "Extra" no tienen columna en el formato
+}
 
 function infEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // Grupos que el usuario actual puede informar
 function gruposDisponibles(){
-  const todos=[...MINISTERIOS,...COMITES];
   if(currentUser&&currentUser.rol==='Lider'){
-    // su ministerio + los comités donde tenga miembros a cargo
-    return todos.filter(g=>g===currentUser.ministerio);
+    // el líder solo informa su propio ministerio
+    return [...MINISTERIOS,...COMITES].filter(g=>g===currentUser.ministerio);
   }
-  return todos;
+  return [GRUPO_SUPER,...MINISTERIOS,...COMITES];
 }
 
 function llenarSelectGrupos(selectId,incluirGeneral=false){
@@ -2348,6 +2512,139 @@ function calcInformeStats(grupo,mes,anio){
   };
 }
 
+// ---------- Plantilla D: estadísticos globales de la iglesia ----------
+function calcInformeStatsD(mes,anio){
+  const pref=`${anio}-${String(mes).padStart(2,'0')}`;
+  const activos=DB.miembros.filter(m=>m.activo!==false);
+  const bautizados=activos.filter(m=>m.bautizado==='SI').length;
+  const cena=new Set(DB.santa_cena.filter(sc=>sc.asistio&&sc.miembro&&(sc.fecha||'').startsWith(pref)).map(sc=>sc.miembro)).size;
+  const servicios=new Set(DB.asistencia.filter(a=>(a.fecha||'').startsWith(pref)).map(a=>a.fecha)).size;
+  const evMes=t=>DB.eventos.filter(e=>e.tipo===t&&(e.fecha||'').startsWith(pref)).length;
+  return {
+    d_miembros:activos.length, d_bautizados:bautizados, d_nobautizados:activos.length-bautizados,
+    d_cena:cena, d_servicios:servicios,
+    d_presentaciones:evMes('presentacion'), d_matrimonios:evMes('matrimonio'),
+    ...calcMatrizAsistencia(mes,anio)
+  };
+}
+
+// Cada columna del formato es la enésima ocurrencia de ese servicio en el mes
+function ocurrenciasPorColumna(mes,anio){
+  const pref=`${anio}-${String(mes).padStart(2,'0')}`;
+  const fechas={};
+  SD_COLS.forEach(c=>fechas[c]=new Set());
+  DB.asistencia.filter(a=>(a.fecha||'').startsWith(pref)).forEach(a=>{
+    const col=colDeServicio(a.servicio);
+    if(col) fechas[col].add(a.fecha);
+  });
+  const out={};
+  SD_COLS.forEach(c=>out[c]=[...fechas[c]].sort());
+  return out;
+}
+
+function calcMatrizAsistencia(mes,anio){
+  const pref=`${anio}-${String(mes).padStart(2,'0')}`;
+  const cols=ocurrenciasPorColumna(mes,anio);
+  const mmap={}; DB.miembros.forEach(m=>mmap[m.id]=m.ministerio);
+  // personas únicas por columna+fecha+ministerio
+  const cont={};
+  DB.asistencia.filter(a=>(a.fecha||'').startsWith(pref)).forEach(a=>{
+    const col=colDeServicio(a.servicio);
+    const min=mmap[a.miembro];
+    if(!col||!min) return;
+    const k=`${col}|${a.fecha}|${min}`;
+    (cont[k]=cont[k]||new Set()).add(a.miembro);
+  });
+  const res={};
+  // Intermedios y Niños no existen como ministerio: se omiten para no pisar
+  // lo que el usuario escriba a mano al pulsar "Recalcular"
+  SD_FEL_AUTO.forEach(f=>{
+    let suma=0, n=0;
+    SD_COLS.forEach(c=>SD_SEMANAS.forEach(w=>{
+      const fecha=cols[c][w-1];
+      // sin servicio esa semana la celda va vacía
+      if(!fecha){ res[`sd_${f}_${c}_${w}`]=''; return; }
+      const s=cont[`${c}|${fecha}|${f}`];
+      const v=s?s.size:0;
+      res[`sd_${f}_${c}_${w}`]=v; suma+=v; n++;
+    }));
+    // % = promedio de asistencia sobre los miembros activos de esa feligresía
+    const base=DB.miembros.filter(m=>m.activo!==false&&m.ministerio===f).length;
+    res[`sd_${f}_PCT`]=(n&&base)?Math.round(suma/n/base*100):'';
+  });
+  return res;
+}
+
+function camposMatrizD(){
+  const l=[];
+  SD_FELIGRESIA.forEach(f=>{
+    SD_COLS.forEach(c=>SD_SEMANAS.forEach(w=>l.push(`sd_${f}_${c}_${w}`)));
+    l.push(`sd_${f}_PCT`);
+  });
+  ED_FILAS.forEach(r=>{
+    l.push(`ed_nombre_${r}`);
+    ['D1','D2'].forEach(c=>SD_SEMANAS.forEach(w=>l.push(`ed_${r}_${c}_${w}`)));
+  });
+  return l;
+}
+
+const INF_CAMPOS_D=['d_miembros','d_bautizados','d_nobautizados','d_cena','d_servicios','d_apartados',
+  'd_reconciliados','d_convertidos','d_presentaciones','d_matrimonios','d_funebres','d_biblias',
+  'd_predicadores','d_alabanza','d_temas','d_temas_ninos'];
+
+// Dibuja las dos matrices editables de la plantilla D
+function renderMatricesD(){
+  const t=document.getElementById('infTablaAsistencia');
+  if(t){
+    let head=`<tr><th rowspan="2" class="sem">FELIGRESIA</th>`+
+      SD_SEMANAS.map(w=>`<th colspan="${SD_COLS.length}" class="sem">Semana ${w}</th>`).join('')+
+      `<th rowspan="2" class="sem">%</th></tr><tr>`+
+      SD_SEMANAS.map(()=>SD_COLS.map(c=>`<th>${c}</th>`).join('')).join('')+`</tr>`;
+    const body=SD_FELIGRESIA.map(f=>{
+      const auto=SD_FEL_AUTO.includes(f);
+      return `<tr><td class="fel">${SD_FEL_LABEL[f]}</td>`+
+        SD_SEMANAS.map(w=>SD_COLS.map(c=>
+          `<td><input type="number" min="0" id="if_sd_${f}_${c}_${w}" class="${auto?'auto':''}" oninput="recalcTotalesD()"></td>`
+        ).join('')).join('')+
+        `<td><input type="number" min="0" max="100" id="if_sd_${f}_PCT" class="${auto?'auto':''}"></td></tr>`;
+    }).join('');
+    const total=`<tr class="total"><td class="fel">TOTAL</td>`+
+      SD_SEMANAS.map(w=>SD_COLS.map(c=>`<td id="tot_${c}_${w}">0</td>`).join('')).join('')+
+      `<td id="tot_PCT">—</td></tr>`;
+    t.innerHTML=head+body+total;
+  }
+  const e=document.getElementById('infTablaEscuela');
+  if(e){
+    let head=`<tr><th rowspan="2" class="sem">NOMBRE DE MAESTRAS</th>`+
+      SD_SEMANAS.map(w=>`<th colspan="2" class="sem">Semana ${w}</th>`).join('')+`</tr><tr>`+
+      SD_SEMANAS.map(()=>`<th>D1</th><th>D2</th>`).join('')+`</tr>`;
+    const body=ED_FILAS.map(r=>`<tr><td><input type="text" class="wide" id="if_ed_nombre_${r}"></td>`+
+      SD_SEMANAS.map(w=>['D1','D2'].map(c=>`<td><input type="text" id="if_ed_${r}_${c}_${w}"></td>`).join('')).join('')+
+      `</tr>`).join('');
+    e.innerHTML=head+body;
+  }
+}
+
+// La fila TOTAL es derivada: se recalcula con cada cambio
+function recalcTotalesD(){
+  SD_SEMANAS.forEach(w=>SD_COLS.forEach(c=>{
+    let s=0;
+    SD_FELIGRESIA.forEach(f=>{
+      const el=document.getElementById(`if_sd_${f}_${c}_${w}`);
+      const v=el?parseInt(el.value):NaN;
+      if(!isNaN(v)) s+=v;
+    });
+    const td=document.getElementById(`tot_${c}_${w}`);
+    if(td) td.textContent=s||'';
+  }));
+  const pcts=SD_FELIGRESIA.map(f=>{
+    const el=document.getElementById(`if_sd_${f}_PCT`);
+    return el?parseFloat(el.value):NaN;
+  }).filter(v=>!isNaN(v));
+  const td=document.getElementById('tot_PCT');
+  if(td) td.textContent=pcts.length?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length)+'%':'—';
+}
+
 const INF_CAMPOS=['miembros','bautizados','nobautizados','cena','convertidos','cultos','asistencia',
   'predicadores','temas','saldo_ant','entradas','salidas','saldo_act','oracion','observacion',
   'pastor','secretaria','lider'];
@@ -2355,7 +2652,74 @@ const INF_CAMPOS=['miembros','bautizados','nobautizados','cena','convertidos','c
 function infListaCampos(){
   const l=[];
   ['mon','pro'].forEach(b=>['esp','mat'].forEach(c=>[1,2,3,4].forEach(n=>l.push(`${b}_${c}_${n}`))));
+  return l.concat(INF_CAMPOS_D,camposMatrizD(),camposServidores(),camposNarrativa(),['ensayos','musicales']);
+}
+
+function plantillaDe(grupo){ return cfgDe(grupo).plantilla; }
+
+// Campos de la tabla de servidores y de las secciones narrativas
+function camposServidores(){
+  const l=[];
+  for(let r=1;r<=SV_MAX_FILAS;r++){
+    l.push(`sv_${r}_nombre`,`sv_${r}_cargo`);
+    SV_SEMANAS.forEach(w=>SV_COLS.forEach(c=>l.push(`sv_${r}_${c}_${w}`)));
+  }
   return l;
+}
+function camposNarrativa(){
+  const ids=new Set();
+  Object.values(INF_CFG).forEach(cfg=>(cfg.narrativa||[]).forEach(s=>s.campos.forEach(c=>ids.add(c.id))));
+  return [...ids];
+}
+
+// Precarga nombres y cargos desde los miembros del comité
+function renderTablaServidores(grupo){
+  const cfg=cfgDe(grupo);
+  const wrap=document.getElementById('infServidoresWrap');
+  const tabla=document.getElementById('infTablaServidores');
+  if(!wrap||!tabla) return;
+  if(!cfg.servidores){ wrap.style.display='none'; tabla.innerHTML=''; return; }
+  wrap.style.display='';
+  document.getElementById('infServidoresTitulo').childNodes[0].nodeValue=cfg.servidores.titulo+' ';
+  const n=cfg.servidores.filas;
+  let head=`<tr><th rowspan="2" class="sem">N°</th><th rowspan="2" class="sem">NOMBRES</th><th rowspan="2" class="sem">CARGO O FUNCION</th>`+
+    SV_SEMANAS.map(w=>`<th colspan="${SV_COLS.length}" class="sem">Semana ${w}</th>`).join('')+`</tr><tr>`+
+    SV_SEMANAS.map(()=>SV_COLS.map(c=>`<th>${c}</th>`).join('')).join('')+`</tr>`;
+  let body='';
+  for(let r=1;r<=n;r++){
+    body+=`<tr><td class="fel">${r}</td>`+
+      `<td><input type="text" class="wide" id="if_sv_${r}_nombre"></td>`+
+      `<td><input type="text" class="wide" id="if_sv_${r}_cargo"></td>`+
+      SV_SEMANAS.map(w=>SV_COLS.map(c=>`<td><input type="text" id="if_sv_${r}_${c}_${w}"></td>`).join('')).join('')+
+      `</tr>`;
+  }
+  tabla.innerHTML=head+body;
+}
+
+// Nombres y cargos que trae el sistema para ese grupo
+function servidoresAutocompletados(grupo){
+  const cfg=cfgDe(grupo);
+  if(!cfg.servidores) return {};
+  const gente=miembrosDeGrupo(grupo)
+    .sort((a,b)=>(a.apellido+a.nombre).localeCompare(b.apellido+b.nombre))
+    .slice(0,cfg.servidores.filas);
+  const out={};
+  gente.forEach((m,i)=>{
+    out[`sv_${i+1}_nombre`]=`${m.nombre} ${m.apellido}`;
+    out[`sv_${i+1}_cargo`]=m.cargo||'';
+  });
+  return out;
+}
+
+function renderNarrativa(grupo){
+  const wrap=document.getElementById('infNarrativaWrap');
+  if(!wrap) return;
+  const secciones=cfgDe(grupo).narrativa;
+  if(!secciones){ wrap.innerHTML=''; return; }
+  wrap.innerHTML=secciones.map(s=>
+    `<div class="inf-block">${s.t?`<h4>${s.t}</h4>`:''}`+
+    s.campos.map(c=>`<div class="form-group"><label>${c.l}</label><textarea id="if_${c.id}" rows="2"></textarea></div>`).join('')+
+    `</div>`).join('');
 }
 
 function informeActualKey(){
@@ -2370,13 +2734,47 @@ function buscarInformeGuardado(grupo,mes,anio){
   return DB.informes.find(i=>i.grupo===grupo&&String(i.mes)===String(mes)&&String(i.anio)===String(anio));
 }
 
+function aplicarPlantillaUI(grupo){
+  const cfg=cfgDe(grupo);
+  const esD=cfg.plantilla==='D';
+  const ver=(id,cond)=>{const el=document.getElementById(id);if(el)el.style.display=cond?'':'none';};
+  ver('infBloquesA',!esD);
+  ver('infBloquesD',esD);
+  if(esD){
+    ver('infOracionWrap',false);
+    const lab=document.getElementById('infLiderLabel');
+    if(lab) lab.textContent='Superintendente(a)';
+    return;
+  }
+  // los 4 datos extra solo existen en la plantilla A
+  document.querySelectorAll('#infDatos [data-solo="A"]').forEach(el=>{
+    el.style.display=cfg.datos==='completo'?'':'none';
+  });
+  ver('infEnsayosWrap',!!cfg.musical);
+  ver('infMusicalesWrap',!!cfg.musical);
+  ver('infMonitoreoWrap',!!cfg.monitoreo);
+  ver('infProyeccionWrap',!!cfg.monitoreo);
+  ver('infFinancieroWrap',!!cfg.financiero);
+  ver('infOracionWrap',!!cfg.oracion);
+  const lab=document.getElementById('infLiderLabel');
+  if(lab) lab.textContent='Líder o Presidente(a)';
+  renderTablaServidores(grupo);
+  renderNarrativa(grupo);
+}
+
 function onInformeSelectorChange(){
   const {grupo,mes,anio}=informeActualKey();
   if(!grupo) return;
+  const plantilla=plantillaDe(grupo);
+  aplicarPlantillaUI(grupo);
+  if(plantilla==='D') renderMatricesD();
   const guardado=buscarInformeGuardado(grupo,mes,anio);
-  const stats=calcInformeStats(grupo,mes,anio);
+  const stats=plantilla==='D'
+    ? calcInformeStatsD(mes,anio)
+    : {...calcInformeStats(grupo,mes,anio),...servidoresAutocompletados(grupo)};
   const datos=guardado?{...stats,...guardado.datos}:stats;
   cargarInformeEnForm(datos);
+  if(plantilla==='D') recalcTotalesD();
   const est=document.getElementById('infEstado');
   if(est){
     est.innerHTML=guardado
@@ -2409,9 +2807,11 @@ function leerInformeDelForm(){
 
 function recalcularInforme(){
   const {grupo,mes,anio}=informeActualKey();
-  const stats=calcInformeStats(grupo,mes,anio);
+  const stats=plantillaDe(grupo)==='D'?calcInformeStatsD(mes,anio):calcInformeStats(grupo,mes,anio);
   const actual=leerInformeDelForm();
+  // los estadísticos pisan al formulario; lo escrito a mano se conserva
   cargarInformeEnForm({...actual,...stats});
+  if(plantillaDe(grupo)==='D') recalcTotalesD();
   showToast('Estadísticos recalculados desde el sistema','success');
 }
 
@@ -2427,7 +2827,7 @@ async function guardarInforme(){
     await apiUpdate('INFORMES',existente.id,{Datos_JSON:JSON.stringify(datos),Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
   } else {
     const id='inf'+Date.now();
-    const plantilla=PLANTILLA_GRUPO[grupo]||'A';
+    const plantilla=plantillaDe(grupo);
     DB.informes.push({id,grupo,mes:String(mes),anio:String(anio),plantilla,datos,estado:'Borrador',registrado_por:currentUser.nombre,ts});
     await apiAdd('INFORMES',{ID:id,Ministerio:grupo,Mes:mes,'Año':anio,Plantilla:plantilla,Datos_JSON:JSON.stringify(datos),Estado:'Borrador',Registrado_Por:currentUser.nombre,Timestamp:ts});
   }
@@ -2463,23 +2863,8 @@ function abrirInforme(id){
 }
 
 // ---------- Generación del documento ----------
-function buildInformeHTML(opts={}){
-  const {grupo,mes,anio}=informeActualKey();
-  const d=leerInformeDelForm();
-  const logo=opts.logo===false?'':'<img src="logo_iglesia.png" style="height:78px;" alt="">';
-  const money=v=>fmtCOP(parseFloat(v)||0);
-  const fila=b=>[1,2,3,4].map(n=>`<tr><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_esp_${n}`]||'')}</td><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_mat_${n}`]||'')}</td></tr>`).join('');
-  const bloque=(titulo,b)=>`
-    <div class="sec-title">${titulo}</div>
-    <table class="grid">
-      <tr><th colspan="2">ESPIRITUALES</th><th colspan="2">MATERIALES</th></tr>
-      ${fila(b)}
-    </table>`;
-  const dato=(lbl,val)=>`<span class="dato"><b>${lbl}:</b> <u>&nbsp;${infEsc(val===''||val==null?'':val)}&nbsp;</u></span>`;
-
-  return `<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Informe ${infEsc(grupo)} ${MESES_NOM[mes-1]} ${anio}</title>
-<style>
+function infDocCSS(){
+  return `
   @page{size:A4 portrait;margin:14mm 12mm;}
   body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;color:#000;margin:0;}
   .head{text-align:center;line-height:1.25;}
@@ -2498,50 +2883,203 @@ function buildInformeHTML(opts={}){
   table.grid td.fill{height:20px;}
   table.fin td,table.fin th{border:1px solid #000;padding:5px;text-align:center;font-size:10pt;}
   table.fin th{background:#eee;font-size:9.5pt;}
+  table.mtz td,table.mtz th{border:1px solid #000;padding:2px 3px;text-align:center;font-size:7.5pt;}
+  table.mtz th{background:#eee;}
+  table.mtz td.fel{text-align:left;font-weight:bold;padding:2px 5px;white-space:nowrap;}
+  table.mtz tr.total td{background:#eee;font-weight:bold;}
+  table.mtz td.nom{text-align:left;padding:2px 5px;min-width:130px;}
   .firmas{margin-top:30px;width:100%;}
   .firmas td{text-align:center;font-size:9pt;width:33.3%;padding:0 8px;vertical-align:bottom;}
   .firmas .sig{height:40px;}
   .firmas .line{border-top:1px solid #000;padding-top:3px;}
-  .obs u{display:block;min-height:14px;}
-</style></head><body>
-<div class="head">
+  .obs u{display:block;min-height:14px;}`;
+}
+
+function infDocHead(logo){
+  return `<div class="head">
   ${logo}
   <div class="n1">Iglesia Catedral Apostólica Escalando Peldaños</div>
   <div class="n2">Iglesia Concilio de Iglesias Dios es Amor</div>
   <div class="n2">Resolución 990 de 11 de julio de 2013, Nit 900729217-6</div>
   <div class="n2">Personería jurídica especial 1779 del ministerio del interior</div>
   <div class="city">CIUDAD CAMELOT</div>
-</div>
-<h1>Informe eclesiástico por departamentos o sociedades</h1>
-<div class="linea">
-  ${dato('MINISTERIO',grupo)} ${dato('MES',MESES_NOM[mes-1])} ${dato('AÑO',anio)}
-</div>
-<div class="sec-title">Datos estadísticos</div>
-<div class="linea">
+</div>`;
+}
+
+function buildInformeHTML(opts={}){
+  const {grupo}=informeActualKey();
+  return plantillaDe(grupo)==='D'?buildInformeD(opts):buildInformeA(opts);
+}
+
+// Genera las plantillas A (ministerio), B (con tabla de servidores) y C (comités)
+function buildInformeA(opts={}){
+  const {grupo,mes,anio}=informeActualKey();
+  const cfg=cfgDe(grupo);
+  const d=leerInformeDelForm();
+  const logo=opts.logo===false?'':'<img src="logo_iglesia.png" style="height:78px;" alt="">';
+  const money=v=>fmtCOP(parseFloat(v)||0);
+  const dato=(lbl,val)=>`<span class="dato"><b>${lbl}:</b> <u>&nbsp;${infEsc(val===''||val==null?'':val)}&nbsp;</u></span>`;
+  const linea=(lbl,val)=>`<div class="linea obs"><b>${lbl}:</b> <u>${infEsc(val||'')}</u></div>`;
+
+  const bloqueMonitoreo=(titulo,b)=>`
+    <div class="sec-title">${titulo}</div>
+    <table class="grid">
+      <tr><th colspan="2">ESPIRITUALES</th><th colspan="2">MATERIALES</th></tr>
+      ${[1,2,3,4].map(n=>`<tr><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_esp_${n}`]||'')}</td><td class="num">${n}.</td><td class="fill">${infEsc(d[`${b}_mat_${n}`]||'')}</td></tr>`).join('')}
+    </table>`;
+
+  // Tabla de servidores: N° | NOMBRES | CARGO | 4 semanas x 4 servicios
+  let tablaServ='';
+  if(cfg.servidores){
+    const cabSem=SV_SEMANAS.map(w=>`<th colspan="${SV_COLS.length}">SEMANA ${w}</th>`).join('');
+    const cabCol=SV_SEMANAS.map(()=>SV_COLS.map(c=>`<th>${c}</th>`).join('')).join('');
+    let filas='';
+    for(let r=1;r<=cfg.servidores.filas;r++){
+      filas+=`<tr><td>${r}</td><td class="nom">${infEsc(d[`sv_${r}_nombre`]||'')}</td><td class="nom">${infEsc(d[`sv_${r}_cargo`]||'')}</td>`+
+        SV_SEMANAS.map(w=>SV_COLS.map(c=>`<td>${infEsc(d[`sv_${r}_${c}_${w}`]||'')}</td>`).join('')).join('')+`</tr>`;
+    }
+    tablaServ=`<div class="sec-title">${cfg.servidores.titulo}</div>
+<table class="mtz">
+  <tr><th rowspan="2">N°</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO O FUNCION</th>${cabSem}</tr>
+  <tr>${cabCol}</tr>
+  ${filas}
+</table>`;
+  }
+
+  // Secciones narrativas de los comités
+  let narrativa='';
+  if(cfg.narrativa){
+    narrativa=cfg.narrativa.map(s=>
+      (s.t?`<div class="sec-title">${s.t}</div>`:'')+
+      s.campos.map(c=>linea(c.l.toUpperCase(),d[c.id])).join('')
+    ).join('');
+  }
+
+  const datosBasicos=`
   ${dato('CUANTOS MIEMBROS TIENE',d.miembros)}
   ${dato('BAUTIZADOS',d.bautizados)}
   ${dato('NO BAUTIZADOS',d.nobautizados)}
-  ${dato('CUANTOS TOMARON SANTA CENA',d.cena)}
+  ${dato('CUANTOS TOMARON SANTA CENA',d.cena)}`;
+  const datosCompletos=cfg.datos==='completo'?`
   ${dato('NUEVOS CONVERTIDOS',d.convertidos)}
   ${dato('CULTOS REALIZADOS EN EL MES',d.cultos)}
-  ${dato('ASISTENCIA POR CULTO',d.asistencia)}
+  ${dato('ASISTENCIA POR CULTO',d.asistencia)}`:'';
+  const datosMusical=cfg.musical?`
+  ${dato('CUANTOS ENSAYOS SE REALIZARON EN EL MES',d.ensayos)}`:'';
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Informe ${infEsc(grupo)} ${MESES_NOM[mes-1]} ${anio}</title>
+<style>${infDocCSS()}</style></head><body>
+${infDocHead(logo)}
+<h1>${cfg.titulo}</h1>
+<div class="linea">
+  ${dato(cfg.etiqueta,grupo)} ${dato('MES',MESES_NOM[mes-1])} ${dato('AÑO',anio)}
 </div>
-<div class="linea"><b>PREDICADORES INVITADOS:</b> <u>${infEsc(d.predicadores||'')}</u></div>
-<div class="linea"><b>TEMAS TRATADOS EN EL MES:</b> <u>${infEsc(d.temas||'')}</u></div>
-${bloque('Monitoreo de actividades realizadas','mon')}
-${bloque('Proyección para este mes','pro')}
-<div class="sec-title">Informe financiero</div>
+<div class="sec-title">Datos estadísticos</div>
+<div class="linea">${datosBasicos}${datosCompletos}${datosMusical}</div>
+${cfg.musical?linea('TEMAS MUSICALES QUE SE MONTARON EN EL MES',d.musicales):''}
+${cfg.datos==='completo'?linea('PREDICADORES INVITADOS',d.predicadores)+linea('TEMAS TRATADOS EN EL MES',d.temas):''}
+${tablaServ}
+${narrativa}
+${cfg.monitoreo?bloqueMonitoreo('Monitoreo de actividades realizadas','mon'):''}
+${cfg.monitoreo?bloqueMonitoreo('Proyección para este mes','pro'):''}
+${cfg.financiero?`<div class="sec-title">Informe financiero</div>
 <table class="fin">
   <tr><th>SALDO ANTERIOR</th><th>ENTRADAS</th><th>SALIDAS</th><th>SALDO ACTUAL</th></tr>
   <tr><td>${money(d.saldo_ant)}</td><td>${money(d.entradas)}</td><td>${money(d.salidas)}</td><td>${money(d.saldo_act)}</td></tr>
-</table>
-<div class="linea obs" style="margin-top:12px;"><b>PIDO ORACION POR:</b> <u>${infEsc(d.oracion||'')}</u></div>
-<div class="linea obs"><b>OBSERVACION:</b> <u>${infEsc(d.observacion||'')}</u></div>
+</table>`:''}
+<div style="margin-top:12px;">
+${cfg.oracion?linea('PIDO ORACION POR',d.oracion):''}
+${linea(cfg.obsPlural?'OBSERVACIONES GENERALES':'OBSERVACION',d.observacion)}
+</div>
 <table class="firmas">
   <tr>
     <td><div class="sig"></div><div class="line">${infEsc(d.pastor||'')}<br>PASTOR (A)</div></td>
     <td><div class="sig"></div><div class="line">${infEsc(d.secretaria||'')}<br>SECRETARIA (O) GENERAL</div></td>
     <td><div class="sig"></div><div class="line">${infEsc(d.lider||'')}<br>LIDER O PRESIDENTE (A)</div></td>
+  </tr>
+</table>
+</body></html>`;
+}
+
+function buildInformeD(opts={}){
+  const {mes,anio}=informeActualKey();
+  const d=leerInformeDelForm();
+  const logo=opts.logo===false?'':'<img src="logo_iglesia.png" style="height:78px;" alt="">';
+  const dato=(lbl,val)=>`<span class="dato"><b>${lbl}:</b> <u>&nbsp;${infEsc(val===''||val==null?'':val)}&nbsp;</u></span>`;
+  const num=v=>{const n=parseInt(v);return isNaN(n)?0:n;};
+
+  // Matriz de asistencia: la fila TOTAL y el % general se derivan de las celdas
+  const filas=SD_FELIGRESIA.map(f=>{
+    const celdas=SD_SEMANAS.map(w=>SD_COLS.map(c=>
+      `<td>${infEsc(d[`sd_${f}_${c}_${w}`]||'')}</td>`).join('')).join('');
+    const pct=d[`sd_${f}_PCT`];
+    return `<tr><td class="fel">${SD_FEL_LABEL[f]}</td>${celdas}<td>${pct===''||pct==null?'':infEsc(pct)+'%'}</td></tr>`;
+  }).join('');
+  const totales=SD_SEMANAS.map(w=>SD_COLS.map(c=>{
+    const s=SD_FELIGRESIA.reduce((a,f)=>a+num(d[`sd_${f}_${c}_${w}`]),0);
+    return `<td>${s||''}</td>`;
+  }).join('')).join('');
+  const pctList=SD_FELIGRESIA.map(f=>parseFloat(d[`sd_${f}_PCT`])).filter(v=>!isNaN(v));
+  const pctGen=pctList.length?Math.round(pctList.reduce((a,b)=>a+b,0)/pctList.length)+'%':'';
+  const cabSem=SD_SEMANAS.map(w=>`<th colspan="${SD_COLS.length}">SEMANA ${w}</th>`).join('');
+  const cabCol=SD_SEMANAS.map(()=>SD_COLS.map(c=>`<th>${c}</th>`).join('')).join('');
+
+  const escuela=ED_FILAS.map(r=>
+    `<tr><td class="nom">${infEsc(d[`ed_nombre_${r}`]||'')}</td>`+
+    SD_SEMANAS.map(w=>['D1','D2'].map(c=>`<td>${infEsc(d[`ed_${r}_${c}_${w}`]||'')}</td>`).join('')).join('')+
+    `</tr>`).join('');
+  const cabEscSem=SD_SEMANAS.map(w=>`<th colspan="2">SEMANA ${w}</th>`).join('');
+  const cabEscCol=SD_SEMANAS.map(()=>`<th>D1</th><th>D2</th>`).join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Informe Superintendente ${MESES_NOM[mes-1]} ${anio}</title>
+<style>${infDocCSS()}</style></head><body>
+${infDocHead(logo)}
+<h1>Informe general eclesiástico del superintendente</h1>
+<div class="linea">${dato('MES',MESES_NOM[mes-1])} ${dato('AÑO',anio)}</div>
+<div class="sec-title">Datos estadísticos</div>
+<div class="linea">
+  ${dato('CUANTOS MIEMBROS ACTIVOS',d.d_miembros)}
+  ${dato('BAUTIZADOS',d.d_bautizados)}
+  ${dato('NO BAUTIZADOS',d.d_nobautizados)}
+  ${dato('CUANTOS TOMARON SANTA CENA',d.d_cena)}
+</div>
+<div class="linea">
+  ${dato('CUANTOS SERVICIOS REALIZADOS EN EL MES',d.d_servicios)}
+  ${dato('APARTADOS',d.d_apartados)}
+  ${dato('RECONCILIADOS',d.d_reconciliados)}
+  ${dato('NUEVOS CONVERTIDOS',d.d_convertidos)}
+</div>
+<div class="linea">
+  ${dato('CUANTAS PRESENTACIONES DE NIÑOS EN EL MES',d.d_presentaciones)}
+  ${dato('MATRIMONIOS REALIZADOS EN EL MES',d.d_matrimonios)}
+  ${dato('CEREMONIAS FUNEBRES',d.d_funebres)}
+</div>
+<div class="linea">${dato('CUANTAS BIBLIAS PROMEDIO POR CULTOS',d.d_biblias)}</div>
+<div class="sec-title">Promedio de asistencia por culto en el mes</div>
+<table class="mtz">
+  <tr><th rowspan="2">FELIGRESIA</th>${cabSem}<th rowspan="2">%</th></tr>
+  <tr>${cabCol}</tr>
+  ${filas}
+  <tr class="total"><td class="fel">TOTAL</td>${totales}<td>${pctGen}</td></tr>
+</table>
+<div class="linea" style="margin-top:10px;"><b>NOMBRES DE PREDICADORES INVITADOS EN EL MES:</b> <u>${infEsc(d.d_predicadores||'')}</u></div>
+<div class="linea"><b>MINISTERIO DE ALABANZA O MINISTRO INVITADO:</b> <u>${infEsc(d.d_alabanza||'')}</u></div>
+<div class="linea obs"><b>TEMAS TRATADOS EN EL MES DE CADA SERVICIO:</b> <u>${infEsc(d.d_temas||'')}</u></div>
+<div class="sec-title">Monitoreo de la escuela dominical para niños, intermedios y adolescentes</div>
+<table class="mtz">
+  <tr><th rowspan="2">NOMBRE DE MAESTRAS DE LOS NIÑOS</th>${cabEscSem}</tr>
+  <tr>${cabEscCol}</tr>
+  ${escuela}
+</table>
+<div class="linea obs" style="margin-top:10px;"><b>TEMAS TRATADOS EN EL MES PARA LOS NIÑOS, INTERMEDIOS Y ADOLECENTES:</b> <u>${infEsc(d.d_temas_ninos||'')}</u></div>
+<div class="linea obs"><b>OBSERVACION:</b> <u>${infEsc(d.observacion||'')}</u></div>
+<table class="firmas">
+  <tr>
+    <td><div class="sig"></div><div class="line">${infEsc(d.pastor||'')}<br>PASTOR (A)</div></td>
+    <td><div class="sig"></div><div class="line">${infEsc(d.secretaria||'')}<br>SECRETARIA (O) GENERAL</div></td>
+    <td><div class="sig"></div><div class="line">${infEsc(d.lider||'')}<br>SUPERINTENDENTE (A)</div></td>
   </tr>
 </table>
 </body></html>`;
@@ -2569,7 +3107,7 @@ function descargarInformeWord(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download=`Informe_${grupo}_${MESES_NOM[mes-1]}_${anio}.doc`;
+  a.download=`Informe_${grupo.replace(/\s+/g,'_')}_${MESES_NOM[mes-1]}_${anio}.doc`;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
   showToast('✓ Documento Word descargado','success');
