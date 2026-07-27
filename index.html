@@ -2460,9 +2460,9 @@ function initInformes(){
   selG.innerHTML=grupos.map(g=>`<option value="${g}">${g}</option>`).join('');
   const hoy=new Date();
   // por defecto el mes anterior, que es el que normalmente se informa
-  // getMonth() es 0-based, así que su valor ya es el número del mes anterior (1-12)
-  let m=hoy.getMonth(), y=hoy.getFullYear();
-  if(m===0){ m=12; y--; }
+  // Se abre en el mes en curso: el informe se va llenando durante el mes y lo
+  // primero que se busca es lo que se acaba de registrar.
+  const m=hoy.getMonth()+1, y=hoy.getFullYear();
   document.getElementById('infMes').innerHTML=MESES_NOM.map((n,i)=>`<option value="${i+1}">${n}</option>`).join('');
   document.getElementById('infMes').value=m;
   const anios=[];
@@ -2527,31 +2527,29 @@ function calcInformeStatsD(mes,anio){
   };
 }
 
-// Cada columna del formato es la enésima ocurrencia de ese servicio en el mes
-function ocurrenciasPorColumna(mes,anio){
-  const pref=`${anio}-${String(mes).padStart(2,'0')}`;
-  const fechas={};
-  SD_COLS.forEach(c=>fechas[c]=new Set());
-  DB.asistencia.filter(a=>(a.fecha||'').startsWith(pref)).forEach(a=>{
-    const col=colDeServicio(a.servicio);
-    if(col) fechas[col].add(a.fecha);
-  });
-  const out={};
-  SD_COLS.forEach(c=>out[c]=[...fechas[c]].sort());
-  return out;
+// La columna de semana es la semana del calendario a la que pertenece la fecha,
+// igual que en el formato en papel: días 1-7 = semana 1, 8-14 = semana 2, etc.
+// Así el dato de un domingo cae siempre en la misma columna, se haya realizado
+// o no el servicio de las semanas anteriores.
+function semanaDelMes(fecha){
+  const dia=parseInt(String(fecha||'').slice(8,10),10);
+  if(!dia) return 0;
+  return Math.min(Math.ceil(dia/7),SD_SEMANAS.length);
 }
 
 function calcMatrizAsistencia(mes,anio){
   const pref=`${anio}-${String(mes).padStart(2,'0')}`;
-  const cols=ocurrenciasPorColumna(mes,anio);
   const mmap={}; DB.miembros.forEach(m=>mmap[m.id]=m.ministerio);
-  // personas únicas por columna+fecha+ministerio
-  const cont={};
+  const cont={};  // columna|semana|ministerio -> personas únicas
+  const hubo={};  // columna|semana -> se realizó ese servicio
   DB.asistencia.filter(a=>(a.fecha||'').startsWith(pref)).forEach(a=>{
     const col=colDeServicio(a.servicio);
+    const w=semanaDelMes(a.fecha);
+    if(!col||!w) return;
+    hubo[`${col}|${w}`]=true;
     const min=mmap[a.miembro];
-    if(!col||!min) return;
-    const k=`${col}|${a.fecha}|${min}`;
+    if(!min) return;
+    const k=`${col}|${w}|${min}`;
     (cont[k]=cont[k]||new Set()).add(a.miembro);
   });
   const res={};
@@ -2560,10 +2558,9 @@ function calcMatrizAsistencia(mes,anio){
   SD_FEL_AUTO.forEach(f=>{
     let suma=0, n=0;
     SD_COLS.forEach(c=>SD_SEMANAS.forEach(w=>{
-      const fecha=cols[c][w-1];
       // sin servicio esa semana la celda va vacía
-      if(!fecha){ res[`sd_${f}_${c}_${w}`]=''; return; }
-      const s=cont[`${c}|${fecha}|${f}`];
+      if(!hubo[`${c}|${w}`]){ res[`sd_${f}_${c}_${w}`]=''; return; }
+      const s=cont[`${c}|${w}|${f}`];
       const v=s?s.size:0;
       res[`sd_${f}_${c}_${w}`]=v; suma+=v; n++;
     }));
