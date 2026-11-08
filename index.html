@@ -162,6 +162,11 @@ tr:hover td{background:#fafaf7;}
 .av-mis-hoy{background:var(--navy);color:var(--white);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
 .av-mis-hoy h3{font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;margin-bottom:0.4rem;}
 .av-empty{color:var(--gray);font-size:0.9rem;padding:1rem 0;}
+.av-scan-wrap{position:relative;background:#000;border-radius:var(--radius);overflow:hidden;aspect-ratio:3/4;max-height:60vh;margin-bottom:0.8rem;}
+.av-scan-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
+.av-scan-marco{position:absolute;inset:18%;border:3px solid var(--gold);border-radius:12px;box-shadow:0 0 0 999px rgba(0,0,0,0.35);pointer-events:none;}
+.av-qr-img{display:block;margin:0 auto 0.6rem;width:220px;height:220px;image-rendering:pixelated;}
+.av-eq-estados{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0.8rem;}
 .kpi-min-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:1.2rem;}
 .kpi-min-card{background:var(--white);border:1px solid var(--lightgray);border-top:4px solid var(--gold);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow);}
 .kpi-min-card.kpi-total{border-top-color:var(--navy);background:#fdfbf6;}
@@ -957,7 +962,9 @@ tr:hover td{background:#fafaf7;}
               <select id="avInvEstado" class="search-box" onchange="renderAVInv()"></select>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="avAbrirScanner()">📷 Escanear QR</button>
               <button class="btn btn-primary btn-sm" onclick="avAbrirInv(null)">+ Agregar equipo</button>
+              <button class="btn btn-outline btn-sm" onclick="avImprimirQRs()">Imprimir QR</button>
               <button class="btn btn-gold btn-sm" onclick="avExportInv()">Exportar Excel</button>
             </div>
           </div>
@@ -1053,6 +1060,53 @@ tr:hover td{background:#fafaf7;}
       <button class="btn btn-primary" onclick="avGuardarReemplazo()">Guardar reemplazo</button>
       <button class="btn btn-outline" onclick="closeModal('avReemplazo')">Cancelar</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL QR DE UN EQUIPO -->
+<div class="modal-overlay" id="modalAvQR">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <img id="avQRImg" class="av-qr-img" alt="Código QR del equipo">
+    <h3 id="avQRNombre" style="margin-bottom:0.2rem;"></h3>
+    <p id="avQRSub" style="font-size:0.8rem;color:var(--gray);margin-bottom:1rem;"></p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:1rem;">Pega esta etiqueta en el equipo. Al escanearla se abre su ficha para marcar fallas, daños, salidas o bajas.</p>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn btn-primary" id="avQRBtnDesc">Descargar</button>
+      <button class="btn btn-gold" id="avQRBtnImp">Imprimir</button>
+      <button class="btn btn-outline" onclick="closeModal('avQR')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESCÁNER QR -->
+<div class="modal-overlay" id="modalAvScanner">
+  <div class="modal" style="max-width:420px;">
+    <h3>Escanear equipo</h3>
+    <div class="av-scan-wrap"><video id="avScanVideo" playsinline muted></video><div class="av-scan-marco"></div></div>
+    <canvas id="avScanCanvas" style="display:none"></canvas>
+    <p id="avScanMsg" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;text-align:center;"></p>
+    <div class="modal-actions">
+      <label class="btn btn-gold" style="text-align:center;">Tomar foto del QR<input type="file" accept="image/*" capture="environment" style="display:none" onchange="avQRDesdeFoto(this)"></label>
+      <button class="btn btn-outline" onclick="avCerrarScanner()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FICHA DE EQUIPO (estado) -->
+<div class="modal-overlay" id="modalAvEquipo">
+  <div class="modal">
+    <h3 id="avEqNombre" style="margin-bottom:0.4rem;"></h3>
+    <p id="avEqInfo" style="font-size:0.85rem;line-height:1.6;margin-bottom:1rem;"></p>
+    <div class="form-group"><label>Marcar como</label><div class="av-eq-estados" id="avEqEstados"></div>
+      <input type="text" id="avEqNota" maxlength="160"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="avGuardarEstadoEquipo()">Guardar</button>
+      <button class="btn btn-outline" onclick="avEditarDesdeFicha()">Editar datos</button>
+      <button class="btn btn-outline" onclick="avQRDesdeFicha()">Ver QR</button>
+      <button class="btn btn-outline" onclick="closeModal('avEquipo')">Cerrar</button>
+    </div>
+    <h4 style="font-family:'Cinzel',serif;font-size:0.9rem;margin:1.2rem 0 0.4rem;">Movimientos</h4>
+    <div id="avEqHist"></div>
   </div>
 </div>
 
@@ -1390,12 +1444,13 @@ async function doLogin(){
     document.getElementById('sec-dashboard').classList.add('active');
     document.querySelector('#mainNav button').classList.add('active');
   }
+  avAbrirPendiente();
 }
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 function doLogout(){
   addLog('login',`Cierre de sesión: ${currentUser.nombre}`,'info');
-  saveDB(); currentUser=null;
+  saveDB(); currentUser=null; avDetenerCamara();
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('appShell').style.display='none';
 }
@@ -4057,7 +4112,9 @@ const AV_SERVICIOS=[
   {id:'Domingo 2da', name:'Domingo 2da', dow:0, orden:4}
 ];
 const AV_ESPECIAL='Campaña';
-const AV_ESTADOS=['Bueno','Regular','Dañado','En reparación','De baja'];
+const AV_ESTADOS=['Bueno','Regular','Con falla','Dañado','En reparación','Salida','De baja'];
+const AV_ESTADO_BADGE={'Bueno':'si','Regular':'pend','Con falla':'pend','Dañado':'no','En reparación':'no','Salida':'visual','De baja':'general'};
+function avBadgeEstado(e){ return `<span class="badge badge-${AV_ESTADO_BADGE[e]||'general'}">${avEsc(e||'—')}</span>`; }
 const AV_MOTIVOS=['No tomó Santa Cena','Incumplimiento','Permiso / viaje','Otro'];
 const AV_MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 let avTab='prog', avSemana=null, avInvArea='audio', editAvTurnoId=null, editAvInvId=null, avEquipoSel=null;
@@ -4716,13 +4773,15 @@ function renderAVInv(){
   const list=todos.filter(x=>(!est||x.estado===est)&&(!q||avNorm([x.nombre,x.marca,x.modelo,x.serie,x.ubicacion,x.notas].join(' ')).includes(q)))
     .sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre)));
   const unidades=todos.filter(x=>x.estado!=='De baja').reduce((s,x)=>s+(parseInt(x.cantidad)||1),0);
-  const fallas=todos.filter(x=>x.estado==='Dañado'||x.estado==='En reparación').length;
+  const fallas=todos.filter(x=>['Con falla','Dañado','En reparación'].includes(x.estado)).length;
   const buenos=todos.filter(x=>x.estado==='Bueno').length;
+  const fuera=todos.filter(x=>x.estado==='Salida').length;
   document.getElementById('avInvStats').innerHTML=`
     <div class="stat-card"><div class="label">Equipos</div><div class="value">${todos.length}</div><div class="sub">${unidades} unidades en uso</div></div>
     <div class="stat-card"><div class="label">En buen estado</div><div class="value">${buenos}</div></div>
-    <div class="stat-card"><div class="label">Con fallas</div><div class="value" style="color:${fallas?'#fca5a5':'inherit'}">${fallas}</div><div class="sub">dañados o en reparación</div></div>`;
-  const badge=e=>{const c={'Bueno':'si','Regular':'pend','Dañado':'no','En reparación':'no','De baja':'general'}[e]||'general';return `<span class="badge badge-${c}">${avEsc(e||'—')}</span>`;};
+    <div class="stat-card"><div class="label">Con fallas</div><div class="value" style="color:${fallas?'#fca5a5':'inherit'}">${fallas}</div><div class="sub">con falla, dañados o en reparación</div></div>
+    <div class="stat-card"><div class="label">Fuera (salida)</div><div class="value">${fuera}</div></div>`;
+  const badge=avBadgeEstado;
   document.getElementById('avInvBody').innerHTML=list.map(x=>`<tr>
     <td><strong>${avEsc(x.nombre)}</strong></td>
     <td>${avEsc([x.marca,x.modelo].filter(Boolean).join(' ')||'—')}</td>
@@ -4731,7 +4790,9 @@ function renderAVInv(){
     <td>${badge(x.estado)}</td>
     <td>${avEsc(x.ubicacion||'—')}</td>
     <td style="max-width:220px;font-size:0.8rem;color:var(--gray)">${avEsc(x.notas||'')}</td>
-    <td><button class="btn btn-warn btn-sm" onclick="avAbrirInv('${x.id}')">Editar</button></td>
+    <td style="white-space:nowrap"><button class="btn btn-primary btn-sm" onclick="avAbrirEquipo('${x.id}')">Estado</button>
+      <button class="btn btn-outline btn-sm" onclick="avVerQR('${x.id}')">QR</button>
+      <button class="btn btn-warn btn-sm" onclick="avAbrirInv('${x.id}')">Editar</button></td>
   </tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">${todos.length?'Sin resultados':'Aún no hay equipos de '+(avInvArea==='audio'?'audio':'visual')+' registrados'}</td></tr>`;
 }
 function avAbrirInv(id){
@@ -4759,6 +4820,8 @@ async function avGuardarInv(){
   showLoader('Guardando equipo...');
   if(editAvInvId){
     const prev=DB.av.find(e=>e.id===editAvInvId);
+    const hist=(prev&&prev.datos.historial)||[];
+    datos.historial=prev&&prev.datos.estado!==datos.estado?[...hist,{estado:datos.estado,de:prev.datos.estado||'',nota:'Cambio desde Editar',por:currentUser.nombre,ts:new Date().toISOString()}]:hist;
     await avActualizar(editAvInvId,prev?prev.fecha:avHoy(),datos);
     addLog('audiovisual',`${currentUser.nombre} editó equipo de ${datos.area}: ${datos.nombre} (${datos.estado})`,'info');
   } else {
@@ -4787,6 +4850,229 @@ function avExportInv(){
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Inventario AV');
   XLSX.writeFile(wb,'ICAEP_AudioVisual_Inventario.xlsx');
+}
+// ── QR DEL INVENTARIO ──
+// Cada equipo tiene un QR con el enlace de la app + ?inv=<id>. Se puede leer con
+// el escáner de la app o con la cámara del celular (abre la app en ese equipo).
+const AV_LIB={
+  qrcode:{src:'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js',ok:()=>typeof qrcode==='function'},
+  jsqr:{src:'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js',ok:()=>typeof jsQR==='function'}
+};
+const AV_NOTA_ESTADO={
+  'Con falla':'¿Qué falla presenta?','Dañado':'¿Qué se dañó y cómo?','En reparación':'¿Dónde o con quién está en reparación?',
+  'Salida':'¿Quién lo lleva, a dónde y cuándo regresa?','De baja':'¿Por qué se da de baja?','Bueno':'Nota (opcional)','Regular':'Nota (opcional)'
+};
+let avScanStream=null, avScanActivo=false, avScanDetector=null, avEquipoAbierto=null, avEstadoSel=null, avPendienteInv=null;
+
+function avLib(nombre){
+  const l=AV_LIB[nombre];
+  if(l.ok()) return Promise.resolve();
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script'); s.src=l.src;
+    s.onload=()=>l.ok()?res():rej(new Error('Librería no disponible'));
+    s.onerror=()=>rej(new Error('Sin conexión para cargar la librería de QR'));
+    document.head.appendChild(s);
+  });
+}
+function avInvUrl(id){
+  const base=location.protocol.startsWith('http')?location.origin+location.pathname:'https://devcamelot.github.io/icaep-asistencia/';
+  return base+'?inv='+encodeURIComponent(id);
+}
+async function avQRDataUrl(texto,celda=6){
+  await avLib('qrcode');
+  const qr=qrcode(0,'M'); qr.addData(texto); qr.make();
+  return qr.createDataURL(celda,celda*2);
+}
+function avAreaNombre(a){ return a==='audio'?'Audio':'Visual'; }
+
+// ── ver / descargar / imprimir ──
+async function avVerQR(id){
+  const x=avInventario().find(i=>i.id===id); if(!x) return;
+  try{
+    const url=await avQRDataUrl(avInvUrl(x.id),8);
+    document.getElementById('avQRImg').src=url;
+    document.getElementById('avQRNombre').textContent=x.nombre;
+    document.getElementById('avQRSub').textContent=[avAreaNombre(x.area),[x.marca,x.modelo].filter(Boolean).join(' '),x.serie?'S/N '+x.serie:''].filter(Boolean).join(' · ');
+    document.getElementById('avQRBtnDesc').onclick=()=>avDescargarQR(x);
+    document.getElementById('avQRBtnImp').onclick=()=>avImprimirQRs([x]);
+    openModal('avQR');
+  }catch(e){ showToast(e.message,'error'); }
+}
+async function avDescargarQR(x){
+  // etiqueta PNG: QR + nombre del equipo
+  const img=new Image(); img.src=await avQRDataUrl(avInvUrl(x.id),10);
+  await new Promise(r=>img.onload=r);
+  const c=document.createElement('canvas'), pad=24;
+  c.width=img.width+pad*2; c.height=img.height+pad*2+50;
+  const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+  g.drawImage(img,pad,pad);
+  g.fillStyle='#0f1f3d'; g.textAlign='center';
+  g.font='bold 20px Lato, Arial'; g.fillText(String(x.nombre).slice(0,32),c.width/2,img.height+pad+26);
+  g.font='14px Lato, Arial'; g.fillText(`ICAEP · ${avAreaNombre(x.area)}${x.serie?' · S/N '+x.serie:''}`.slice(0,48),c.width/2,img.height+pad+46);
+  const a=document.createElement('a');
+  a.href=c.toDataURL('image/png'); a.download=`QR_${String(x.nombre).replace(/[^\w\-]+/g,'_')}.png`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function avImprimirQRs(lista){
+  lista=lista||avInventario(avInvArea).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre)));
+  if(!lista.length){ showToast('No hay equipos para imprimir','error'); return; }
+  const w=window.open('','_blank');
+  if(!w){ showToast('Permite las ventanas emergentes para imprimir','error'); return; }
+  w.document.write('<p style="font-family:sans-serif">Generando códigos QR...</p>');
+  try{
+    const items=[];
+    for(const x of lista) items.push({x,url:await avQRDataUrl(avInvUrl(x.id),5)});
+    const e=avEsc;
+    w.document.open();
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>QR inventario</title><style>
+      body{font-family:Arial,sans-serif;margin:12px;color:#0f1f3d}
+      .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+      .et{border:1px dashed #999;border-radius:6px;padding:8px;text-align:center;break-inside:avoid}
+      .et img{width:140px;height:140px;image-rendering:pixelated}
+      .n{font-weight:bold;font-size:13px;margin-top:4px}.s{font-size:10px;color:#555}
+      @media print{.np{display:none}}
+    </style></head><body>
+      <p class="np"><button onclick="print()">Imprimir</button> ${lista.length} etiqueta(s)</p>
+      <div class="grid">${items.map(({x,url})=>`<div class="et"><img src="${url}" alt=""><div class="n">${e(x.nombre)}</div><div class="s">ICAEP · ${avAreaNombre(x.area)}${x.serie?' · S/N '+e(x.serie):''}</div></div>`).join('')}</div>
+      <script>window.onload=()=>setTimeout(()=>print(),300)<\/script>
+    </body></html>`);
+    w.document.close();
+  }catch(err){ w.close(); showToast(err.message,'error'); }
+}
+
+// ── escáner ──
+function avScanEstado(t){ document.getElementById('avScanMsg').textContent=t; }
+async function avAbrirScanner(){
+  avScanDetector=null;
+  document.getElementById('avScanVideo').style.display='block';
+  openModal('avScanner');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ avScanEstado('Este navegador no permite abrir la cámara aquí. Usa "Tomar foto del QR".'); return; }
+  avScanEstado('Abriendo cámara...');
+  try{
+    avScanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+  }catch(e){
+    avScanEstado(e&&e.name==='NotAllowedError'?'No diste permiso para usar la cámara. Actívalo en el navegador o usa "Tomar foto del QR".':'No se pudo abrir la cámara. Usa "Tomar foto del QR".');
+    return;
+  }
+  const v=document.getElementById('avScanVideo');
+  v.setAttribute('playsinline',''); v.muted=true; v.srcObject=avScanStream;
+  try{ await v.play(); }catch(e){}
+  try{
+    if('BarcodeDetector' in window){
+      const f=await BarcodeDetector.getSupportedFormats();
+      if(f.includes('qr_code')) avScanDetector=new BarcodeDetector({formats:['qr_code']});
+    }
+    if(!avScanDetector) await avLib('jsqr');
+  }catch(e){ avScanEstado(e.message); return; }
+  avScanActivo=true;
+  avScanEstado('Apunta la cámara al código QR del equipo');
+  avScanLoop();
+}
+async function avLeerQR(fuente,w,h){
+  if(avScanDetector){ try{ const r=await avScanDetector.detect(fuente); return r.length?r[0].rawValue:null; }catch(e){ return null; } }
+  const c=document.getElementById('avScanCanvas'), k=Math.min(1,800/Math.max(w,h));
+  c.width=Math.round(w*k); c.height=Math.round(h*k);
+  const g=c.getContext('2d',{willReadFrequently:true});
+  g.drawImage(fuente,0,0,c.width,c.height);
+  const d=g.getImageData(0,0,c.width,c.height);
+  const r=jsQR(d.data,c.width,c.height,{inversionAttempts:'attemptBoth'});
+  return r?r.data:null;
+}
+async function avScanLoop(){
+  if(!avScanActivo) return;
+  const v=document.getElementById('avScanVideo');
+  if(v.readyState>=2&&v.videoWidth){
+    const txt=await avLeerQR(v,v.videoWidth,v.videoHeight);
+    if(txt){ avProcesarQR(txt); return; }
+  }
+  setTimeout(avScanLoop,200);
+}
+function avDetenerCamara(){
+  avScanActivo=false;
+  if(avScanStream){ avScanStream.getTracks().forEach(t=>t.stop()); avScanStream=null; }
+  const v=document.getElementById('avScanVideo'); if(v) v.srcObject=null;
+}
+function avCerrarScanner(){ avDetenerCamara(); closeModal('avScanner'); }
+// Respaldo: foto del QR (sirve en cualquier celular aunque no deje usar la cámara en vivo)
+async function avQRDesdeFoto(input){
+  const f=input.files&&input.files[0]; input.value=''; if(!f) return;
+  avScanEstado('Leyendo la foto...');
+  try{
+    if(!avScanDetector) await avLib('jsqr');
+    const img=new Image(); img.src=URL.createObjectURL(f);
+    await new Promise((r,j)=>{img.onload=r;img.onerror=j;});
+    const txt=await avLeerQR(img,img.naturalWidth,img.naturalHeight);
+    URL.revokeObjectURL(img.src);
+    if(txt) avProcesarQR(txt); else avScanEstado('No se encontró un código QR en la foto. Intenta acercarte más y con buena luz.');
+  }catch(e){ avScanEstado('No se pudo leer la foto.'); }
+}
+function avIdDesdeQR(txt){
+  txt=String(txt||'').trim();
+  try{ const u=new URL(txt); const id=u.searchParams.get('inv'); if(id) return id; }catch(e){}
+  const m=txt.match(/[?&]inv=([^&\s#]+)/); if(m) return decodeURIComponent(m[1]);
+  return txt;
+}
+function avProcesarQR(txt){
+  const id=avIdDesdeQR(txt);
+  const x=avInventario().find(i=>i.id===id);
+  if(!x){ avScanEstado('Este código QR no corresponde a ningún equipo del inventario.'); if(avScanStream){ avScanActivo=true; setTimeout(avScanLoop,1500);} return; }
+  if(navigator.vibrate) navigator.vibrate(80);
+  avCerrarScanner();
+  avAbrirEquipo(x.id);
+}
+
+// ── ficha del equipo: cambiar estado (falla, daño, salida, baja...) ──
+function avAbrirEquipo(id){
+  const x=avInventario().find(i=>i.id===id); if(!x){ showToast('El equipo ya no existe en el inventario','error'); return; }
+  avEquipoAbierto=x.id; avEstadoSel=x.estado||'Bueno';
+  document.getElementById('avEqNombre').textContent=x.nombre;
+  document.getElementById('avEqInfo').innerHTML=[
+    `<strong>${avAreaNombre(x.area)}</strong>`,
+    avEsc([x.marca,x.modelo].filter(Boolean).join(' ')),
+    x.serie?'S/N '+avEsc(x.serie):'',
+    x.ubicacion?'Ubicación: '+avEsc(x.ubicacion):'',
+    'Cantidad: '+avEsc(x.cantidad||1)
+  ].filter(Boolean).join(' · ')+`<br>Estado actual: ${avBadgeEstado(x.estado)}`;
+  document.getElementById('avEqNota').value='';
+  avPintarEstados();
+  const h=[...(x.historial||[])].reverse().slice(0,10);
+  document.getElementById('avEqHist').innerHTML=h.length?h.map(c=>`<div class="av-rol" style="font-size:0.8rem"><span style="flex:1">${avBadgeEstado(c.estado)} ${avEsc(c.nota||'')}<span class="av-reemp-nota" style="color:var(--gray)">${avEsc(c.por)} · ${formatDate(String(c.ts).slice(0,10))}</span></span></div>`).join(''):'<p class="av-empty" style="padding:0.3rem 0">Sin movimientos registrados.</p>';
+  openModal('avEquipo');
+}
+function avPintarEstados(){
+  document.getElementById('avEqEstados').innerHTML=AV_ESTADOS.map(e=>`<button type="button" class="period-tab ${e===avEstadoSel?'active':''}" onclick="avEstadoSel='${e}';avPintarEstados()">${e}</button>`).join('');
+  document.getElementById('avEqNota').placeholder=AV_NOTA_ESTADO[avEstadoSel]||'Nota (opcional)';
+}
+async function avGuardarEstadoEquipo(){
+  const rec=DB.av.find(e=>e.id===avEquipoAbierto); if(!rec) return;
+  const nota=document.getElementById('avEqNota').value.trim();
+  const ant=rec.datos.estado||'Bueno';
+  if(avEstadoSel===ant&&!nota){ showToast('Elige un estado distinto o escribe una nota','error'); return; }
+  if(['Salida','Con falla','Dañado','De baja'].includes(avEstadoSel)&&avEstadoSel!==ant&&!nota){ showToast(AV_NOTA_ESTADO[avEstadoSel],'error'); document.getElementById('avEqNota').focus(); return; }
+  const datos={...rec.datos,estado:avEstadoSel,historial:[...(rec.datos.historial||[]),{estado:avEstadoSel,de:ant,nota,por:currentUser.nombre,ts:new Date().toISOString()}]};
+  showLoader('Guardando...');
+  await avActualizar(rec.id,rec.fecha,datos);
+  hideLoader(); saveDB(); closeModal('avEquipo');
+  addLog('audiovisual',`${currentUser.nombre} marcó "${datos.nombre}" como ${avEstadoSel}${nota?': '+nota:''}`,avEstadoSel==='Bueno'?'info':'warn');
+  if(document.getElementById('avPane-inv').style.display!=='none') renderAVInv();
+  showToast(`✓ ${datos.nombre}: ${avEstadoSel}`,'success');
+}
+function avEditarDesdeFicha(){ const id=avEquipoAbierto; closeModal('avEquipo'); avAbrirInv(id); }
+function avQRDesdeFicha(){ const id=avEquipoAbierto; closeModal('avEquipo'); avVerQR(id); }
+
+// Enlace ?inv=<id> (QR leído con la cámara del celular): abrir el equipo después de iniciar sesión
+(function(){ try{ const id=new URLSearchParams(location.search).get('inv'); if(id) avPendienteInv=id; }catch(e){} })();
+function avAbrirPendiente(){
+  if(!avPendienteInv) return;
+  const id=avPendienteInv; avPendienteInv=null;
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
+  if(!avGestiona()){ showToast('Solo los líderes de Audio y Visual pueden gestionar el inventario','error'); return; }
+  const x=avInventario().find(i=>i.id===id);
+  if(!x){ showToast('Este QR no corresponde a ningún equipo del inventario','error'); return; }
+  const nb=document.getElementById('navAV'); nb.style.display='';
+  showSection('av',nb); avInvArea=x.area; avSetTab('inv'); avSetInvArea(x.area);
+  avAbrirEquipo(x.id);
 }
 </script>
 </body>
