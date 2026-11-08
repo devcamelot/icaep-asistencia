@@ -360,7 +360,6 @@ tr:hover td{background:#fafaf7;}
     <button onclick="showSection('historial',this)">Historial</button>
     <button onclick="showSection('miembros',this)">Miembros</button>
     <button id="navUsuarios" onclick="showSection('usuarios',this)" style="display:none">Usuarios</button>
-    <button id="navMinisterios" onclick="showSection('ministerios',this)" style="display:none">Ministerios</button>
     <button id="navInformes" onclick="showSection('informes',this)">Informes</button>
     <button id="navEventos" onclick="showSection('eventos',this)" style="display:none">Eventos</button>
     <button id="navContabilidad" onclick="showSection('contabilidad',this)" style="display:none">Contabilidad</button>
@@ -869,28 +868,6 @@ tr:hover td{background:#fafaf7;}
     </div>
 
 
-    <!-- MINISTERIOS -->
-    <div id="sec-ministerios" class="section">
-      <div class="section-header section-head-row">
-        <div><h2>Ministerios</h2><p id="minResumen"></p></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-primary btn-sm" onclick="minAbrir(null)">+ Nuevo ministerio</button>
-          <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('ministerios')" title="Refrescar">
-            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
-          </button>
-        </div>
-      </div>
-      <div class="card">
-        <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Cada ministerio tiene un líder con su propio usuario. El líder solo ve los miembros, la asistencia y los informes de su ministerio.</p>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Ministerio</th><th>Líder</th><th>Usuario del líder</th><th>Miembros</th><th>Registra asistencia en</th><th></th></tr></thead>
-            <tbody id="minBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
     <!-- AUDIO Y VISUAL -->
     <div id="sec-av" class="section">
       <div class="section-header section-head-row">
@@ -1042,35 +1019,6 @@ tr:hover td{background:#fafaf7;}
   </div>
 </div>
 
-<!-- MODAL MINISTERIO -->
-<div class="modal-overlay" id="modalMinisterio">
-  <div class="modal">
-    <h3 id="minTitulo">Ministerio</h3>
-    <div class="form-group"><label>Nombre del ministerio</label><input type="text" id="minNombre" maxlength="40" placeholder="Ej: Niños, Matrimonios, Intercesión" oninput="minActualizarUsuario()">
-      <p id="minNombreNota" style="display:none;font-size:0.75rem;color:var(--gray);margin-top:4px;">El nombre no se puede cambiar porque ya tiene miembros o usuarios.</p></div>
-    <div class="form-group"><label>Líder</label>
-      <input type="text" id="minLiderBuscar" placeholder="Buscar por nombre, cédula o ministerio..." oninput="minLlenarLideres()" style="margin-bottom:6px;">
-      <select id="minLider" onchange="minActualizarUsuario()"></select>
-    </div>
-    <div class="form-group"><label>Usuario del líder</label>
-      <p id="minUsuarioInfo" style="font-size:0.85rem;line-height:1.5;"></p>
-      <div id="minUsuarioCampos" style="display:none;margin-top:8px;">
-        <input type="text" id="minUEmail" placeholder="Usuario (con forma de correo)" autocomplete="off" style="margin-bottom:6px;">
-        <input type="password" id="minUPass" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="new-password">
-        <p style="font-size:0.75rem;color:var(--gray);margin-top:4px;">No tiene que ser un correo real; es solo el usuario para iniciar sesión.</p>
-      </div>
-    </div>
-    <div class="form-group"><label>Servicios donde el líder registra asistencia <span class="inf-auto">sin marcar = todos</span></label>
-      <div class="inf-comites" id="minServicios"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" onclick="minGuardar()">Guardar</button>
-      <button class="btn btn-danger" id="minDelBtn" onclick="minBorrar()">Eliminar</button>
-      <button class="btn btn-outline" onclick="closeModal('ministerio')">Cancelar</button>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL TURNO AUDIO Y VISUAL -->
 <div class="modal-overlay" id="modalAvTurno">
   <div class="modal">
@@ -1116,19 +1064,20 @@ tr:hover td{background:#fafaf7;}
 <div class="modal-overlay" id="modalAddUser">
   <div class="modal">
     <h3 id="modalUserTitle">Agregar Usuario</h3>
-    <div class="form-group"><label>Email</label><input type="email" id="uEmail"></div>
+    <div class="form-group"><label>Miembro <span class="inf-auto" id="uMiembroHint">opcional</span></label>
+      <input type="text" id="uMiembroBuscar" placeholder="Buscar por nombre, cédula o ministerio..." oninput="uLlenarMiembros()" style="margin-bottom:6px;">
+      <select id="uMiembro" onchange="uElegirMiembro()"></select>
+    </div>
+    <div class="form-group"><label>Email / usuario</label><input type="email" id="uEmail" placeholder="No tiene que ser un correo real"></div>
     <div class="form-group"><label>Nombre</label><input type="text" id="uNombre"></div>
     <div class="form-group"><label>Contraseña</label><input type="password" id="uPass" placeholder="Mínimo 6 caracteres"></div>
     <div class="form-group"><label>Rol</label>
       <select id="uRol" onchange="toggleMinisterioField()"><option value="Admin">Admin</option><option value="Lider">Líder</option><option value="Servidor AV">Servidor Audio y Visual</option></select>
     </div>
-    <div class="form-group" id="uMiembroAVWrap" style="display:none">
-      <label>Integrante de Audio y Visual</label>
-      <select id="uMiembroAV"></select>
-    </div>
     <div class="form-group" id="uMinisterioWrap">
-      <label>Ministerio Asignado</label>
-      <select id="uMinisterio"></select>
+      <label>Ministerio que lidera</label>
+      <select id="uMinisterio" onchange="toggleMinisterioField()"></select>
+      <input type="text" id="uMinisterioNuevo" maxlength="40" placeholder="Nombre del nuevo ministerio" style="display:none;margin-top:6px;">
     </div>
     <div class="modal-actions">
       <button class="btn btn-primary" onclick="saveUser()">Guardar</button>
@@ -1403,7 +1352,6 @@ async function doLogin(){
   document.getElementById('headerUsername').textContent = `${found.nombre} · ${roleText}`;
   document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='');
   document.getElementById('navUsuarios').style.display = found.rol==='Admin'?'':'none';
-  document.getElementById('navMinisterios').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navEventos').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navContabilidad').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navLog').style.display = found.rol==='Admin'?'':'none';
@@ -1475,7 +1423,7 @@ function initApp(){
   document.getElementById('fechaHoy').textContent = formatDate(today);
   document.getElementById('contFecha').value = today;
   document.getElementById('scFecha').value = getMostRecentPrimerDomingo();
-  minLlenarSelect('filtMinisterio',{todos:true});
+  minLlenarSelect('filtMinisterio');
   clearHistorialFilters(true);
   renderServiceButtons();
   renderMinFilterButtons();
@@ -1507,7 +1455,6 @@ function showSection(id,btn){
   if(id==='contabilidad') syncAndRender('contabilidad');
   if(id==='informes')     syncAndRender('informes');
   if(id==='av')           syncAndRender('av');
-  if(id==='ministerios')  syncAndRender('ministerios');
 }
 
 async function syncAndRender(section){
@@ -1533,7 +1480,6 @@ async function syncAndRender(section){
   if(section==='contabilidad')  renderContabilidad();
   if(section==='informes'){ onInformeSelectorChange(); renderInformesHist(); }
   if(section==='av')            renderAV();
-  if(section==='ministerios')   renderMinisterios();
 }
 
 async function refreshSectionData(section){
@@ -2123,20 +2069,35 @@ function filterUsuariosTable(v){ renderUsuariosTable(v); }
 function toggleMinisterioField(){
   const rol=document.getElementById('uRol').value;
   document.getElementById('uMinisterioWrap').style.display=rol==='Lider'?'block':'none';
-  document.getElementById('uMiembroAVWrap').style.display=rol===AV_ROL?'block':'none';
-  if(rol===AV_ROL){
-    const sel=document.getElementById('uMiembroAV'), cur=sel.value;
-    sel.innerHTML='<option value="">— Selecciona —</option>'+avPersonasAV().map(m=>`<option value="${m.id}">${avEsc(m.nombre+' '+m.apellido)}</option>`).join('');
-    sel.value=cur;
+  document.getElementById('uMinisterioNuevo').style.display=rol==='Lider'&&document.getElementById('uMinisterio').value===MIN_NUEVO?'block':'none';
+  document.getElementById('uMiembroHint').textContent=rol===AV_ROL?'obligatorio para Audio y Visual':'opcional';
+}
+// Buscador de miembros del formulario de usuario
+function uLlenarMiembros(sel){
+  const q=avNorm(document.getElementById('uMiembroBuscar').value);
+  const s=document.getElementById('uMiembro');
+  const cur=sel!==undefined?sel:s.value;
+  const lista=DB.miembros.filter(m=>m.id===cur||((m.activo!==false)&&(!q||avNorm([m.nombre,m.apellido,m.cedula,m.ministerio].join(' ')).includes(q))))
+    .sort((a,b)=>(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido));
+  s.innerHTML=`<option value="">— ${q?lista.length+' resultado(s)':'Selecciona un miembro'} —</option>`+lista.map(m=>`<option value="${m.id}">${avEsc(m.nombre+' '+m.apellido)} · ${avEsc(m.ministerio)}${m.cedula?' · '+avEsc(m.cedula):''}</option>`).join('');
+  s.value=cur||'';
+}
+// Al elegir el miembro se llena el nombre y, si es líder nuevo, su ministerio
+function uElegirMiembro(){
+  const m=DB.miembros.find(x=>x.id===document.getElementById('uMiembro').value); if(!m) return;
+  document.getElementById('uNombre').value=toTitleCaseName(m.nombre+' '+m.apellido);
+  if(!editUserId&&document.getElementById('uRol').value==='Lider'&&minNombres().includes(m.ministerio)){
+    document.getElementById('uMinisterio').value=m.ministerio; toggleMinisterioField();
   }
 }
 
 function openAddUser(){
   editUserId=null;
   document.getElementById('modalUserTitle').textContent='Agregar Usuario';
-  ['uEmail','uNombre','uPass'].forEach(id=>document.getElementById(id).value='');
+  ['uEmail','uNombre','uPass','uMiembroBuscar','uMinisterioNuevo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('uRol').value='Lider';
   minLlenarSelect('uMinisterio');
+  uLlenarMiembros('');
   toggleMinisterioField();
   openModal('addUser');
 }
@@ -2149,9 +2110,13 @@ function editUser(id){
   document.getElementById('uNombre').value=u.nombre;
   document.getElementById('uPass').value='';
   document.getElementById('uRol').value=u.rol;
+  ['uMiembroBuscar','uMinisterioNuevo'].forEach(id=>document.getElementById(id).value='');
   minLlenarSelect('uMinisterio',{actual:u.rol==='Lider'?u.ministerio:''});
+  // miembro vinculado: el ID guardado (Audio y Visual) o el que tenga el mismo nombre
+  const nom=avNorm(u.nombre);
+  const mv=u.rol===AV_ROL?DB.miembros.find(m=>m.id===u.ministerio):DB.miembros.find(m=>avNorm(m.nombre+' '+m.apellido)===nom);
+  uLlenarMiembros(mv?mv.id:'');
   toggleMinisterioField();
-  if(u.rol===AV_ROL) document.getElementById('uMiembroAV').value=u.ministerio||'';
   openModal('addUser');
 }
 
@@ -2161,9 +2126,19 @@ async function saveUser(){
   const pass=document.getElementById('uPass').value;
   const rol=document.getElementById('uRol').value;
   // Para "Servidor AV" la columna Ministerio guarda el ID del miembro vinculado
-  const ministerio=rol==='Lider'?document.getElementById('uMinisterio').value:(rol===AV_ROL?document.getElementById('uMiembroAV').value:'');
+  const miembro=document.getElementById('uMiembro').value;
+  let ministerio='';
+  if(rol==='Lider'){
+    ministerio=document.getElementById('uMinisterio').value;
+    if(ministerio===MIN_NUEVO){
+      ministerio=toTitleCaseName(document.getElementById('uMinisterioNuevo').value).replace(/['"<>`\\,]/g,'').trim();
+      if(!ministerio){ showToast('Escribe el nombre del nuevo ministerio','error'); return; }
+      const igual=minNombres().find(n=>avNorm(n)===avNorm(ministerio));
+      if(igual) ministerio=igual;
+    }
+  } else if(rol===AV_ROL) ministerio=miembro;
   if(!email||!nombre){ showToast('Email y nombre requeridos','error'); return; }
-  if(rol===AV_ROL&&!ministerio){ showToast('Selecciona el integrante de Audio y Visual','error'); return; }
+  if(rol===AV_ROL&&!ministerio){ showToast('Busca y selecciona el miembro','error'); return; }
   document.getElementById('uNombre').value=nombre;
   const exists=DB.usuarios.find(u=>u.email===email&&u.id!==editUserId);
   if(exists){ showToast('Ya existe un usuario con ese email','error'); return; }
@@ -2183,6 +2158,10 @@ async function saveUser(){
   }
   hideLoader();
   saveDB();closeModal('addUser');renderUsuariosTable();
+  // un ministerio nuevo aparece en filtros e informes
+  minLlenarSelect('filtMinisterio');
+  const selG=document.getElementById('infGrupo');
+  if(selG){ const v=selG.value; selG.innerHTML=gruposDisponibles().map(g=>`<option value="${g}">${g}</option>`).join(''); if(v) selG.value=v; }
   showToast('✓ Usuario guardado','success');
 }
 
@@ -4008,199 +3987,36 @@ function getCertHTML(m){
 }
 // ============================================================
 // MINISTERIOS
-// La lista se guarda en la hoja EVENTOS (Tipo cfg_ministerios, un solo registro):
-//   {lista:[{nombre, lider:ID_Miembro, usuario:ID_Usuario, servicios:[ids de SERVICES]}]}
-// Mientras no se guarde, se usan los 4 ministerios de siempre.
+// La lista sale de los usuarios con rol Líder (columna Ministerio) más los
+// 4 ministerios de siempre y los que ya tengan miembros. Un ministerio nuevo
+// se crea al asignárselo a un usuario líder.
 // ============================================================
 const MIN_BASE=['Jovenes','Caballeros','Damas','Adolescentes'];
 const MIN_PALETA=['#378ADD','#1D9E75','#D4537E','#9333ea','#c9a84c','#0891b2','#ea580c','#65a30d','#be123c','#4f46e5'];
-let editMinNombre=null;
+const MIN_NUEVO='__nuevo__';
 
-function minCfgRec(){ return DB.cfg.find(e=>e.tipo==='cfg_ministerios')||null; }
-function minLista(){
-  const rec=minCfgRec();
-  if(rec&&Array.isArray(rec.datos.lista)) return rec.datos.lista;
-  return MIN_BASE.map(n=>({nombre:n,lider:'',usuario:'',servicios:LIDER_SERVICES[n]||[]}));
+function minNombres(){
+  const lideres=DB.usuarios.filter(u=>u.rol==='Lider'&&u.activo!==false).map(u=>u.ministerio);
+  return [...new Set([...MIN_BASE,...lideres,...DB.miembros.map(m=>m.ministerio)].filter(Boolean))];
 }
-function minNombres(){ return minLista().map(m=>m.nombre); }
-function minDe(nombre){ return minLista().find(m=>m.nombre===nombre)||null; }
 // Servicios en los que el líder puede registrar asistencia (null = todos)
-function minServiciosDe(nombre){ const m=minDe(nombre); return m&&m.servicios&&m.servicios.length?m.servicios:null; }
+function minServiciosDe(nombre){ return LIDER_SERVICES[nombre]||null; }
 function minColor(nombre){
   if(CMIN[nombre]) return CMIN[nombre];
   let h=0; for(const c of String(nombre)) h=(h*31+c.charCodeAt(0))>>>0;
   return MIN_PALETA[h%MIN_PALETA.length];
 }
-// Ministerios configurados + los que ya tienen miembros (para no perder ninguno en filtros)
-function minTodos(){ return [...new Set([...minNombres(),...DB.miembros.map(m=>m.ministerio).filter(Boolean)])]; }
-function minLlenarSelect(id,{todos=false,actual=''}={}){
+function minLlenarSelect(id,{actual=''}={}){
   const sel=document.getElementById(id); if(!sel) return;
   const prev=actual||sel.value;
-  const lista=todos?minTodos():minNombres();
-  if(prev&&!lista.includes(prev)) lista.push(prev);
-  sel.innerHTML=(id==='filtMinisterio'?'<option value="">Todos los ministerios</option>':'')+lista.map(n=>`<option value="${avEsc(n)}">${avEsc(n)}</option>`).join('');
+  const lista=minNombres();
+  if(prev&&prev!==MIN_NUEVO&&!lista.includes(prev)) lista.push(prev);
+  sel.innerHTML=(id==='filtMinisterio'?'<option value="">Todos los ministerios</option>':'')
+    +lista.map(n=>`<option value="${avEsc(n)}">${avEsc(n)}</option>`).join('')
+    +(id==='uMinisterio'?`<option value="${MIN_NUEVO}">+ Nuevo ministerio…</option>`:'');
   sel.value=prev||(id==='filtMinisterio'?'':(lista[0]||''));
 }
 function visitorMinisterios(){ return [...new Set([...minNombres(),...VISITOR_MINISTERIOS])]; }
-
-// Usuario del líder: el vinculado, o un Lider de ese ministerio, o un Admin con el mismo nombre
-function minUsuarioDe(m){
-  if(m.usuario){ const u=DB.usuarios.find(x=>x.id===m.usuario); if(u) return u; }
-  const porMin=DB.usuarios.find(x=>x.rol==='Lider'&&x.ministerio===m.nombre&&x.activo!==false);
-  if(porMin) return porMin;
-  const nom=avNorm(avNombrePlano(m.lider));
-  return nom?DB.usuarios.find(x=>x.rol==='Admin'&&x.activo!==false&&avNorm(x.nombre)===nom)||null:null;
-}
-
-async function minGuardarLista(lista){
-  const rec=minCfgRec(), datos={lista};
-  if(rec){
-    rec.datos=datos;
-    await apiUpdate('EVENTOS',rec.id,{Fecha:avHoy(),Datos_JSON:JSON.stringify(datos)});
-  } else {
-    const r={id:'cfg'+Date.now(),tipo:'cfg_ministerios',fecha:avHoy(),datos,registrado_por:currentUser.nombre,ts:new Date().toISOString()};
-    DB.cfg.push(r);
-    await apiAdd('EVENTOS',{ID:r.id,Tipo:r.tipo,Fecha:r.fecha,Datos_JSON:JSON.stringify(datos),Registrado_Por:r.registrado_por,Timestamp:r.ts});
-  }
-}
-
-// ── listado ──
-function renderMinisterios(){
-  const body=document.getElementById('minBody'); if(!body) return;
-  const nomServ=id=>{const s=SERVICES.find(x=>x.id===id);return s?s.name:id;};
-  const lista=[...minLista()].sort((a,b)=>a.nombre.localeCompare(b.nombre));
-  const sinLider=lista.filter(m=>!m.lider||!minUsuarioDe(m)).length;
-  document.getElementById('minResumen').innerHTML=`${lista.length} ministerio(s)${sinLider?` · <strong style="color:var(--danger)">${sinLider} sin líder o sin usuario</strong>`:''}`;
-  body.innerHTML=lista.map(m=>{
-    const u=minUsuarioDe(m);
-    const n=DB.miembros.filter(x=>x.ministerio===m.nombre&&x.activo!==false).length;
-    return `<tr>
-      <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${minColor(m.nombre)};margin-right:8px;"></span><strong>${avEsc(m.nombre)}</strong></td>
-      <td>${m.lider?avNombre(m.lider):'<span class="badge badge-no">Sin líder</span>'}</td>
-      <td>${u?`${avEsc(u.email)} <span class="badge badge-${u.activo!==false?'si':'no'}">${u.rol==='Admin'?'Admin':(u.activo!==false?'Activo':'Inactivo')}</span>`:'<span class="badge badge-pend">Sin usuario</span>'}</td>
-      <td>${n}</td>
-      <td style="font-size:0.8rem">${(m.servicios&&m.servicios.length)?m.servicios.map(nomServ).join(', '):'Todos'}</td>
-      <td><button class="btn btn-warn btn-sm" onclick="minAbrir('${avEsc(m.nombre)}')">Editar</button></td>
-    </tr>`;
-  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin ministerios</td></tr>';
-}
-
-// ── modal ──
-function minLlenarLideres(sel){
-  const q=avNorm(document.getElementById('minLiderBuscar').value);
-  const s=document.getElementById('minLider');
-  const cur=sel!==undefined?sel:s.value;
-  const lista=DB.miembros.filter(m=>(m.activo!==false||m.id===cur)&&(!q||m.id===cur||avNorm([m.nombre,m.apellido,m.cedula,m.ministerio].join(' ')).includes(q)))
-    .sort((a,b)=>(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido));
-  s.innerHTML='<option value="">— Selecciona el líder —</option>'+lista.map(m=>`<option value="${m.id}">${avEsc(m.nombre+' '+m.apellido)} · ${avEsc(m.ministerio)}</option>`).join('');
-  s.value=cur||'';
-  minActualizarUsuario();
-}
-// Muestra el usuario existente o pide crear uno
-function minActualizarUsuario(){
-  const lider=document.getElementById('minLider').value;
-  const nombre=document.getElementById('minNombre').value.trim();
-  const prev=editMinNombre?minDe(editMinNombre):null;
-  const m={nombre:editMinNombre||nombre,lider,usuario:prev&&prev.lider===lider?prev.usuario:''};
-  const u=lider?minUsuarioDe(m):null;
-  const info=document.getElementById('minUsuarioInfo'), campos=document.getElementById('minUsuarioCampos');
-  if(!lider){ info.innerHTML='<span style="color:var(--gray)">Primero selecciona el líder.</span>'; campos.style.display='none'; return; }
-  if(u&&(u.rol==='Admin'||!prev||prev.lider===lider||!prev.lider)){
-    info.innerHTML=`✓ Ya tiene usuario: <strong>${avEsc(u.email)}</strong> (${avEsc(u.rol==='Lider'?'Líder':u.rol)})`;
-    campos.style.display='none'; return;
-  }
-  const viejo=prev&&prev.lider&&prev.lider!==lider?minUsuarioDe(prev):null;
-  info.innerHTML=`Crea el usuario con el que <strong>${avNombre(lider)}</strong> entrará a la app como líder de este ministerio.`+
-    (viejo&&viejo.rol==='Lider'?`<br><span style="color:var(--warn)">El usuario anterior (${avEsc(viejo.email)}) se desactivará.</span>`:'');
-  campos.style.display='block';
-  if(!document.getElementById('minUEmail').value){
-    const base=avNorm(avNombrePlano(lider)).split(/\s+/)[0]||'lider';
-    document.getElementById('minUEmail').value=`${base}.${avNorm(nombre||editMinNombre||'ministerio').replace(/[^a-z0-9]/g,'')}@icaep.app`;
-  }
-}
-function minAbrir(nombre){
-  const m=nombre?minDe(nombre):null;
-  editMinNombre=m?m.nombre:null;
-  document.getElementById('minTitulo').textContent=m?'Editar ministerio':'Nuevo ministerio';
-  const inp=document.getElementById('minNombre');
-  inp.value=m?m.nombre:'';
-  // el nombre se guarda en cada miembro, por eso no se renombra si ya tiene miembros o usuarios
-  const enUso=m&&(DB.miembros.some(x=>x.ministerio===m.nombre)||DB.usuarios.some(u=>u.rol==='Lider'&&u.ministerio===m.nombre));
-  inp.disabled=!!enUso;
-  document.getElementById('minNombreNota').style.display=enUso?'block':'none';
-  document.getElementById('minLiderBuscar').value='';
-  document.getElementById('minUEmail').value='';
-  document.getElementById('minUPass').value='';
-  document.getElementById('minServicios').innerHTML=SERVICES.map(s=>`<label><input type="checkbox" value="${s.id}" ${m&&(m.servicios||[]).includes(s.id)?'checked':''}> ${s.name}</label>`).join('');
-  minLlenarLideres(m?m.lider:'');
-  document.getElementById('minDelBtn').style.display=m?'':'none';
-  openModal('ministerio');
-}
-async function minGuardar(){
-  const nombre=toTitleCaseName(document.getElementById('minNombre').value).replace(/['"<>`\\]/g,'').trim();
-  const lider=document.getElementById('minLider').value;
-  const servicios=[...document.querySelectorAll('#minServicios input:checked')].map(i=>i.value);
-  if(!nombre){ showToast('Escribe el nombre del ministerio','error'); return; }
-  const lista=minLista().map(x=>({...x}));
-  const prev=editMinNombre?lista.find(x=>x.nombre===editMinNombre):null;
-  if(lista.some(x=>x!==prev&&avNorm(x.nombre)===avNorm(nombre))){ showToast('Ya existe un ministerio con ese nombre','error'); return; }
-  if(!lider){ showToast('Selecciona el líder del ministerio','error'); return; }
-
-  // usuario del líder (obligatorio)
-  const campos=document.getElementById('minUsuarioCampos').style.display!=='none';
-  let usuarioId=prev&&prev.lider===lider?prev.usuario:'';
-  let nuevoUsuario=null, desactivar=null;
-  if(campos){
-    const email=document.getElementById('minUEmail').value.trim().toLowerCase();
-    const pass=document.getElementById('minUPass').value;
-    if(!email){ showToast('Escribe el usuario del líder','error'); return; }
-    if(pass.length<6){ showToast('La contraseña debe tener mínimo 6 caracteres','error'); return; }
-    if(DB.usuarios.some(u=>u.email===email)){ showToast('Ya existe un usuario con ese correo/usuario','error'); return; }
-    nuevoUsuario={id:'u'+Date.now(),email,nombre:toTitleCaseName(avNombrePlano(lider)),pass,rol:'Lider',ministerio:nombre,activo:true};
-    usuarioId=nuevoUsuario.id;
-    if(prev&&prev.lider&&prev.lider!==lider){ const v=minUsuarioDe(prev); if(v&&v.rol==='Lider') desactivar=v; }
-  } else {
-    const u=minUsuarioDe({nombre:prev?prev.nombre:nombre,lider,usuario:usuarioId});
-    if(u) usuarioId=u.id;
-  }
-
-  const item={nombre,lider,usuario:usuarioId,servicios};
-  if(prev) Object.assign(prev,item); else lista.push(item);
-  showLoader('Guardando ministerio...');
-  if(nuevoUsuario){
-    DB.usuarios.push(nuevoUsuario);
-    await apiAdd('USUARIOS',{ID:nuevoUsuario.id,Email:nuevoUsuario.email,Nombre:nuevoUsuario.nombre,Password:nuevoUsuario.pass,Rol:'Lider',Ministerio:nombre,Activo:true});
-    addLog('usuario',`${currentUser.nombre} creó usuario líder: ${nuevoUsuario.nombre} (${nombre})`,'success');
-  }
-  if(desactivar){ desactivar.activo=false; await apiUpdate('USUARIOS',desactivar.id,{Activo:false}); }
-  await minGuardarLista(lista);
-  hideLoader(); saveDB(); closeModal('ministerio');
-  addLog('ministerio',`${currentUser.nombre} ${prev?'editó':'creó'} el ministerio ${nombre} (líder: ${avNombrePlano(lider)})`,'success');
-  minRefrescarListas(); renderMinisterios();
-  showToast(nuevoUsuario?`✓ Ministerio guardado y usuario creado: ${nuevoUsuario.email}`:'✓ Ministerio guardado','success');
-}
-function minBorrar(){
-  const m=minDe(editMinNombre); if(!m) return;
-  const n=DB.miembros.filter(x=>x.ministerio===m.nombre).length;
-  if(n){ showAlertModal(`"${m.nombre}" tiene ${n} miembro(s). Muévelos a otro ministerio antes de eliminarlo.`,'No se puede eliminar'); return; }
-  showConfirm(`¿Eliminar el ministerio "${m.nombre}"? Su usuario de líder se desactivará.`,async()=>{
-    showLoader('Eliminando...');
-    const u=minUsuarioDe(m);
-    if(u&&u.rol==='Lider'){ u.activo=false; await apiUpdate('USUARIOS',u.id,{Activo:false}); }
-    await minGuardarLista(minLista().filter(x=>x.nombre!==m.nombre));
-    hideLoader(); saveDB(); closeModal('ministerio');
-    addLog('ministerio',`${currentUser.nombre} eliminó el ministerio ${m.nombre}`,'warn');
-    minRefrescarListas(); renderMinisterios();
-    showToast('Ministerio eliminado');
-  });
-}
-// Vuelve a llenar los selectores que dependen de la lista
-function minRefrescarListas(){
-  minLlenarSelect('filtMinisterio',{todos:true});
-  minLlenarSelect('uMinisterio');
-  const selG=document.getElementById('infGrupo');
-  if(selG){ const v=selG.value; selG.innerHTML=gruposDisponibles().map(g=>`<option value="${g}">${g}</option>`).join(''); if(v) selG.value=v; }
-}
 
 // ============================================================
 // AUDIO Y VISUAL
