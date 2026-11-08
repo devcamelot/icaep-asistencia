@@ -133,7 +133,7 @@ tr:hover td{background:#fafaf7;}
 .av-turno-fecha{font-size:0.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
 .av-turno-serv{font-family:'Cinzel',serif;font-weight:700;font-size:0.95rem;}
 .av-turno-nombre{font-size:0.8rem;color:var(--warn);font-weight:700;}
-.av-rol{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--lightgray);font-size:0.88rem;}
+.av-rol{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 8px;padding:6px 0;border-top:1px dashed var(--lightgray);font-size:0.88rem;}
 .av-rol .av-rol-lbl{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);width:52px;flex-shrink:0;}
 .av-rol .av-rol-name{flex:1;font-weight:700;min-width:0;overflow-wrap:anywhere;}
 .av-asis{border:none;border-radius:20px;padding:3px 10px;font-size:0.71rem;font-weight:700;cursor:pointer;white-space:nowrap;}
@@ -142,6 +142,11 @@ tr:hover td{background:#fafaf7;}
 .av-asis.no{background:#fee2e2;color:#991b1b;}
 .av-asis.pend{background:#fef3c7;color:#92400e;}
 .av-asis.fut{background:var(--lightgray);color:var(--gray);}
+.av-reemp-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1.5px solid var(--lightgray);background:transparent;color:var(--navy);border-radius:7px;cursor:pointer;flex-shrink:0;}
+.av-reemp-btn:hover{border-color:var(--gold);background:#fdfbf6;}
+.av-reemp-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.av-reemp-nota{display:block;font-size:0.72rem;font-weight:400;color:var(--warn);margin-top:2px;}
+.av-rol > .av-reemp-nota{flex-basis:100%;margin:0 0 0 60px;}
 .av-disp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--lightgray);}
 .av-disp-row .av-disp-name{flex:1;min-width:160px;font-weight:700;}
 .av-disp-row .av-disp-hint{font-size:0.75rem;color:var(--gray);font-weight:400;display:block;margin-top:2px;}
@@ -929,7 +934,7 @@ tr:hover td{background:#fafaf7;}
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Integrante</th><th>Programado</th><th>Asistió</th><th>No asistió</th><th>Pendiente</th><th>Cumplimiento</th></tr></thead>
+              <thead><tr><th>Integrante</th><th>Programado</th><th>Asistió</th><th>No asistió</th><th>Pendiente</th><th>Fue reemplazado</th><th>Cumplimiento</th></tr></thead>
               <tbody id="avAsisBody"></tbody>
             </table>
           </div>
@@ -1031,6 +1036,22 @@ tr:hover td{background:#fafaf7;}
       <button class="btn btn-primary" onclick="avGuardarTurno()">Guardar</button>
       <button class="btn btn-danger" id="avTDelBtn" onclick="avBorrarTurno(editAvTurnoId)">Eliminar</button>
       <button class="btn btn-outline" onclick="closeModal('avTurno')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REEMPLAZO AUDIO Y VISUAL -->
+<div class="modal-overlay" id="modalAvReemplazo">
+  <div class="modal">
+    <h3>Reemplazar servidor</h3>
+    <p id="avRInfo" style="font-size:0.88rem;line-height:1.5;margin-bottom:1rem;"></p>
+    <div class="form-group"><label>Motivo de la novedad</label><select id="avRMotivo"></select></div>
+    <div class="form-group"><label>Detalle <span style="text-transform:none;font-weight:400;color:var(--gray)">(opcional)</span></label><input type="text" id="avRNota" maxlength="120" placeholder="Ej: Cita médica, turno de trabajo..."></div>
+    <div class="form-group"><label>Quién lo reemplaza</label><select id="avRNuevo"></select></div>
+    <button class="btn btn-outline btn-sm" onclick="avSugerirReemplazo()" style="margin-bottom:1rem;">Sugerir reemplazo</button>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="avGuardarReemplazo()">Guardar reemplazo</button>
+      <button class="btn btn-outline" onclick="closeModal('avReemplazo')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -4180,7 +4201,10 @@ function avTurnoCard(t,opts={}){
     const puede=esAdmin?(est!=='fut'&&est!=='none'):(t[r]===mio&&t.fecha===hoy);
     const btn=est==='none'?'':`<button class="av-asis ${est}" ${puede?`onclick="avToggleAsis('${t.id}','${r}')" title="${est==='si'?'Quitar asistencia':'Marcar asistencia'}"`:'disabled'}>${lbl}</button>`;
     const nombre=t[r]?avNombre(t[r])+(t[r]===mio&&!esAdmin?' (tú)':''):'<em style="color:var(--danger)">Sin asignar</em>';
-    return `<div class="av-rol"><span class="av-rol-lbl">${r==='audio'?'Audio':'Visual'}</span><span class="av-rol-name">${nombre}</span>${btn}</div>`;
+    const c=avUltimoCambio(t,r);
+    const nota=c?`<span class="av-reemp-nota" title="${avEsc(c.motivo+(c.nota?' — '+c.nota:''))}">↺ Reemplaza a ${avNombre(c.de)} · ${avEsc(c.motivo)}</span>`:'';
+    const reemp=avPuedeReemplazar(t,r)?`<button class="av-reemp-btn" title="Reemplazar (novedad)" aria-label="Reemplazar" onclick="avAbrirReemplazo('${t.id}','${r}')"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></button>`:'';
+    return `<div class="av-rol"><span class="av-rol-lbl">${r==='audio'?'Audio':'Visual'}</span><span class="av-rol-name">${nombre}</span>${reemp}${btn}${nota}</div>`;
   };
   const bloq=['audio','visual'].filter(r=>t[r]&&!avDisponible(t[r],t.fecha));
   return `<div class="av-turno ${avEsEstandar(t)?'':'campana'} ${t.fecha===hoy?'hoy':''}">
@@ -4216,6 +4240,61 @@ async function avToggleAsis(tid,rol){
   showToast(ex?'Asistencia quitada':'✓ Asistencia marcada','success');
 }
 
+// ── REEMPLAZOS ──
+// Cada cambio queda en datos.cambios: {rol, de, a, motivo, nota, por, ts}
+const AV_MOTIVOS_NOVEDAD=['Enfermedad','Trabajo','Viaje','Calamidad familiar','Otro'];
+let avReemp=null;
+function avUltimoCambio(t,r){ return [...(t.cambios||[])].reverse().find(c=>c.rol===r&&c.a===t[r])||null; }
+// Líder/Admin: cualquier turno no cumplido. Servidor: su propio turno, hoy o después.
+function avPuedeReemplazar(t,r){
+  if(!t[r]) return false;
+  const est=avEstado(t,r);
+  if(est==='si') return false;
+  if(avGestiona()) return true;
+  return t[r]===avMiId()&&t.fecha>=avHoy();
+}
+function avAbrirReemplazo(tid,r){
+  const t=avTurnos().find(x=>x.id===tid); if(!t||!avPuedeReemplazar(t,r)) return;
+  avReemp={tid,rol:r};
+  document.getElementById('avRInfo').innerHTML=`<strong>${avEsc(avServNombre(t))}</strong>${t.nombre?' · '+avEsc(t.nombre):''} — ${avDiaNombre(t.fecha)} ${formatDate(t.fecha)}<br>${r==='audio'?'Audio':'Visual'}: <strong>${avNombre(t[r])}</strong>`;
+  document.getElementById('avRMotivo').innerHTML=AV_MOTIVOS_NOVEDAD.map(m=>`<option>${m}</option>`).join('');
+  document.getElementById('avRNota').value='';
+  const otro=t[r==='audio'?'visual':'audio'];
+  const mismoDia=new Set(avTurnos().filter(x=>x.fecha===t.fecha&&x.id!==t.id).flatMap(x=>[x.audio,x.visual]).filter(Boolean));
+  const cands=avEquipo().filter(m=>m.id!==t[r]&&m.id!==otro);
+  document.getElementById('avRNuevo').innerHTML='<option value="">— Selecciona —</option>'+cands.map(m=>{
+    const extra=[!avDisponible(m.id,t.fecha)?'no disponible este mes':'',mismoDia.has(m.id)?'ya sirve ese día':''].filter(Boolean).join(', ');
+    return `<option value="${m.id}">${avEsc(m.nombre+' '+m.apellido)}${extra?' ('+extra+')':''}</option>`;
+  }).join('');
+  openModal('avReemplazo');
+}
+function avSugerirReemplazo(){
+  const t=avTurnos().find(x=>x.id===avReemp.tid); if(!t) return;
+  const r=avReemp.rol, otro=t[r==='audio'?'visual':'audio'];
+  const cnt=avConteos(avAddDays(t.fecha,-70),avAddDays(t.fecha,7),new Set());
+  const ocupados=new Set(avTurnos().filter(x=>x.fecha===t.fecha).flatMap(x=>[x.audio,x.visual]).filter(Boolean));
+  const disp=avEquipoIds().filter(id=>avDisponible(id,t.fecha)&&id!==t[r]&&id!==otro);
+  const id=avElegir(disp,cnt,r,ocupados)||avElegir(disp,cnt,r,new Set());
+  if(!id){ showToast('No hay integrantes disponibles para reemplazar','error'); return; }
+  document.getElementById('avRNuevo').value=id;
+}
+async function avGuardarReemplazo(){
+  const t=avTurnos().find(x=>x.id===avReemp.tid); if(!t) return;
+  const r=avReemp.rol, nuevo=document.getElementById('avRNuevo').value;
+  if(!avPuedeReemplazar(t,r)){ showToast('Este turno ya no se puede reemplazar','error'); return; }
+  if(!nuevo){ showToast('Selecciona quién lo reemplaza','error'); return; }
+  const motivo=document.getElementById('avRMotivo').value, nota=document.getElementById('avRNota').value.trim();
+  const rec=DB.av.find(e=>e.id===t.id);
+  const datos={...rec.datos};
+  datos.cambios=[...(datos.cambios||[]),{rol:r,de:t[r],a:nuevo,motivo,nota,por:currentUser.nombre,ts:new Date().toISOString()}];
+  datos[r]=nuevo;
+  showLoader('Guardando reemplazo...');
+  await avActualizar(t.id,rec.fecha,datos);
+  hideLoader(); saveDB(); closeModal('avReemplazo'); renderAVActual();
+  addLog('audiovisual',`${currentUser.nombre}: ${avNombrePlano(nuevo)} reemplaza a ${avNombrePlano(t[r])} en ${r} — ${avServNombre(t)} ${t.fecha} (${motivo}${nota?': '+nota:''})`,'warn');
+  showToast(`✓ ${avNombrePlano(nuevo)} reemplaza a ${avNombrePlano(t[r])}`,'success');
+}
+
 // ── MIS TURNOS (servidor) ──
 function renderAVMis(){
   const wrap=document.getElementById('avMisTurnos');
@@ -4248,6 +4327,13 @@ function renderAVMis(){
   </div>`;
   html+=`<h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:0.6rem;">Próximos turnos</h4>`;
   html+=proximos.length?`<div class="av-turnos" style="margin-bottom:1.5rem;">${proximos.map(t=>avTurnoCard(t)).join('')}</div>`:'<p class="av-empty">No tienes turnos programados.</p>';
+  const cedidos=avTurnos().filter(t=>t.fecha>=avAddDays(hoy,-60)&&(t.cambios||[]).some(c=>c.de===mio)&&t.audio!==mio&&t.visual!==mio).sort(avSortTurnos);
+  if(cedidos.length){
+    html+=`<h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:0.6rem;">Turnos en los que te reemplazaron</h4><div class="card" style="margin-bottom:1.5rem;">`+cedidos.map(t=>{
+      const c=[...t.cambios].reverse().find(x=>x.de===mio);
+      return `<div class="av-rol"><span style="flex:1">${avDiaNombre(t.fecha)} ${formatDate(t.fecha)} · ${avEsc(avServNombre(t))} (${c.rol==='audio'?'Audio':'Visual'})<span class="av-reemp-nota">Te reemplazó ${avNombre(c.a)} · ${avEsc(c.motivo)}</span></span></div>`;
+    }).join('')+'</div>';
+  }
   html+=`<h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:0.6rem;">Turnos anteriores (60 días)</h4>`;
   html+=pasados.length?`<div class="av-turnos">${pasados.map(t=>avTurnoCard(t)).join('')}</div>`:'<p class="av-empty">Sin turnos anteriores.</p>';
   wrap.innerHTML=html;
@@ -4435,7 +4521,7 @@ async function avGuardarTurno(){
   if(audio&&audio===visual){ showToast('Audio y visual deben ser personas distintas','error'); return; }
   if(std&&avTurnos().some(t=>t.id!==editAvTurnoId&&t.fecha===fecha&&t.servicio===servicio)){ showToast('Ese servicio ya está programado en esa fecha','error'); return; }
   const prev=editAvTurnoId?avTurnos().find(t=>t.id===editAvTurnoId):null;
-  const datos={fecha,servicio,nombre,audio,visual};
+  const datos={fecha,servicio,nombre,audio,visual,...(prev&&prev.cambios?{cambios:prev.cambios}:{})};
   showLoader('Guardando servicio...');
   if(prev){
     await avActualizar(prev.id,fecha,datos);
@@ -4535,10 +4621,12 @@ async function avGuardarDisp(){
 function avResumenMes(mes){
   const list=avTurnos().filter(t=>avMes(t.fecha)===mes).sort(avSortTurnos);
   const res={};
-  avEquipo().forEach(m=>res[m.id]={prog:0,si:0,no:0,pend:0});
+  const nuevo=()=>({prog:0,si:0,no:0,pend:0,reemp:0});
+  avEquipo().forEach(m=>res[m.id]=nuevo());
+  list.forEach(t=>(t.cambios||[]).forEach(c=>{ (res[c.de]=res[c.de]||nuevo()).reemp++; }));
   list.forEach(t=>['audio','visual'].forEach(r=>{
     if(!t[r]) return;
-    const x=res[t[r]]=res[t[r]]||{prog:0,si:0,no:0,pend:0};
+    const x=res[t[r]]=res[t[r]]||nuevo();
     const est=avEstado(t,r);
     x.prog++;
     if(est==='si') x.si++; else if(est==='no') x.no++; else x.pend++;
@@ -4552,9 +4640,9 @@ function renderAVAsis(){
     const eval_=x.si+x.no;
     const pct=eval_?Math.round(x.si*100/eval_):null;
     const col=pct===null?'var(--gray)':(pct>=90?'var(--success)':(pct>=70?'var(--warn)':'var(--danger)'));
-    return `<tr><td><strong>${avNombre(id)}</strong></td><td>${x.prog}</td><td>${x.si}</td><td>${x.no}</td><td>${x.pend}</td>
+    return `<tr><td><strong>${avNombre(id)}</strong></td><td>${x.prog}</td><td>${x.si}</td><td>${x.no}</td><td>${x.pend}</td><td>${x.reemp}</td>
       <td><strong style="color:${col}">${pct===null?'—':pct+'%'}</strong></td></tr>`;
-  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin integrantes</td></tr>';
+  }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:2rem">Sin integrantes</td></tr>';
   document.getElementById('avAsisTurnos').innerHTML=list.map(t=>avTurnoCard(t)).join('')
     ||'<div class="card" style="grid-column:1/-1"><p class="av-empty">No hay servicios programados en este mes.</p></div>';
 }
@@ -4563,7 +4651,11 @@ function avExportAsis(){
   const {list}=avResumenMes(mes);
   const lbl={si:'Asistió',no:'No asistió',pend:'Pendiente',fut:'Programado',none:'Sin asignar'};
   const data=[];
-  list.forEach(t=>['audio','visual'].forEach(r=>data.push({'Fecha':t.fecha,'Día':avDiaNombre(t.fecha),'Servicio':avServNombre(t),'Nombre':t.nombre||'','Rol':r==='audio'?'Audio':'Visual','Servidor':avNombrePlano(t[r])||'Sin asignar','Estado':lbl[avEstado(t,r)]})));
+  list.forEach(t=>['audio','visual'].forEach(r=>{
+    const c=avUltimoCambio(t,r);
+    data.push({'Fecha':t.fecha,'Día':avDiaNombre(t.fecha),'Servicio':avServNombre(t),'Nombre':t.nombre||'','Rol':r==='audio'?'Audio':'Visual','Servidor':avNombrePlano(t[r])||'Sin asignar','Estado':lbl[avEstado(t,r)],
+      'Reemplazó a':c?avNombrePlano(c.de):'','Motivo':c?c.motivo+(c.nota?' — '+c.nota:''):''});
+  }));
   if(!data.length){ showToast('No hay datos para exportar','error'); return; }
   const ws=XLSX.utils.json_to_sheet(data);
   const wb=XLSX.utils.book_new();
