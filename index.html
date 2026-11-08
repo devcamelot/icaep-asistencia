@@ -151,8 +151,6 @@ tr:hover td{background:#fafaf7;}
 .av-team-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--lightgray);border-radius:8px;cursor:pointer;font-size:0.88rem;}
 .av-team-item.on{border-color:var(--gold);background:#fdfbf6;font-weight:700;}
 .av-team-item > span{flex:1;min-width:0;}
-.av-lider-btn{border:1.5px solid var(--lightgray);background:transparent;color:var(--gray);border-radius:20px;padding:2px 9px;font-size:0.7rem;font-weight:700;cursor:pointer;white-space:nowrap;}
-.av-lider-btn.on{background:var(--gold);border-color:var(--gold);color:var(--navy);}
 .av-del-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1.5px solid #fecaca;background:transparent;color:var(--danger);cursor:pointer;border-radius:8px;}
 .av-del-btn:hover{background:#fee2e2;}
 .av-del-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
@@ -976,7 +974,7 @@ tr:hover td{background:#fafaf7;}
           </div>
           <div class="av-team-list" id="avEquipoList"></div>
           <h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin:1.5rem 0 0.6rem;">Acceso a la aplicación</h4>
-          <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Cada integrante necesita un usuario con rol <strong>Servidor Audio y Visual</strong> (se crea en Usuarios) para ver sus turnos y marcar su asistencia.</p>
+          <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Los <strong>líderes</strong> son los usuarios con rol <strong>Líder</strong> y ministerio <strong>Audio y Visual</strong>. Cada integrante necesita un usuario con rol <strong>Servidor Audio y Visual</strong> para ver sus turnos y marcar su asistencia. Ambos se crean en Usuarios.</p>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Integrante</th><th>Usuario</th><th>Estado</th></tr></thead>
@@ -1357,10 +1355,10 @@ async function doLogin(){
   document.getElementById('navLog').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navSantaCena').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navAV').style.display = found.rol==='Admin'||avEsLider()?'':'none';
-  avTab = found.rol===AV_ROL?'mis':'prog'; avSemana=null; avEquipoSel=null; avLideresSel=null;
+  avTab = found.rol===AV_ROL?'mis':'prog'; avSemana=null; avEquipoSel=null;
   initApp();
-  if(found.rol===AV_ROL){
-    // El servidor de Audio y Visual solo ve su programación
+  if(found.rol===AV_ROL||avEsLider()){
+    // Servidores y líderes de Audio y Visual solo ven su sección
     document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='none');
     const nb=document.getElementById('navAV'); nb.style.display='';
     showSection('av',nb);
@@ -3996,7 +3994,8 @@ const MIN_PALETA=['#378ADD','#1D9E75','#D4537E','#9333ea','#c9a84c','#0891b2','#
 const MIN_NUEVO='__nuevo__';
 
 function minNombres(){
-  const lideres=DB.usuarios.filter(u=>u.rol==='Lider'&&u.activo!==false).map(u=>u.ministerio);
+  // "Audio y Visual" no es un ministerio de miembros: no sale en filtros, visitantes ni informes
+  const lideres=DB.usuarios.filter(u=>u.rol==='Lider'&&u.activo!==false&&avNorm(u.ministerio)!==avNorm(AV_MINISTERIO)).map(u=>u.ministerio);
   return [...new Set([...MIN_BASE,...lideres,...DB.miembros.map(m=>m.ministerio)].filter(Boolean))];
 }
 // Servicios en los que el líder puede registrar asistencia (null = todos)
@@ -4013,6 +4012,7 @@ function minLlenarSelect(id,{actual=''}={}){
   if(prev&&prev!==MIN_NUEVO&&!lista.includes(prev)) lista.push(prev);
   sel.innerHTML=(id==='filtMinisterio'?'<option value="">Todos los ministerios</option>':'')
     +lista.map(n=>`<option value="${avEsc(n)}">${avEsc(n)}</option>`).join('')
+    +(id==='uMinisterio'&&!lista.includes(AV_MINISTERIO)?`<option value="${AV_MINISTERIO}">${AV_MINISTERIO}</option>`:'')
     +(id==='uMinisterio'?`<option value="${MIN_NUEVO}">+ Nuevo ministerio…</option>`:'');
   sel.value=prev||(id==='filtMinisterio'?'':(lista[0]||''));
 }
@@ -4027,8 +4027,8 @@ function visitorMinisterios(){ return [...new Set([...minNombres(),...VISITOR_MI
 // ============================================================
 const AV_ROL='Servidor AV';
 const AV_EQUIPO_INICIAL=['David William','German Padilla','Juan Atencio','Jeiner Castillo','Andres Alvis','Luis Bossio'];
-// Líderes de Audio y Visual: junto con los Admin son los únicos que pueden borrar programación
-const AV_LIDERES_INICIAL=['David William','Dario Padilla'];
+// Líderes de Audio y Visual: usuarios con rol Líder y ministerio "Audio y Visual" (hoja USUARIOS)
+const AV_MINISTERIO='Audio y Visual';
 const AV_SERVICIOS=[
   {id:'Miercoles',   name:'Miércoles',   dow:3, orden:1},
   {id:'Jueves',      name:'Jueves',      dow:4, orden:2},
@@ -4039,7 +4039,7 @@ const AV_ESPECIAL='Campaña';
 const AV_ESTADOS=['Bueno','Regular','Dañado','En reparación','De baja'];
 const AV_MOTIVOS=['No tomó Santa Cena','Incumplimiento','Permiso / viaje','Otro'];
 const AV_MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-let avTab='prog', avSemana=null, avInvArea='audio', editAvTurnoId=null, editAvInvId=null, avEquipoSel=null, avLideresSel=null;
+let avTab='prog', avSemana=null, avInvArea='audio', editAvTurnoId=null, editAvInvId=null, avEquipoSel=null;
 
 // ── utilidades ──
 function avEsc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -4083,17 +4083,24 @@ function avBuscarPorNombres(nombres){
   }).filter(Boolean);
 }
 function avEquipoSugerido(){ return avBuscarPorNombres(AV_EQUIPO_INICIAL); }
-function avLideresIds(){
-  const cfg=avEquipoGuardado();
-  const ids=cfg&&Array.isArray(cfg.datos.lideres)?cfg.datos.lideres:avBuscarPorNombres(AV_LIDERES_INICIAL);
-  return ids.filter(id=>DB.miembros.some(m=>m.id===id));
+function avEsUsuarioLider(u){ return !!u&&u.rol==='Lider'&&u.activo!==false&&avNorm(u.ministerio)===avNorm(AV_MINISTERIO); }
+function avUsuariosLideres(){ return DB.usuarios.filter(avEsUsuarioLider); }
+// Miembro que corresponde a un nombre de usuario: nombre completo exacto o, si es único, el que contenga todas sus palabras
+function avMiembroPorNombre(nombre){
+  const n=avNorm(nombre); if(!n) return null;
+  const exacto=DB.miembros.find(m=>avNorm(m.nombre+' '+m.apellido)===n);
+  if(exacto) return exacto;
+  const t=n.split(/\s+/);
+  const c=DB.miembros.filter(m=>{const f=avNorm(m.nombre+' '+m.apellido).split(/\s+/);return t.every(w=>f.includes(w));});
+  return c.length===1?c[0]:null;
 }
+function avLideresIds(){ return avUsuariosLideres().map(u=>avMiembroPorNombre(u.nombre)).filter(Boolean).map(m=>m.id); }
 // equipo + líderes (un líder puede no estar en la rotación)
 function avPersonasAV(){
   const ids=[...new Set([...avEquipoIds(),...avLideresIds()])];
   return ids.map(id=>DB.miembros.find(m=>m.id===id)).sort((a,b)=>(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido));
 }
-function avEsLider(){ const id=avMiId(); return !!id&&avLideresIds().includes(id); }
+function avEsLider(){ return avEsUsuarioLider(currentUser); }
 // Admin y líderes AV administran toda la sección (programar, editar, borrar, inventario, equipo)
 function avGestiona(){ return avEsAdmin()||avEsLider(); }
 function avPuedeBorrar(){ return avGestiona(); }
@@ -4106,8 +4113,7 @@ function avEquipo(){ return avEquipoIds().map(id=>DB.miembros.find(m=>m.id===id)
 function avMiId(){
   if(!currentUser) return '';
   if(currentUser.rol===AV_ROL&&currentUser.ministerio) return currentUser.ministerio;
-  const n=avNorm(currentUser.nombre);
-  const m=avPersonasAV().find(x=>avNorm(x.nombre+' '+x.apellido)===n);
+  const m=avMiembroPorNombre(currentUser.nombre);
   return m?m.id:'';
 }
 
@@ -4137,7 +4143,7 @@ function avTabsDisponibles(){
   if(!avGestiona()) return [['mis','Mis turnos'],['prog','Programación']];
   const tabs=[['prog','Programación'],['disp','Disponibilidad'],['asis','Asistencia'],['inv','Inventario'],['equipo','Equipo']];
   // un líder que también sirve conserva su pestaña de turnos
-  return currentUser.rol===AV_ROL?[['mis','Mis turnos'],...tabs]:tabs;
+  return avEsLider()?[['mis','Mis turnos'],...tabs]:tabs;
 }
 function avSetTab(id){ avTab=id; renderAV(); }
 function renderAV(){
@@ -4567,8 +4573,8 @@ function avExportAsis(){
 
 // ── EQUIPO ──
 function renderAVEquipo(keepSel){
-  if(!keepSel||!avEquipoSel){ avEquipoSel=new Set(avEquipoIds()); avLideresSel=new Set(avLideresIds()); }
-  const enLista=id=>avEquipoSel.has(id)||avLideresSel.has(id);
+  if(!keepSel||!avEquipoSel) avEquipoSel=new Set(avEquipoIds());
+  const enLista=id=>avEquipoSel.has(id);
   const q=avNorm(document.getElementById('avEquipoBuscar').value);
   // Sin búsqueda se muestra el equipo actual; la búsqueda recorre todos los miembros
   const miembros=DB.miembros
@@ -4578,18 +4584,22 @@ function renderAVEquipo(keepSel){
   document.getElementById('avEquipoList').innerHTML=(q?`<p style="grid-column:1/-1;font-size:0.8rem;color:var(--gray)">${miembros.length} resultado(s) de ${DB.miembros.length} miembros</p>`:'')+(miembros.map(m=>`<label class="av-team-item ${avEquipoSel.has(m.id)?'on':''}">
       <input type="checkbox" ${avEquipoSel.has(m.id)?'checked':''} onchange="avToggleEquipo('${m.id}',this.checked)">
       <span>${avEsc(m.nombre+' '+m.apellido)}<br><span style="font-size:0.72rem;color:var(--gray);font-weight:400">${avEsc(m.ministerio)}${m.cedula?' · '+avEsc(m.cedula):''}${m.activo===false?' · inactivo':''}</span></span>
-      <button type="button" class="av-lider-btn ${avLideresSel.has(m.id)?'on':''}" title="Los líderes pueden borrar programación" onclick="event.preventDefault();avToggleLider('${m.id}')">★ Líder</button>
     </label>`).join('')||`<p class="av-empty" style="grid-column:1/-1">${vacio}</p>`);
-  document.getElementById('avEquipoUsuarios').innerHTML=[...new Set([...avLideresSel,...avEquipoSel])].map(id=>{
+  const lideres=avUsuariosLideres().map(u=>{
+    const m=avMiembroPorNombre(u.nombre);
+    return `<tr><td><strong>${avEsc(m?m.nombre+' '+m.apellido:u.nombre)}</strong> <span class="badge badge-admin">Líder</span></td><td>${avEsc(u.email)}</td><td><span class="badge badge-si">Activo</span></td></tr>`;
+  });
+  const lidIds=new Set(avLideresIds());
+  const servidores=[...avEquipoSel].filter(id=>!lidIds.has(id)).map(id=>{
     const u=DB.usuarios.find(x=>x.rol===AV_ROL&&x.ministerio===id);
-    return `<tr><td><strong>${avNombre(id)}</strong>${avLideresSel.has(id)?' <span class="badge badge-admin">Líder</span>':''}</td><td>${u?avEsc(u.email):'<span style="color:var(--gray)">Sin usuario</span>'}</td>
+    return `<tr><td><strong>${avNombre(id)}</strong></td><td>${u?avEsc(u.email):'<span style="color:var(--gray)">Sin usuario</span>'}</td>
       <td>${u?`<span class="badge badge-${u.activo!==false?'si':'no'}">${u.activo!==false?'Activo':'Inactivo'}</span>`:'<span class="badge badge-pend">Crear en Usuarios</span>'}</td></tr>`;
-  }).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:1.5rem">Sin integrantes</td></tr>';
+  });
+  document.getElementById('avEquipoUsuarios').innerHTML=[...lideres,...servidores].join('')||'<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:1.5rem">Sin integrantes</td></tr>';
 }
 function avToggleEquipo(id,on){ if(on) avEquipoSel.add(id); else avEquipoSel.delete(id); renderAVEquipo(true); }
-function avToggleLider(id){ if(avLideresSel.has(id)) avLideresSel.delete(id); else avLideresSel.add(id); renderAVEquipo(true); }
 async function avGuardarEquipo(){
-  const datos={miembros:[...avEquipoSel],lideres:[...avLideresSel]};
+  const datos={miembros:[...avEquipoSel]};
   showLoader('Guardando equipo...');
   const cfg=avEquipoGuardado();
   if(cfg) await avActualizar(cfg.id,avHoy(),datos); else await avCrear('av_equipo',avHoy(),datos);
