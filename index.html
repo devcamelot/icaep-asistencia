@@ -4024,7 +4024,9 @@ function avPersonasAV(){
   return ids.map(id=>DB.miembros.find(m=>m.id===id)).sort((a,b)=>(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido));
 }
 function avEsLider(){ const id=avMiId(); return !!id&&avLideresIds().includes(id); }
-function avPuedeBorrar(){ return avEsAdmin()||avEsLider(); }
+// Admin y líderes AV administran toda la sección (programar, editar, borrar, inventario, equipo)
+function avGestiona(){ return avEsAdmin()||avEsLider(); }
+function avPuedeBorrar(){ return avGestiona(); }
 function avEquipoIds(){
   const cfg=avEquipoGuardado();
   const ids=cfg&&Array.isArray(cfg.datos.miembros)?cfg.datos.miembros:avEquipoSugerido();
@@ -4062,18 +4064,19 @@ function avEstado(t,rol){
 
 // ── navegación ──
 function avTabsDisponibles(){
-  return avEsAdmin()
-    ?[['prog','Programación'],['disp','Disponibilidad'],['asis','Asistencia'],['inv','Inventario'],['equipo','Equipo']]
-    :[['mis','Mis turnos'],['prog','Programación']];
+  if(!avGestiona()) return [['mis','Mis turnos'],['prog','Programación']];
+  const tabs=[['prog','Programación'],['disp','Disponibilidad'],['asis','Asistencia'],['inv','Inventario'],['equipo','Equipo']];
+  // un líder que también sirve conserva su pestaña de turnos
+  return currentUser.rol===AV_ROL?[['mis','Mis turnos'],...tabs]:tabs;
 }
 function avSetTab(id){ avTab=id; renderAV(); }
 function renderAV(){
   const tabs=avTabsDisponibles();
   if(!tabs.some(t=>t[0]===avTab)) avTab=tabs[0][0];
-  document.getElementById('avSubtitulo').textContent=avEsAdmin()?'Programación, asistencia e inventario del equipo':'Tus turnos de servicio en Audio y Visual';
+  document.getElementById('avSubtitulo').textContent=avGestiona()?'Programación, asistencia e inventario del equipo':'Tus turnos de servicio en Audio y Visual';
   document.getElementById('avTabs').innerHTML=tabs.map(([id,l])=>`<button class="sub-tab ${id===avTab?'active':''}" onclick="avSetTab('${id}')">${l}</button>`).join('');
   document.querySelectorAll('.av-pane').forEach(p=>p.style.display=p.id==='avPane-'+avTab?'block':'none');
-  document.querySelectorAll('.av-admin-only').forEach(el=>el.style.display=avEsAdmin()?'':'none');
+  document.querySelectorAll('.av-admin-only').forEach(el=>el.style.display=avGestiona()?'':'none');
   document.querySelectorAll('.av-borrar-only').forEach(el=>el.style.display=avPuedeBorrar()?'':'none');
   renderAVActual();
 }
@@ -4094,7 +4097,7 @@ function avOpcionesMeses(selId){
 
 // ── tarjeta de un turno ──
 function avTurnoCard(t,opts={}){
-  const hoy=avHoy(), esAdmin=avEsAdmin(), mio=avMiId();
+  const hoy=avHoy(), esAdmin=avGestiona(), mio=avMiId();
   const rol=r=>{
     const est=avEstado(t,r);
     const lbl={si:'✓ Asistió',no:'✗ No asistió',pend:'Pendiente',fut:'Programado',none:''}[est];
@@ -4123,7 +4126,7 @@ function avTurnoCard(t,opts={}){
 
 async function avToggleAsis(tid,rol){
   const t=avTurnos().find(x=>x.id===tid); if(!t||!t[rol]) return;
-  if(!avEsAdmin()&&(t[rol]!==avMiId()||t.fecha!==avHoy())){ showToast('Solo puedes marcar tu asistencia el día de tu turno','error'); return; }
+  if(!avGestiona()&&(t[rol]!==avMiId()||t.fecha!==avHoy())){ showToast('Solo puedes marcar tu asistencia el día de tu turno','error'); return; }
   const ex=avAsisDe(t,rol);
   showLoader('Guardando asistencia...');
   if(ex){
@@ -4194,7 +4197,7 @@ function renderAVProg(){
   const bloq=Object.keys(avBloqueos(avMes(lunes))).length;
   document.getElementById('avProgNota').textContent=`Equipo: ${eq.length} integrantes${bloq?` · ${bloq} no disponible(s) en ${avMesLabel(avMes(lunes))}`:''}. Se programan miércoles, jueves y domingo (1ra y 2da), una persona en audio y otra en visual.`;
   document.getElementById('avTurnosGrid').innerHTML=list.map(t=>avTurnoCard(t)).join('')
-    ||`<div class="card" style="grid-column:1/-1"><p class="av-empty">No hay programación para esta semana.${avEsAdmin()?' Pulsa <strong>Generar semana</strong>.':''}</p></div>`;
+    ||`<div class="card" style="grid-column:1/-1"><p class="av-empty">No hay programación para esta semana.${avGestiona()?' Pulsa <strong>Generar semana</strong>.':''}</p></div>`;
 }
 
 function avNuevoConteo(){ return {t:0,audio:0,visual:0,sem:0}; }
