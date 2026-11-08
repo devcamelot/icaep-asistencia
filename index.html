@@ -965,7 +965,7 @@ tr:hover td{background:#fafaf7;}
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-primary btn-sm" onclick="avAbrirScanner()">📷 Escanear QR</button>
               <button class="btn btn-primary btn-sm" onclick="avAbrirInv(null)">+ Agregar equipo</button>
-              <button class="btn btn-outline btn-sm" onclick="avImprimirQRs()">Imprimir QR</button>
+              <button class="btn btn-outline btn-sm" onclick="avElegirTamQR()">Imprimir QR</button>
               <button class="btn btn-gold btn-sm" onclick="avExportInv()">Exportar Excel</button>
             </div>
           </div>
@@ -1076,6 +1076,17 @@ tr:hover td{background:#fafaf7;}
       <button class="btn btn-gold" id="avQRBtnImp">Imprimir</button>
       <button class="btn btn-outline" onclick="closeModal('avQR')">Cerrar</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL TAMAÑO DE ETIQUETA QR -->
+<div class="modal-overlay" id="modalAvQRTam">
+  <div class="modal" style="max-width:400px;">
+    <h3>Tamaño de la etiqueta</h3>
+    <p id="avQRTamInfo" style="font-size:0.85rem;color:var(--gray);margin-bottom:1rem;"></p>
+    <div id="avQRTamOps" style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;"></div>
+    <p style="font-size:0.75rem;color:var(--gray);margin-bottom:1rem;">Imprime al 100 % (sin "ajustar a la página") para que la etiqueta salga del tamaño indicado.</p>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('avQRTam')">Cancelar</button></div>
   </div>
 </div>
 
@@ -4879,9 +4890,10 @@ function avInvUrl(id){
   const base=location.protocol.startsWith('http')?location.origin+location.pathname:'https://devcamelot.github.io/icaep-asistencia/';
   return base+'?inv='+encodeURIComponent(id);
 }
-async function avQRDataUrl(texto,celda=6){
+async function avQRDataUrl(texto,celda=6,correccion='M'){
   await avLib('qrcode');
-  const qr=qrcode(0,'M'); qr.addData(texto); qr.make();
+  // 'L' genera menos cuadritos: se lee mejor cuando la etiqueta es pequeña
+  const qr=qrcode(0,correccion); qr.addData(texto); qr.make();
   return qr.createDataURL(celda,celda*2);
 }
 function avAreaNombre(a){ return a==='audio'?'Audio':'Visual'; }
@@ -4895,7 +4907,7 @@ async function avVerQR(id){
     document.getElementById('avQRNombre').textContent=x.nombre;
     document.getElementById('avQRSub').textContent=[avAreaNombre(x.area),[x.marca,x.modelo].filter(Boolean).join(' '),x.serie?'S/N '+x.serie:''].filter(Boolean).join(' · ');
     document.getElementById('avQRBtnDesc').onclick=()=>avDescargarQR(x);
-    document.getElementById('avQRBtnImp').onclick=()=>avImprimirQRs([x]);
+    document.getElementById('avQRBtnImp').onclick=()=>{ closeModal('avQR'); avElegirTamQR([x]); };
     openModal('avQR');
   }catch(e){ showToast(e.message,'error'); }
 }
@@ -4915,27 +4927,49 @@ async function avDescargarQR(x){
   a.href=c.toDataURL('image/png'); a.download=`QR_${String(x.nombre).replace(/[^\w\-]+/g,'_')}.png`;
   document.body.appendChild(a); a.click(); a.remove();
 }
-async function avImprimirQRs(lista){
-  lista=lista||avInventario(avInvArea).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre)));
-  if(!lista.length){ showToast('No hay equipos para imprimir','error'); return; }
+// Tamaños de etiqueta en mm: el QR mide "qr" mm de lado
+const AV_QR_TAM={
+  grande:{nombre:'Grande',qr:40,txt:11,sub:8,detalle:'4 cm · consolas, proyectores, cajas'},
+  mediano:{nombre:'Mediano',qr:25,txt:8,sub:6,detalle:'2,5 cm · parlantes, cámaras, cables en rollo'},
+  pequeno:{nombre:'Pequeño',qr:15,txt:5.5,sub:0,detalle:'1,5 cm · micrófonos, receptores, petacas'}
+};
+let avQRLista=null;
+function avElegirTamQR(lista){
+  avQRLista=lista||avInventario(avInvArea).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre)));
+  if(!avQRLista.length){ showToast('No hay equipos para imprimir','error'); return; }
+  let ult='mediano'; try{ ult=localStorage.getItem('icaep_qr_tam')||ult; }catch(e){}
+  document.getElementById('avQRTamInfo').textContent=avQRLista.length===1?`Etiqueta para: ${avQRLista[0].nombre}`:`${avQRLista.length} etiquetas de ${avAreaNombre(avInvArea).toLowerCase()}`;
+  document.getElementById('avQRTamOps').innerHTML=Object.entries(AV_QR_TAM).map(([k,t])=>`<button class="btn ${k===ult?'btn-primary':'btn-outline'}" style="display:flex;align-items:center;gap:12px;text-align:left;" onclick="avImprimirQRs('${k}')">
+      <span style="display:inline-block;width:${Math.round(t.qr*0.9)}px;height:${Math.round(t.qr*0.9)}px;border:2px solid currentColor;border-radius:3px;flex-shrink:0;"></span>
+      <span><strong>${t.nombre}</strong><br><span style="font-weight:400;font-size:0.8rem;">${t.detalle}</span></span></button>`).join('');
+  openModal('avQRTam');
+}
+async function avImprimirQRs(tam){
+  const t=AV_QR_TAM[tam]||AV_QR_TAM.mediano, lista=avQRLista||[];
+  closeModal('avQRTam');
+  if(!lista.length) return;
+  try{ localStorage.setItem('icaep_qr_tam',tam); }catch(e){}
   const w=window.open('','_blank');
   if(!w){ showToast('Permite las ventanas emergentes para imprimir','error'); return; }
   w.document.write('<p style="font-family:sans-serif">Generando códigos QR...</p>');
   try{
     const items=[];
-    for(const x of lista) items.push({x,url:await avQRDataUrl(avInvUrl(x.id),5)});
-    const e=avEsc;
+    for(const x of lista) items.push({x,url:await avQRDataUrl(avInvUrl(x.id),6,t.qr<=25?'L':'M')});
+    const e=avEsc, ancho=t.qr+4;
     w.document.open();
-    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>QR inventario</title><style>
-      body{font-family:Arial,sans-serif;margin:12px;color:#0f1f3d}
-      .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
-      .et{border:1px dashed #999;border-radius:6px;padding:8px;text-align:center;break-inside:avoid}
-      .et img{width:140px;height:140px;image-rendering:pixelated}
-      .n{font-weight:bold;font-size:13px;margin-top:4px}.s{font-size:10px;color:#555}
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>QR inventario · ${t.nombre}</title><style>
+      @page{margin:8mm}
+      body{font-family:Arial,sans-serif;margin:0;color:#0f1f3d}
+      .np{margin:10px 0;font-size:14px}
+      .grid{display:flex;flex-wrap:wrap;gap:2mm}
+      .et{width:${ancho}mm;box-sizing:border-box;border:0.2mm dashed #999;padding:1.5mm;text-align:center;break-inside:avoid;page-break-inside:avoid}
+      .et img{display:block;margin:0 auto;width:${t.qr}mm;height:${t.qr}mm;image-rendering:pixelated}
+      .n{font-weight:bold;font-size:${t.txt}pt;line-height:1.15;margin-top:0.8mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .s{font-size:${t.sub}pt;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       @media print{.np{display:none}}
     </style></head><body>
-      <p class="np"><button onclick="print()">Imprimir</button> ${lista.length} etiqueta(s)</p>
-      <div class="grid">${items.map(({x,url})=>`<div class="et"><img src="${url}" alt=""><div class="n">${e(x.nombre)}</div><div class="s">ICAEP · ${avAreaNombre(x.area)}${x.serie?' · S/N '+e(x.serie):''}</div></div>`).join('')}</div>
+      <p class="np"><button onclick="print()">Imprimir</button> ${lista.length} etiqueta(s) · ${t.nombre} (${t.qr/10} cm). Imprime al 100 %.</p>
+      <div class="grid">${items.map(({x,url})=>`<div class="et"><img src="${url}" alt=""><div class="n">${e(x.nombre)}</div>${t.sub?`<div class="s">${avAreaNombre(x.area)}${x.serie?' · S/N '+e(x.serie):''}</div>`:''}</div>`).join('')}</div>
       <script>window.onload=()=>setTimeout(()=>print(),300)<\/script>
     </body></html>`);
     w.document.close();
