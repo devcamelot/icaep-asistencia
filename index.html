@@ -4931,8 +4931,11 @@ async function avDescargarQR(x){
 const AV_QR_TAM={
   grande:{nombre:'Grande',qr:40,txt:11,sub:8,detalle:'4 cm · consolas, proyectores, cajas'},
   mediano:{nombre:'Mediano',qr:25,txt:8,sub:6,detalle:'2,5 cm · parlantes, cámaras, cables en rollo'},
-  pequeno:{nombre:'Pequeño',qr:15,txt:5.5,sub:0,detalle:'1,5 cm · micrófonos, receptores, petacas'}
+  pequeno:{nombre:'Pequeño',qr:15,txt:5.5,sub:0,detalle:'1,5 cm · micrófonos, receptores, petacas'},
+  // Mini: guarda solo el código del equipo (menos cuadritos); se lee con el escáner de la app
+  mini:{nombre:'Mini (chip)',qr:10,txt:4,sub:0,corto:true,detalle:'1 cm · micrófonos delgados. Se lee solo con "Escanear QR" de la app'}
 };
+const AV_QR_PREFIJO='ICAEP-';
 let avQRLista=null;
 function avElegirTamQR(lista){
   avQRLista=lista||avInventario(avInvArea).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre)));
@@ -4954,15 +4957,15 @@ async function avImprimirQRs(tam){
   w.document.write('<p style="font-family:sans-serif">Generando códigos QR...</p>');
   try{
     const items=[];
-    for(const x of lista) items.push({x,url:await avQRDataUrl(avInvUrl(x.id),6,t.qr<=25?'L':'M')});
-    const e=avEsc, ancho=t.qr+4;
+    for(const x of lista) items.push({x,url:await avQRDataUrl(t.corto?AV_QR_PREFIJO+x.id:avInvUrl(x.id),6,t.qr<=25?'L':'M')});
+    const e=avEsc, ancho=t.qr+(t.corto?3:4);
     w.document.open();
     w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>QR inventario · ${t.nombre}</title><style>
       @page{margin:8mm}
       body{font-family:Arial,sans-serif;margin:0;color:#0f1f3d}
       .np{margin:10px 0;font-size:14px}
       .grid{display:flex;flex-wrap:wrap;gap:2mm}
-      .et{width:${ancho}mm;box-sizing:border-box;border:0.2mm dashed #999;padding:1.5mm;text-align:center;break-inside:avoid;page-break-inside:avoid}
+      .et{width:${ancho}mm;box-sizing:border-box;border:0.2mm dashed #999;padding:${t.corto?1:1.5}mm;text-align:center;break-inside:avoid;page-break-inside:avoid}
       .et img{display:block;margin:0 auto;width:${t.qr}mm;height:${t.qr}mm;image-rendering:pixelated}
       .n{font-weight:bold;font-size:${t.txt}pt;line-height:1.15;margin-top:0.8mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .s{font-size:${t.sub}pt;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -5046,6 +5049,7 @@ function avIdDesdeQR(txt){
   txt=String(txt||'').trim();
   try{ const u=new URL(txt); const id=u.searchParams.get('inv'); if(id) return id; }catch(e){}
   const m=txt.match(/[?&]inv=([^&\s#]+)/); if(m) return decodeURIComponent(m[1]);
+  if(txt.startsWith(AV_QR_PREFIJO)) return txt.slice(AV_QR_PREFIJO.length);
   return txt;
 }
 function avProcesarQR(txt){
