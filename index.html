@@ -125,17 +125,18 @@ tr:hover td{background:#fafaf7;}
 /* ── AUDIO Y VISUAL ── */
 .av-week-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
 .av-week-nav .av-week-label{font-weight:700;font-size:0.95rem;min-width:180px;text-align:center;}
-.av-turnos{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.av-turnos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px;}
 .av-turno{background:var(--white);border:1px solid var(--lightgray);border-top:4px solid var(--gold);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow);}
 .av-turno.campana{border-top-color:var(--warn);}
 .av-turno.hoy{border-top-color:var(--success);}
 .av-turno-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:0.6rem;}
+.av-turno-head > div:first-child{min-width:0;}
 .av-turno-fecha{font-size:0.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
 .av-turno-serv{font-family:'Cinzel',serif;font-weight:700;font-size:0.95rem;}
 .av-turno-nombre{font-size:0.8rem;color:var(--warn);font-weight:700;}
 .av-rol{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 8px;padding:6px 0;border-top:1px dashed var(--lightgray);font-size:0.88rem;}
 .av-rol .av-rol-lbl{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);width:52px;flex-shrink:0;}
-.av-rol .av-rol-name{flex:1;font-weight:700;min-width:0;overflow-wrap:anywhere;}
+.av-rol .av-rol-name{flex:1 1 0;font-weight:700;min-width:80px;overflow-wrap:break-word;}
 .av-asis{border:none;border-radius:20px;padding:3px 10px;font-size:0.71rem;font-weight:700;cursor:pointer;white-space:nowrap;}
 .av-asis[disabled]{cursor:default;}
 .av-asis.si{background:#dcfce7;color:#166534;}
