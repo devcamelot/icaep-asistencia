@@ -4886,9 +4886,22 @@ function avLib(nombre){
     document.head.appendChild(s);
   });
 }
+// Código corto del equipo (5 caracteres, siempre el mismo para un ID) para que el QR
+// tenga pocos cuadritos y se pueda leer pequeño con la cámara del celular
+function avCodigoCorto(id){
+  let h=0x811c9dc5;
+  for(const c of String(id)){ h^=c.charCodeAt(0); h=Math.imul(h,0x01000193)>>>0; }
+  return (h%60466176).toString(36).padStart(5,'0');
+}
 function avInvUrl(id){
   const base=location.protocol.startsWith('http')?location.origin+location.pathname:'https://devcamelot.github.io/icaep-asistencia/';
-  return base+'?inv='+encodeURIComponent(id);
+  return base+'?'+avCodigoCorto(id);
+}
+// Busca por ID completo (etiquetas anteriores) o por código corto
+function avBuscarInv(clave){
+  if(!clave) return null;
+  const inv=avInventario();
+  return inv.find(i=>i.id===clave)||inv.find(i=>avCodigoCorto(i.id)===clave)||null;
 }
 async function avQRDataUrl(texto,celda=6,correccion='M'){
   await avLib('qrcode');
@@ -4932,8 +4945,7 @@ const AV_QR_TAM={
   grande:{nombre:'Grande',qr:40,txt:11,sub:8,detalle:'4 cm · consolas, proyectores, cajas'},
   mediano:{nombre:'Mediano',qr:25,txt:8,sub:6,detalle:'2,5 cm · parlantes, cámaras, cables en rollo'},
   pequeno:{nombre:'Pequeño',qr:15,txt:5.5,sub:0,detalle:'1,5 cm · micrófonos, receptores, petacas'},
-  // Mini: guarda solo el código del equipo (menos cuadritos); se lee con el escáner de la app
-  mini:{nombre:'Mini (chip)',qr:10,txt:4,sub:0,corto:true,detalle:'1 cm · micrófonos delgados. Se lee solo con "Escanear QR" de la app'}
+  mini:{nombre:'Mini (chip)',qr:12,txt:4,sub:0,mini:true,detalle:'1,2 cm · micrófonos delgados'}
 };
 const AV_QR_PREFIJO='ICAEP-';
 let avQRLista=null;
@@ -4957,15 +4969,15 @@ async function avImprimirQRs(tam){
   w.document.write('<p style="font-family:sans-serif">Generando códigos QR...</p>');
   try{
     const items=[];
-    for(const x of lista) items.push({x,url:await avQRDataUrl(t.corto?AV_QR_PREFIJO+x.id:avInvUrl(x.id),6,t.qr<=25?'L':'M')});
-    const e=avEsc, ancho=t.qr+(t.corto?3:4);
+    for(const x of lista) items.push({x,url:await avQRDataUrl(avInvUrl(x.id),6,t.qr<=25?'L':'M')});
+    const e=avEsc, ancho=t.qr+(t.mini?3:4);
     w.document.open();
     w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>QR inventario · ${t.nombre}</title><style>
       @page{margin:8mm}
       body{font-family:Arial,sans-serif;margin:0;color:#0f1f3d}
       .np{margin:10px 0;font-size:14px}
       .grid{display:flex;flex-wrap:wrap;gap:2mm}
-      .et{width:${ancho}mm;box-sizing:border-box;border:0.2mm dashed #999;padding:${t.corto?1:1.5}mm;text-align:center;break-inside:avoid;page-break-inside:avoid}
+      .et{width:${ancho}mm;box-sizing:border-box;border:0.2mm dashed #999;padding:${t.mini?1:1.5}mm;text-align:center;break-inside:avoid;page-break-inside:avoid}
       .et img{display:block;margin:0 auto;width:${t.qr}mm;height:${t.qr}mm;image-rendering:pixelated}
       .n{font-weight:bold;font-size:${t.txt}pt;line-height:1.15;margin-top:0.8mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .s{font-size:${t.sub}pt;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -5047,14 +5059,16 @@ async function avQRDesdeFoto(input){
 }
 function avIdDesdeQR(txt){
   txt=String(txt||'').trim();
-  try{ const u=new URL(txt); const id=u.searchParams.get('inv'); if(id) return id; }catch(e){}
+  try{
+    const u=new URL(txt); const id=u.searchParams.get('inv'); if(id) return id;
+    const c=u.search.match(/^\?([0-9a-z]{5})$/); if(c) return c[1];
+  }catch(e){}
   const m=txt.match(/[?&]inv=([^&\s#]+)/); if(m) return decodeURIComponent(m[1]);
   if(txt.startsWith(AV_QR_PREFIJO)) return txt.slice(AV_QR_PREFIJO.length);
   return txt;
 }
 function avProcesarQR(txt){
-  const id=avIdDesdeQR(txt);
-  const x=avInventario().find(i=>i.id===id);
+  const x=avBuscarInv(avIdDesdeQR(txt));
   if(!x){ avScanEstado('Este código QR no corresponde a ningún equipo del inventario.'); if(avScanStream){ avScanActivo=true; setTimeout(avScanLoop,1500);} return; }
   if(navigator.vibrate) navigator.vibrate(80);
   avCerrarScanner();
@@ -5101,13 +5115,17 @@ function avEditarDesdeFicha(){ const id=avEquipoAbierto; closeModal('avEquipo');
 function avQRDesdeFicha(){ const id=avEquipoAbierto; closeModal('avEquipo'); avVerQR(id); }
 
 // Enlace ?inv=<id> (QR leído con la cámara del celular): abrir el equipo después de iniciar sesión
-(function(){ try{ const id=new URLSearchParams(location.search).get('inv'); if(id) avPendienteInv=id; }catch(e){} })();
+(function(){ try{
+  const id=new URLSearchParams(location.search).get('inv');
+  const c=location.search.match(/^\?([0-9a-z]{5})$/);
+  if(id) avPendienteInv=id; else if(c) avPendienteInv=c[1];
+}catch(e){} })();
 function avAbrirPendiente(){
   if(!avPendienteInv) return;
   const id=avPendienteInv; avPendienteInv=null;
   try{ history.replaceState(null,'',location.pathname); }catch(e){}
   if(!avGestiona()){ showToast('Solo los líderes de Audio y Visual pueden gestionar el inventario','error'); return; }
-  const x=avInventario().find(i=>i.id===id);
+  const x=avBuscarInv(id);
   if(!x){ showToast('Este QR no corresponde a ningún equipo del inventario','error'); return; }
   const nb=document.getElementById('navAV'); nb.style.display='';
   showSection('av',nb); avInvArea=x.area; avSetTab('inv'); avSetInvArea(x.area);
