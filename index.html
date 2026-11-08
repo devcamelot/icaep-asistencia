@@ -119,6 +119,40 @@ tr:hover td{background:#fafaf7;}
 .badge-no,.badge-false{background:#fee2e2;color:#991b1b;}
 .badge-admin{background:#fef3c7;color:#92400e;}
 .badge-lider{background:#e0f2fe;color:#075985;}
+.badge-servidor-av,.badge-audio{background:#ede9fe;color:#5b21b6;}
+.badge-visual{background:#cffafe;color:#155e75;}
+.badge-pend{background:#fef3c7;color:#92400e;}
+/* ── AUDIO Y VISUAL ── */
+.av-week-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
+.av-week-nav .av-week-label{font-weight:700;font-size:0.95rem;min-width:180px;text-align:center;}
+.av-turnos{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.av-turno{background:var(--white);border:1px solid var(--lightgray);border-top:4px solid var(--gold);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow);}
+.av-turno.campana{border-top-color:var(--warn);}
+.av-turno.hoy{border-top-color:var(--success);}
+.av-turno-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:0.6rem;}
+.av-turno-fecha{font-size:0.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.av-turno-serv{font-family:'Cinzel',serif;font-weight:700;font-size:0.95rem;}
+.av-turno-nombre{font-size:0.8rem;color:var(--warn);font-weight:700;}
+.av-rol{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--lightgray);font-size:0.88rem;}
+.av-rol .av-rol-lbl{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray);width:52px;flex-shrink:0;}
+.av-rol .av-rol-name{flex:1;font-weight:700;min-width:0;overflow-wrap:anywhere;}
+.av-asis{border:none;border-radius:20px;padding:3px 10px;font-size:0.71rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.av-asis[disabled]{cursor:default;}
+.av-asis.si{background:#dcfce7;color:#166534;}
+.av-asis.no{background:#fee2e2;color:#991b1b;}
+.av-asis.pend{background:#fef3c7;color:#92400e;}
+.av-asis.fut{background:var(--lightgray);color:var(--gray);}
+.av-disp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--lightgray);}
+.av-disp-row .av-disp-name{flex:1;min-width:160px;font-weight:700;}
+.av-disp-row .av-disp-hint{font-size:0.75rem;color:var(--gray);font-weight:400;display:block;margin-top:2px;}
+.av-disp-row select,.av-disp-row input{padding:6px 10px;border:1.5px solid var(--lightgray);border-radius:8px;font-family:'Lato',sans-serif;font-size:0.85rem;}
+.av-disp-row.bloq .av-disp-name{color:var(--danger);}
+.av-team-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;max-height:420px;overflow-y:auto;margin-top:0.8rem;}
+.av-team-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--lightgray);border-radius:8px;cursor:pointer;font-size:0.88rem;}
+.av-team-item.on{border-color:var(--gold);background:#fdfbf6;font-weight:700;}
+.av-mis-hoy{background:var(--navy);color:var(--white);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
+.av-mis-hoy h3{font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;margin-bottom:0.4rem;}
+.av-empty{color:var(--gray);font-size:0.9rem;padding:1rem 0;}
 .kpi-min-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:1.2rem;}
 .kpi-min-card{background:var(--white);border:1px solid var(--lightgray);border-top:4px solid var(--gold);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow);}
 .kpi-min-card.kpi-total{border-top-color:var(--navy);background:#fdfbf6;}
@@ -323,6 +357,7 @@ tr:hover td{background:#fafaf7;}
     <button id="navInformes" onclick="showSection('informes',this)">Informes</button>
     <button id="navEventos" onclick="showSection('eventos',this)" style="display:none">Eventos</button>
     <button id="navContabilidad" onclick="showSection('contabilidad',this)" style="display:none">Contabilidad</button>
+    <button id="navAV" onclick="showSection('av',this)" style="display:none">Audio y Visual</button>
     <button id="navLog" onclick="showSection('log',this)" style="display:none">Log</button>
   </nav>
   <main>
@@ -373,6 +408,13 @@ tr:hover td{background:#fafaf7;}
           <div class="form-group">
             <label>Nombre del evento extra</label>
             <input type="text" id="extraNombre" placeholder="Ej: Ayuno mañana, Retiro, Vigilia...">
+          </div>
+        </div>
+
+        <div id="servNombreWrap" style="margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Nombre del servicio <span style="text-transform:none;font-weight:400;color:var(--gray)">(opcional)</span></label>
+            <input type="text" id="servNombreOpc" maxlength="60" placeholder="Ej: Santa Cena, Campaña de sanidad, Aniversario...">
           </div>
         </div>
 
@@ -821,6 +863,125 @@ tr:hover td{background:#fafaf7;}
       </div>
     </div>
 
+
+    <!-- AUDIO Y VISUAL -->
+    <div id="sec-av" class="section">
+      <div class="section-header section-head-row">
+        <div><h2>Audio y Visual</h2><p id="avSubtitulo">Programación, asistencia e inventario del equipo</p></div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="refreshSectionData('av')" title="Refrescar">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+        </button>
+      </div>
+      <div class="sub-tabs" id="avTabs"></div>
+
+      <!-- Mis turnos (servidor) -->
+      <div id="avPane-mis" class="av-pane">
+        <div id="avMisTurnos"></div>
+      </div>
+
+      <!-- Programación semanal -->
+      <div id="avPane-prog" class="av-pane">
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="av-week-nav">
+            <button class="btn btn-outline btn-sm" onclick="avMoverSemana(-1)" title="Semana anterior">◀</button>
+            <span class="av-week-label" id="avWeekLabel"></span>
+            <button class="btn btn-outline btn-sm" onclick="avMoverSemana(1)" title="Semana siguiente">▶</button>
+            <button class="btn btn-outline btn-sm" onclick="avIrSemana(avHoy())">Esta semana</button>
+            <input type="date" class="search-box" id="avWeekPick" onchange="if(this.value)avIrSemana(this.value)" title="Ir a la semana de esta fecha">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm av-admin-only" id="avGenBtn" onclick="avGenerarClick()">Generar semana</button>
+            <button class="btn btn-gold btn-sm av-admin-only" onclick="avAbrirTurno(null)">+ Servicio especial / Campaña</button>
+            <button class="btn btn-outline btn-sm" onclick="avCopiarSemana()">Copiar para WhatsApp</button>
+          </div>
+          <p class="av-admin-only" id="avProgNota" style="font-size:0.8rem;color:var(--gray);margin-top:0.8rem;"></p>
+        </div>
+        <div class="av-turnos" id="avTurnosGrid"></div>
+      </div>
+
+      <!-- Disponibilidad del mes -->
+      <div id="avPane-disp" class="av-pane">
+        <div class="card">
+          <div class="toolbar">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Mes</label>
+              <select id="avDispMes" class="search-box" onchange="renderAVDisp()"></select>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="avGuardarDisp()">Guardar disponibilidad</button>
+          </div>
+          <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.5rem;">Marca como <strong>No disponible</strong> a quien no deba servir este mes. No se le programará ni aparecerá en las sugerencias.</p>
+          <div id="avDispList"></div>
+        </div>
+      </div>
+
+      <!-- Asistencia de servidores -->
+      <div id="avPane-asis" class="av-pane">
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="toolbar">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <label style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Mes</label>
+              <select id="avAsisMes" class="search-box" onchange="renderAVAsis()"></select>
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="avExportAsis()">Exportar Excel</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Integrante</th><th>Programado</th><th>Asistió</th><th>No asistió</th><th>Pendiente</th><th>Cumplimiento</th></tr></thead>
+              <tbody id="avAsisBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Toca el estado de un servidor para corregir su asistencia.</p>
+        <div class="av-turnos" id="avAsisTurnos"></div>
+      </div>
+
+      <!-- Inventario -->
+      <div id="avPane-inv" class="av-pane">
+        <div class="period-tabs" id="avInvAreaTabs">
+          <button class="period-tab active" data-area="audio" onclick="avSetInvArea('audio')">Audio</button>
+          <button class="period-tab" data-area="visual" onclick="avSetInvArea('visual')">Visual</button>
+        </div>
+        <div class="stats-grid" id="avInvStats"></div>
+        <div class="card">
+          <div class="toolbar">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;flex:1;">
+              <input class="search-box" id="avInvBuscar" placeholder="Buscar equipo, marca, serie..." oninput="renderAVInv()" style="flex:1;min-width:180px;max-width:300px;">
+              <select id="avInvEstado" class="search-box" onchange="renderAVInv()"></select>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="avAbrirInv(null)">+ Agregar equipo</button>
+              <button class="btn btn-gold btn-sm" onclick="avExportInv()">Exportar Excel</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Equipo</th><th>Marca / Modelo</th><th>Serie</th><th>Cant.</th><th>Estado</th><th>Ubicación</th><th>Notas</th><th></th></tr></thead>
+              <tbody id="avInvBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipo -->
+      <div id="avPane-equipo" class="av-pane">
+        <div class="card">
+          <div class="toolbar">
+            <input class="search-box" id="avEquipoBuscar" placeholder="Buscar miembro..." oninput="renderAVEquipo(true)" style="flex:1;max-width:300px;">
+            <button class="btn btn-primary btn-sm" onclick="avGuardarEquipo()">Guardar equipo</button>
+          </div>
+          <div id="avEquipoNota" style="font-size:0.85rem;color:var(--gray);"></div>
+          <div class="av-team-list" id="avEquipoList"></div>
+          <h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin:1.5rem 0 0.6rem;">Acceso a la aplicación</h4>
+          <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Cada integrante necesita un usuario con rol <strong>Servidor Audio y Visual</strong> (se crea en Usuarios) para ver sus turnos y marcar su asistencia.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Integrante</th><th>Usuario</th><th>Estado</th></tr></thead>
+              <tbody id="avEquipoUsuarios"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -854,6 +1015,47 @@ tr:hover td{background:#fafaf7;}
   </div>
 </div>
 
+<!-- MODAL TURNO AUDIO Y VISUAL -->
+<div class="modal-overlay" id="modalAvTurno">
+  <div class="modal">
+    <h3 id="avTurnoTitulo">Servicio</h3>
+    <div class="form-group"><label>Fecha</label><input type="date" id="avTFecha" onchange="avLlenarSelectsTurno()"></div>
+    <div class="form-group"><label>Servicio</label><select id="avTServ"></select></div>
+    <div class="form-group"><label>Nombre <span style="text-transform:none;font-weight:400;color:var(--gray)">(opcional)</span></label><input type="text" id="avTNombre" maxlength="60" placeholder="Ej: Campaña evangelística, Santa Cena..."></div>
+    <div class="form-group"><label>Audio</label><select id="avTAudio"></select></div>
+    <div class="form-group"><label>Visual</label><select id="avTVisual"></select></div>
+    <button class="btn btn-outline btn-sm" onclick="avSugerirTurno()" style="margin-bottom:1rem;">Sugerir integrantes</button>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="avGuardarTurno()">Guardar</button>
+      <button class="btn btn-danger" id="avTDelBtn" onclick="avBorrarTurno()">Eliminar</button>
+      <button class="btn btn-outline" onclick="closeModal('avTurno')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INVENTARIO AUDIO Y VISUAL -->
+<div class="modal-overlay" id="modalAvInv">
+  <div class="modal">
+    <h3 id="avInvTitulo">Equipo</h3>
+    <div class="form-group"><label>Área</label><select id="avIArea"><option value="audio">Audio</option><option value="visual">Visual</option></select></div>
+    <div class="form-group"><label>Equipo</label><input type="text" id="avINombre" placeholder="Ej: Consola, Micrófono inalámbrico, Proyector..."></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px;">
+      <div class="form-group"><label>Marca</label><input type="text" id="avIMarca"></div>
+      <div class="form-group"><label>Modelo</label><input type="text" id="avIModelo"></div>
+      <div class="form-group"><label>N° de serie</label><input type="text" id="avISerie"></div>
+      <div class="form-group"><label>Cantidad</label><input type="number" id="avICantidad" min="1" value="1"></div>
+      <div class="form-group"><label>Estado</label><select id="avIEstado"></select></div>
+      <div class="form-group"><label>Ubicación</label><input type="text" id="avIUbicacion" placeholder="Ej: Cabina, Bodega"></div>
+    </div>
+    <div class="form-group"><label>Notas</label><textarea id="avINotas" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="avGuardarInv()">Guardar</button>
+      <button class="btn btn-danger" id="avIDelBtn" onclick="avBorrarInv()">Eliminar</button>
+      <button class="btn btn-outline" onclick="closeModal('avInv')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL AGREGAR USUARIO -->
 <div class="modal-overlay" id="modalAddUser">
   <div class="modal">
@@ -862,7 +1064,11 @@ tr:hover td{background:#fafaf7;}
     <div class="form-group"><label>Nombre</label><input type="text" id="uNombre"></div>
     <div class="form-group"><label>Contraseña</label><input type="password" id="uPass" placeholder="Mínimo 6 caracteres"></div>
     <div class="form-group"><label>Rol</label>
-      <select id="uRol" onchange="toggleMinisterioField()"><option value="Admin">Admin</option><option value="Lider">Líder</option></select>
+      <select id="uRol" onchange="toggleMinisterioField()"><option value="Admin">Admin</option><option value="Lider">Líder</option><option value="Servidor AV">Servidor Audio y Visual</option></select>
+    </div>
+    <div class="form-group" id="uMiembroAVWrap" style="display:none">
+      <label>Integrante de Audio y Visual</label>
+      <select id="uMiembroAV"></select>
     </div>
     <div class="form-group" id="uMinisterioWrap">
       <label>Ministerio Asignado</label>
@@ -1010,7 +1216,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxo0QvDU14xDPLmrmblDQrS
 // ============================================================
 // BASE DE DATOS
 // ============================================================
-let DB = { usuarios:[], miembros:[], asistencia:[], log:[], santa_cena:[], visitantes:[], eventos:[], contabilidad:[], informes:[] };
+let DB = { usuarios:[], miembros:[], asistencia:[], log:[], santa_cena:[], visitantes:[], eventos:[], contabilidad:[], informes:[], av:[] };
 let DB_READY = false;
 
 function showLoader(msg='Cargando datos...'){
@@ -1020,7 +1226,15 @@ function showLoader(msg='Cargando datos...'){
 function hideLoader(){ document.getElementById('appLoader').style.display = 'none'; }
 
 function normalizeSheet(data){
+  const evs=(data.EVENTOS||[]).filter(r=>r.ID).map(r=>({
+    id:String(r.ID), tipo:String(r.Tipo||'').toLowerCase(),
+    fecha:String(r.Fecha||'').split('T')[0],
+    datos:(()=>{try{return JSON.parse(String(r.Datos_JSON||'{}'));}catch(e){return {};}})(),
+    registrado_por:String(r.Registrado_Por||''), ts:String(r.Timestamp||'')
+  }));
   return {
+    // Audio y Visual se guarda en la hoja EVENTOS con Tipo "av_*"
+    av: evs.filter(e=>e.tipo.startsWith('av_')),
     usuarios: (data.USUARIOS||[]).map(r=>({
       id:String(r.ID), email:String(r.Email||'').toLowerCase(),
       nombre:String(r.Nombre||''), pass:String(r.Password||''),
@@ -1058,12 +1272,7 @@ function normalizeSheet(data){
       ministerio:String(r.Ministerio||''), servicio:String(r.Servicio||''),
       registrado_por:String(r.Registrado_Por||'')
     })),
-    eventos: (data.EVENTOS||[]).filter(r=>r.ID).map(r=>({
-      id:String(r.ID), tipo:String(r.Tipo||'').toLowerCase(),
-      fecha:String(r.Fecha||'').split('T')[0],
-      datos:(()=>{try{return JSON.parse(String(r.Datos_JSON||'{}'));}catch(e){return {};}})(),
-      registrado_por:String(r.Registrado_Por||''), ts:String(r.Timestamp||'')
-    })),
+    eventos: evs.filter(e=>!e.tipo.startsWith('av_')),
     contabilidad: (data.CONTABILIDAD||[]).filter(r=>r.ID).map(r=>({
       id:String(r.ID), fecha:String(r.Fecha||'').split('T')[0],
       tipo:String(r.Tipo||''), descripcion:String(r.Descripcion||''),
@@ -1134,12 +1343,27 @@ async function doLogin(){
   document.getElementById('appShell').style.display='flex';
   const roleText = found.rol==='Lider'?`Lider de ${found.ministerio||'Ministerio'}`:found.rol;
   document.getElementById('headerUsername').textContent = `${found.nombre} · ${roleText}`;
+  document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='');
   document.getElementById('navUsuarios').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navEventos').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navContabilidad').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navLog').style.display = found.rol==='Admin'?'':'none';
   document.getElementById('navSantaCena').style.display = found.rol==='Admin'?'':'none';
+  document.getElementById('navAV').style.display = found.rol==='Admin'?'':'none';
+  avTab = found.rol===AV_ROL?'mis':'prog'; avSemana=null; avEquipoSel=null;
   initApp();
+  if(found.rol===AV_ROL){
+    // El servidor de Audio y Visual solo ve su programación
+    document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='none');
+    const nb=document.getElementById('navAV'); nb.style.display='';
+    showSection('av',nb);
+  } else {
+    // Volver al dashboard sin recargar (initApp ya lo pintó)
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.getElementById('sec-dashboard').classList.add('active');
+    document.querySelector('#mainNav button').classList.add('active');
+  }
 }
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
@@ -1222,6 +1446,7 @@ function showSection(id,btn){
   if(id==='eventos')      syncAndRender('eventos');
   if(id==='contabilidad') syncAndRender('contabilidad');
   if(id==='informes')     syncAndRender('informes');
+  if(id==='av')           syncAndRender('av');
 }
 
 async function syncAndRender(section){
@@ -1234,7 +1459,7 @@ async function syncAndRender(section){
       if(n.log.length) DB.log=n.log;
       DB.santa_cena=n.santa_cena; DB.visitantes=n.visitantes;
       DB.eventos=n.eventos; DB.contabilidad=n.contabilidad;
-      DB.informes=n.informes;
+      DB.informes=n.informes; DB.av=n.av;
     }
   }catch(e){}
   if(section==='dashboard')     renderDashboard();
@@ -1246,6 +1471,7 @@ async function syncAndRender(section){
   if(section==='eventos')       renderEventosList();
   if(section==='contabilidad')  renderContabilidad();
   if(section==='informes'){ onInformeSelectorChange(); renderInformesHist(); }
+  if(section==='av')            renderAV();
 }
 
 async function refreshSectionData(section){
@@ -1285,6 +1511,7 @@ function selectService(id,el){
   document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('extraServiceWrap').style.display=id==='Extra'?'block':'none';
+  document.getElementById('servNombreWrap').style.display=id==='Extra'?'none':'block';
   renderMinFilterButtons();
   renderMembersGrid();
   renderVisitantesList();
@@ -1330,6 +1557,8 @@ const SERVICE_DIAS = {
   'Extra':               null  // cualquier día
 };
 const DIA_NOMBRES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+// "Domingo 1ra: Santa Cena" → "Domingo 1ra"
+function servBase(serv){ return String(serv||'').split(':')[0].trim(); }
 
 function validarServicioFecha(servicio, fecha){
   if(!fecha) return {ok:false, msg:'Selecciona una fecha.'};
@@ -1446,9 +1675,11 @@ async function guardarAsistencia(){
   }
   const cena=false;
   const already=getAlreadyPresent(fecha);
+  // Nombre opcional: se guarda como "Servicio: Nombre" (mismo formato que los Extra)
+  const nombreOpc=document.getElementById('servNombreOpc').value.trim().replace(/:/g,' -');
   const servNombre=selectedService==='Extra'
     ?'Extra: '+document.getElementById('extraNombre').value.trim()
-    :selectedService;
+    :(nombreOpc?selectedService+': '+nombreOpc:selectedService);
   let nuevos=0;
   const rowsToSave=[];
   presentMembers.forEach(mid=>{
@@ -1481,6 +1712,7 @@ async function guardarAsistencia(){
   addLog('asistencia',`${currentUser.nombre} registró ${nuevos} asistencias — ${servNombre} — ${fecha}`,'success');
   saveDB();
   presentMembers.clear();
+  document.getElementById('servNombreOpc').value='';
   renderMembersGrid();
   checkDuplicates();
   showToast(`✓ ${nuevos} asistencias guardadas`,'success');
@@ -1814,8 +2046,8 @@ function renderUsuariosTable(filter=''){
   document.getElementById('usuariosBody').innerHTML=list.map(u=>`<tr>
     <td>${u.email}</td>
     <td><strong>${u.nombre}</strong></td>
-    <td><span class="badge badge-${u.rol.toLowerCase()}">${u.rol}</span></td>
-    <td>${u.ministerio||'—'}</td>
+    <td><span class="badge badge-${u.rol.toLowerCase().replace(/\s+/g,'-')}">${u.rol}</span></td>
+    <td>${u.rol===AV_ROL?avNombre(u.ministerio):(u.ministerio||'—')}</td>
     <td><span class="badge badge-${u.activo!==false?'si':'no'}">${u.activo!==false?'Activo':'Inactivo'}</span></td>
     <td style="display:flex;gap:4px;flex-wrap:wrap;">
       <button class="btn btn-warn btn-sm" onclick="editUser('${u.id}')">Editar</button>
@@ -1824,7 +2056,16 @@ function renderUsuariosTable(filter=''){
   </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin usuarios</td></tr>';
 }
 function filterUsuariosTable(v){ renderUsuariosTable(v); }
-function toggleMinisterioField(){ document.getElementById('uMinisterioWrap').style.display=document.getElementById('uRol').value==='Lider'?'block':'none'; }
+function toggleMinisterioField(){
+  const rol=document.getElementById('uRol').value;
+  document.getElementById('uMinisterioWrap').style.display=rol==='Lider'?'block':'none';
+  document.getElementById('uMiembroAVWrap').style.display=rol===AV_ROL?'block':'none';
+  if(rol===AV_ROL){
+    const sel=document.getElementById('uMiembroAV'), cur=sel.value;
+    sel.innerHTML='<option value="">— Selecciona —</option>'+avEquipo().map(m=>`<option value="${m.id}">${avEsc(m.nombre+' '+m.apellido)}</option>`).join('');
+    sel.value=cur;
+  }
+}
 
 function openAddUser(){
   editUserId=null;
@@ -1845,6 +2086,7 @@ function editUser(id){
   document.getElementById('uRol').value=u.rol;
   document.getElementById('uMinisterio').value=u.ministerio||'Jovenes';
   toggleMinisterioField();
+  if(u.rol===AV_ROL) document.getElementById('uMiembroAV').value=u.ministerio||'';
   openModal('addUser');
 }
 
@@ -1853,8 +2095,10 @@ async function saveUser(){
   const nombre=toTitleCaseName(document.getElementById('uNombre').value);
   const pass=document.getElementById('uPass').value;
   const rol=document.getElementById('uRol').value;
-  const ministerio=rol==='Lider'?document.getElementById('uMinisterio').value:'';
+  // Para "Servidor AV" la columna Ministerio guarda el ID del miembro vinculado
+  const ministerio=rol==='Lider'?document.getElementById('uMinisterio').value:(rol===AV_ROL?document.getElementById('uMiembroAV').value:'');
   if(!email||!nombre){ showToast('Email y nombre requeridos','error'); return; }
+  if(rol===AV_ROL&&!ministerio){ showToast('Selecciona el integrante de Audio y Visual','error'); return; }
   document.getElementById('uNombre').value=nombre;
   const exists=DB.usuarios.find(u=>u.email===email&&u.id!==editUserId);
   if(exists){ showToast('Ya existe un usuario con ese email','error'); return; }
@@ -1994,7 +2238,7 @@ function renderDashboard(){
   rows.forEach(r=>{
     if(!bautSet.has(r.miembro)) return;
     const min=mmap[r.miembro]||'General';
-    const sk=r.servicio.startsWith('Extra')?'Extra':r.servicio;
+    const sk=r.servicio.startsWith('Extra')?'Extra':servBase(r.servicio);
     (porFecha[r.fecha]=porFecha[r.fecha]||new Set()).add(r.miembro);
     addU(porMinFecha,min,r.fecha,r.miembro);
     addU(porServFecha,sk,r.fecha,r.miembro);
@@ -2424,6 +2668,7 @@ const ED_FILAS=[1,2,3,4,5];
 
 function colDeServicio(serv){
   if(!serv) return null;
+  serv=servBase(serv);
   if(serv==='Miercoles') return 'M';
   if(serv==='Jueves') return 'J';
   if(serv.startsWith('Sabado')) return 'S';
@@ -3696,6 +3941,638 @@ function getCertHTML(m){
     </div>
   </div>
 </div>`;
+}
+// ============================================================
+// AUDIO Y VISUAL
+// Todo se guarda en la hoja EVENTOS (Tipo av_*, datos en Datos_JSON):
+//   av_equipo → integrantes del equipo       av_disp → disponibilidad por mes
+//   av_turno  → un servicio con audio/visual  av_asis → asistencia de un servidor a un turno
+//   av_inv    → un equipo del inventario
+// ============================================================
+const AV_ROL='Servidor AV';
+const AV_EQUIPO_INICIAL=['David William','German Padilla','Juan Atencio','Jeiner Castillo','Andres Alvis','Luis Bossio'];
+const AV_SERVICIOS=[
+  {id:'Miercoles',   name:'Miércoles',   dow:3, orden:1},
+  {id:'Jueves',      name:'Jueves',      dow:4, orden:2},
+  {id:'Domingo 1ra', name:'Domingo 1ra', dow:0, orden:3},
+  {id:'Domingo 2da', name:'Domingo 2da', dow:0, orden:4}
+];
+const AV_ESPECIAL='Campaña';
+const AV_ESTADOS=['Bueno','Regular','Dañado','En reparación','De baja'];
+const AV_MOTIVOS=['No tomó Santa Cena','Incumplimiento','Permiso / viaje','Otro'];
+const AV_MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+let avTab='prog', avSemana=null, avInvArea='audio', editAvTurnoId=null, editAvInvId=null, avEquipoSel=null;
+
+// ── utilidades ──
+function avEsc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function avYmd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function avParse(s){ const [y,m,d]=String(s).split('-').map(Number); return new Date(y,m-1,d); }
+function avHoy(){ return avYmd(new Date()); }
+function avAddDays(s,n){ const d=avParse(s); d.setDate(d.getDate()+n); return avYmd(d); }
+function avLunes(s){ const d=avParse(s); d.setDate(d.getDate()-((d.getDay()+6)%7)); return avYmd(d); }
+function avNorm(v){ return String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
+function avDiaNombre(s){ const n=DIA_NOMBRES[avParse(s).getDay()]; return n.charAt(0).toUpperCase()+n.slice(1); }
+function avMes(fecha){ return String(fecha).slice(0,7); }
+function avMesLabel(mes){ const [y,m]=mes.split('-').map(Number); return AV_MESES[m-1]+' '+y; }
+function avEsAdmin(){ return !!currentUser&&currentUser.rol==='Admin'; }
+function avNombrePlano(id){ const m=DB.miembros.find(x=>x.id===id); return m?(m.nombre+' '+m.apellido).trim():''; }
+function avNombre(id){ return avEsc(avNombrePlano(id))||'—'; }
+function avNuevoId(){ return 'av'+Date.now()+Math.random().toString(36).slice(2,7); }
+
+// ── registros en EVENTOS ──
+function avList(tipo){ return DB.av.filter(e=>e.tipo===tipo); }
+async function avCrear(tipo,fecha,datos){
+  const rec={id:avNuevoId(),tipo,fecha,datos,registrado_por:currentUser.nombre,ts:new Date().toISOString()};
+  DB.av.push(rec);
+  await apiAdd('EVENTOS',{ID:rec.id,Tipo:tipo,Fecha:fecha,Datos_JSON:JSON.stringify(datos),Registrado_Por:rec.registrado_por,Timestamp:rec.ts});
+  return rec;
+}
+async function avActualizar(id,fecha,datos){
+  const rec=DB.av.find(e=>e.id===id); if(!rec) return;
+  rec.fecha=fecha; rec.datos=datos;
+  await apiUpdate('EVENTOS',id,{Fecha:fecha,Datos_JSON:JSON.stringify(datos)});
+}
+async function avBorrar(id){ DB.av=DB.av.filter(e=>e.id!==id); await apiDelete('EVENTOS',id); }
+
+// ── equipo ──
+function avEquipoGuardado(){ return avList('av_equipo')[0]||null; }
+function avEquipoSugerido(){
+  const activos=DB.miembros.filter(m=>m.activo!==false);
+  return AV_EQUIPO_INICIAL.map(n=>{
+    const t=avNorm(n).split(/\s+/);
+    const m=activos.find(x=>{const full=avNorm(x.nombre+' '+x.apellido).split(/\s+/);return t.every(w=>full.includes(w));});
+    return m?m.id:null;
+  }).filter(Boolean);
+}
+function avEquipoIds(){
+  const cfg=avEquipoGuardado();
+  const ids=cfg&&Array.isArray(cfg.datos.miembros)?cfg.datos.miembros:avEquipoSugerido();
+  return ids.filter(id=>DB.miembros.some(m=>m.id===id));
+}
+function avEquipo(){ return avEquipoIds().map(id=>DB.miembros.find(m=>m.id===id)).sort((a,b)=>(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido)); }
+function avMiId(){
+  if(!currentUser) return '';
+  if(currentUser.rol===AV_ROL&&currentUser.ministerio) return currentUser.ministerio;
+  const n=avNorm(currentUser.nombre);
+  const m=avEquipo().find(x=>avNorm(x.nombre+' '+x.apellido)===n);
+  return m?m.id:'';
+}
+
+// ── disponibilidad ──
+function avDispRec(mes){ return avList('av_disp').find(e=>e.datos.mes===mes); }
+function avBloqueos(mes){ const r=avDispRec(mes); return (r&&r.datos.bloqueados)||{}; }
+function avDisponible(id,fecha){ return !avBloqueos(avMes(fecha))[id]; }
+
+// ── turnos y asistencia ──
+function avTurnos(){ return avList('av_turno').map(e=>({...e.datos,id:e.id,fecha:e.datos.fecha||e.fecha})); }
+function avEsEstandar(t){ return AV_SERVICIOS.some(s=>s.id===t.servicio); }
+function avOrden(t){ const s=AV_SERVICIOS.find(x=>x.id===t.servicio); return s?s.orden:5; }
+function avServNombre(t){ const s=AV_SERVICIOS.find(x=>x.id===t.servicio); return s?s.name:(t.servicio||AV_ESPECIAL); }
+function avSortTurnos(a,b){ return a.fecha.localeCompare(b.fecha)||avOrden(a)-avOrden(b); }
+function avFechaServicio(lunes,s){ return avAddDays(lunes,(s.dow+6)%7); }
+function avAsisDe(t,rol){ return avList('av_asis').find(e=>e.datos.turno===t.id&&e.datos.rol===rol&&e.datos.miembro===t[rol]); }
+// 'si' asistió · 'no' no asistió · 'pend' hoy sin marcar · 'fut' programado · 'none' sin asignar
+function avEstado(t,rol){
+  if(!t[rol]) return 'none';
+  if(avAsisDe(t,rol)) return 'si';
+  const hoy=avHoy();
+  return t.fecha>hoy?'fut':(t.fecha===hoy?'pend':'no');
+}
+
+// ── navegación ──
+function avTabsDisponibles(){
+  return avEsAdmin()
+    ?[['prog','Programación'],['disp','Disponibilidad'],['asis','Asistencia'],['inv','Inventario'],['equipo','Equipo']]
+    :[['mis','Mis turnos'],['prog','Programación']];
+}
+function avSetTab(id){ avTab=id; renderAV(); }
+function renderAV(){
+  const tabs=avTabsDisponibles();
+  if(!tabs.some(t=>t[0]===avTab)) avTab=tabs[0][0];
+  document.getElementById('avSubtitulo').textContent=avEsAdmin()?'Programación, asistencia e inventario del equipo':'Tus turnos de servicio en Audio y Visual';
+  document.getElementById('avTabs').innerHTML=tabs.map(([id,l])=>`<button class="sub-tab ${id===avTab?'active':''}" onclick="avSetTab('${id}')">${l}</button>`).join('');
+  document.querySelectorAll('.av-pane').forEach(p=>p.style.display=p.id==='avPane-'+avTab?'block':'none');
+  document.querySelectorAll('.av-admin-only').forEach(el=>el.style.display=avEsAdmin()?'':'none');
+  renderAVActual();
+}
+function renderAVActual(){
+  const f={mis:renderAVMis,prog:renderAVProg,disp:renderAVDisp,asis:renderAVAsis,inv:renderAVInv,equipo:renderAVEquipo}[avTab];
+  if(f) f();
+}
+function avOpcionesMeses(selId){
+  const sel=document.getElementById(selId);
+  const actual=sel.value||avMes(avHoy());
+  const base=new Date(); base.setDate(1);
+  const opts=[];
+  for(let i=-6;i<=6;i++){ const d=new Date(base.getFullYear(),base.getMonth()+i,1); const mes=avYmd(d).slice(0,7); opts.push(`<option value="${mes}">${avMesLabel(mes)}</option>`); }
+  sel.innerHTML=opts.join('');
+  sel.value=actual;
+  return sel.value;
+}
+
+// ── tarjeta de un turno ──
+function avTurnoCard(t,opts={}){
+  const hoy=avHoy(), esAdmin=avEsAdmin(), mio=avMiId();
+  const rol=r=>{
+    const est=avEstado(t,r);
+    const lbl={si:'✓ Asistió',no:'✗ No asistió',pend:'Pendiente',fut:'Programado',none:''}[est];
+    const puede=esAdmin?(est!=='fut'&&est!=='none'):(t[r]===mio&&t.fecha===hoy);
+    const btn=est==='none'?'':`<button class="av-asis ${est}" ${puede?`onclick="avToggleAsis('${t.id}','${r}')" title="${est==='si'?'Quitar asistencia':'Marcar asistencia'}"`:'disabled'}>${lbl}</button>`;
+    const nombre=t[r]?avNombre(t[r])+(t[r]===mio&&!esAdmin?' (tú)':''):'<em style="color:var(--danger)">Sin asignar</em>';
+    return `<div class="av-rol"><span class="av-rol-lbl">${r==='audio'?'Audio':'Visual'}</span><span class="av-rol-name">${nombre}</span>${btn}</div>`;
+  };
+  const bloq=['audio','visual'].filter(r=>t[r]&&!avDisponible(t[r],t.fecha));
+  return `<div class="av-turno ${avEsEstandar(t)?'':'campana'} ${t.fecha===hoy?'hoy':''}">
+    <div class="av-turno-head">
+      <div>
+        <div class="av-turno-fecha">${avDiaNombre(t.fecha)} · ${formatDate(t.fecha)}${t.fecha===hoy?' · HOY':''}</div>
+        <div class="av-turno-serv">${avEsc(avServNombre(t))}</div>
+        ${t.nombre?`<div class="av-turno-nombre">${avEsc(t.nombre)}</div>`:''}
+      </div>
+      ${esAdmin&&!opts.sinEditar?`<button class="btn btn-outline btn-sm" onclick="avAbrirTurno('${t.id}')">Editar</button>`:''}
+    </div>
+    ${rol('audio')}${rol('visual')}
+    ${esAdmin&&bloq.length?`<div style="font-size:0.75rem;color:var(--danger);margin-top:6px;">⚠️ ${bloq.map(r=>avNombre(t[r])).join(' y ')} no está disponible este mes</div>`:''}
+  </div>`;
+}
+
+async function avToggleAsis(tid,rol){
+  const t=avTurnos().find(x=>x.id===tid); if(!t||!t[rol]) return;
+  if(!avEsAdmin()&&(t[rol]!==avMiId()||t.fecha!==avHoy())){ showToast('Solo puedes marcar tu asistencia el día de tu turno','error'); return; }
+  const ex=avAsisDe(t,rol);
+  showLoader('Guardando asistencia...');
+  if(ex){
+    await avBorrar(ex.id);
+    addLog('audiovisual',`${currentUser.nombre} quitó la asistencia de ${avNombrePlano(t[rol])} (${rol}) — ${avServNombre(t)} — ${t.fecha}`,'warn');
+  } else {
+    await avCrear('av_asis',t.fecha,{turno:t.id,rol,miembro:t[rol],fecha:t.fecha,marcado_por:currentUser.nombre});
+    addLog('audiovisual',`${currentUser.nombre} marcó asistencia de ${avNombrePlano(t[rol])} (${rol}) — ${avServNombre(t)} — ${t.fecha}`,'success');
+  }
+  hideLoader(); saveDB(); renderAVActual();
+  showToast(ex?'Asistencia quitada':'✓ Asistencia marcada','success');
+}
+
+// ── MIS TURNOS (servidor) ──
+function renderAVMis(){
+  const wrap=document.getElementById('avMisTurnos');
+  const mio=avMiId();
+  if(!mio){ wrap.innerHTML='<div class="card"><p class="av-empty">Tu usuario todavía no está vinculado a un integrante de Audio y Visual. Pídele al líder que lo vincule en Usuarios.</p></div>'; return; }
+  const hoy=avHoy();
+  const mios=avTurnos().filter(t=>t.audio===mio||t.visual===mio).sort(avSortTurnos);
+  const deHoy=mios.filter(t=>t.fecha===hoy);
+  const proximos=mios.filter(t=>t.fecha>hoy);
+  const pasados=mios.filter(t=>t.fecha<hoy&&t.fecha>=avAddDays(hoy,-60)).reverse();
+  const rolDe=t=>t.audio===mio?'audio':'visual';
+  let html='';
+  if(deHoy.length){
+    html+=deHoy.map(t=>{
+      const r=rolDe(t), est=avEstado(t,r);
+      return `<div class="av-mis-hoy">
+        <h3>Hoy te toca servir</h3>
+        <p style="margin-bottom:0.9rem;">${avEsc(avServNombre(t))}${t.nombre?' · '+avEsc(t.nombre):''} — <strong>${r==='audio'?'Audio':'Visual'}</strong></p>
+        ${est==='si'
+          ?`<button class="btn btn-block" style="background:var(--success);color:#fff;" onclick="avToggleAsis('${t.id}','${r}')">✓ Asistencia marcada (tocar para quitar)</button>`
+          :`<button class="btn btn-gold btn-block" onclick="avToggleAsis('${t.id}','${r}')">Marcar mi asistencia</button>`}
+      </div>`;
+    }).join('');
+  }
+  const total=mios.filter(t=>t.fecha<=hoy&&t.fecha.startsWith(avMes(hoy)));
+  const cumplidos=total.filter(t=>avEstado(t,rolDe(t))==='si').length;
+  html+=`<div class="stats-grid">
+    <div class="stat-card"><div class="label">Próximos turnos</div><div class="value">${proximos.length}</div></div>
+    <div class="stat-card"><div class="label">Asistencias este mes</div><div class="value">${cumplidos}<span style="font-size:1rem;opacity:0.6">/${total.length}</span></div></div>
+  </div>`;
+  html+=`<h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:0.6rem;">Próximos turnos</h4>`;
+  html+=proximos.length?`<div class="av-turnos" style="margin-bottom:1.5rem;">${proximos.map(t=>avTurnoCard(t)).join('')}</div>`:'<p class="av-empty">No tienes turnos programados.</p>';
+  html+=`<h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin-bottom:0.6rem;">Turnos anteriores (60 días)</h4>`;
+  html+=pasados.length?`<div class="av-turnos">${pasados.map(t=>avTurnoCard(t)).join('')}</div>`:'<p class="av-empty">Sin turnos anteriores.</p>';
+  wrap.innerHTML=html;
+}
+
+// ── PROGRAMACIÓN SEMANAL ──
+function avMoverSemana(n){ avSemana=avAddDays(avSemana||avLunes(avHoy()),7*n); renderAVProg(); }
+function avIrSemana(fecha){ avSemana=avLunes(fecha); renderAVProg(); }
+function avTurnosSemana(lunes){ const dom=avAddDays(lunes,6); return avTurnos().filter(t=>t.fecha>=lunes&&t.fecha<=dom).sort(avSortTurnos); }
+function avFaltantesSemana(lunes){
+  const list=avTurnosSemana(lunes), hoy=avHoy();
+  return AV_SERVICIOS.filter(s=>avFechaServicio(lunes,s)>=hoy&&!list.some(t=>t.servicio===s.id&&t.fecha===avFechaServicio(lunes,s)));
+}
+function renderAVProg(){
+  if(!avSemana) avSemana=avLunes(avHoy());
+  const lunes=avSemana, dom=avAddDays(lunes,6);
+  document.getElementById('avWeekLabel').textContent=`${formatDate(lunes)} – ${formatDate(dom)}`;
+  document.getElementById('avWeekPick').value='';
+  const list=avTurnosSemana(lunes);
+  const faltan=avFaltantesSemana(lunes);
+  document.getElementById('avGenBtn').textContent=faltan.length?'Generar semana':'Reasignar semana';
+  const eq=avEquipoIds();
+  const bloq=Object.keys(avBloqueos(avMes(lunes))).length;
+  document.getElementById('avProgNota').textContent=`Equipo: ${eq.length} integrantes${bloq?` · ${bloq} no disponible(s) en ${avMesLabel(avMes(lunes))}`:''}. Se programan miércoles, jueves y domingo (1ra y 2da), una persona en audio y otra en visual.`;
+  document.getElementById('avTurnosGrid').innerHTML=list.map(t=>avTurnoCard(t)).join('')
+    ||`<div class="card" style="grid-column:1/-1"><p class="av-empty">No hay programación para esta semana.${avEsAdmin()?' Pulsa <strong>Generar semana</strong>.':''}</p></div>`;
+}
+
+function avNuevoConteo(){ return {t:0,audio:0,visual:0,sem:0}; }
+function avConteos(desde,hasta,excluir){
+  const cnt={};
+  avTurnos().filter(t=>t.fecha>=desde&&t.fecha<=hasta&&!excluir.has(t.id)).forEach(t=>['audio','visual'].forEach(r=>{
+    if(!t[r]) return;
+    const c=cnt[t[r]]=cnt[t[r]]||avNuevoConteo(); c.t++; c[r]++;
+  }));
+  return cnt;
+}
+// Elige al integrante con menos turnos recientes (y menos en la semana), rotando entre audio y visual
+function avElegir(cands,cnt,rol,excluir){
+  const ok=cands.filter(id=>!excluir.has(id));
+  if(!ok.length) return '';
+  const sc={}; ok.forEach(id=>{const c=cnt[id]||avNuevoConteo(); sc[id]=c.t*10+c.sem*25+c[rol]*3+Math.random();});
+  return ok.sort((a,b)=>sc[a]-sc[b])[0];
+}
+// Asigna audio y visual a un servicio; evita repetir persona el mismo día si hay alternativas
+function avAsignar(fecha,equipo,cnt,ocupados){
+  const disp=equipo.filter(id=>avDisponible(id,fecha));
+  const occ=ocupados[fecha]=ocupados[fecha]||new Set();
+  const pick=(rol,excl)=>{
+    let id=avElegir(disp,cnt,rol,new Set([...occ,...excl]));
+    if(!id) id=avElegir(disp,cnt,rol,new Set(excl));
+    if(id){ const c=cnt[id]=cnt[id]||avNuevoConteo(); c.t++; c[rol]++; c.sem++; occ.add(id); }
+    return id||'';
+  };
+  const audio=pick('audio',[]);
+  const visual=pick('visual',audio?[audio]:[]);
+  return {audio,visual};
+}
+
+function avGenerarClick(){
+  if(avFaltantesSemana(avSemana).length) avGenerarSemana(false);
+  else showConfirm('Esta semana ya está programada. ¿Quieres reasignar a los servidores? Los turnos que ya tienen asistencia marcada no se cambian.',()=>avGenerarSemana(true));
+}
+
+async function avGenerarSemana(regenerar){
+  const lunes=avSemana, dom=avAddDays(lunes,6);
+  const equipo=avEquipoIds();
+  if(equipo.length<2){ showAlertModal('Necesitas al menos 2 integrantes en el equipo. Configúralo en la pestaña "Equipo".','Equipo incompleto'); return; }
+  const hoy=avHoy();
+  const existentes=avTurnosSemana(lunes);
+  // solo se programa / reasigna de hoy en adelante
+  const reasignar=regenerar?existentes.filter(t=>t.fecha>=hoy&&!avAsisDe(t,'audio')&&!avAsisDe(t,'visual')):[];
+  const reIds=new Set(reasignar.map(t=>t.id));
+  const fijos=existentes.filter(t=>!reIds.has(t.id));
+  const cnt=avConteos(avAddDays(lunes,-70),dom,reIds);
+  const ocupados={};
+  fijos.forEach(t=>['audio','visual'].forEach(r=>{
+    if(!t[r]) return;
+    (cnt[t[r]]=cnt[t[r]]||avNuevoConteo()).sem++;
+    (ocupados[t.fecha]=ocupados[t.fecha]||new Set()).add(t[r]);
+  }));
+  const slots=[];
+  AV_SERVICIOS.forEach(s=>{
+    const fecha=avFechaServicio(lunes,s);
+    const ex=existentes.find(t=>t.fecha===fecha&&t.servicio===s.id);
+    if(fecha<hoy||(ex&&!reIds.has(ex.id))) return;
+    slots.push(ex||{id:null,fecha,servicio:s.id,nombre:''});
+  });
+  reasignar.filter(t=>!avEsEstandar(t)).forEach(t=>slots.push(t));
+  if(!slots.length){ showToast(regenerar?'No hay turnos próximos para reasignar':'No quedan servicios por programar en esta semana','success'); return; }
+  slots.sort(avSortTurnos);
+
+  const avisos=[], nuevos=[], cambios=[];
+  slots.forEach(sl=>{
+    const {audio,visual}=avAsignar(sl.fecha,equipo,cnt,ocupados);
+    if(!audio||!visual) avisos.push(`${avDiaNombre(sl.fecha)} ${formatDate(sl.fecha)} (${avServNombre(sl)})`);
+    const datos={fecha:sl.fecha,servicio:sl.servicio,nombre:sl.nombre||'',audio,visual};
+    if(sl.id) cambios.push({id:sl.id,datos}); else nuevos.push(datos);
+  });
+
+  showLoader('Generando programación...');
+  const ts=new Date().toISOString();
+  const rows=nuevos.map(d=>{
+    const id=avNuevoId();
+    DB.av.push({id,tipo:'av_turno',fecha:d.fecha,datos:d,registrado_por:currentUser.nombre,ts});
+    return {ID:id,Tipo:'av_turno',Fecha:d.fecha,Datos_JSON:JSON.stringify(d),Registrado_Por:currentUser.nombre,Timestamp:ts};
+  });
+  await apiAddBatch('EVENTOS',rows);
+  for(const c of cambios) await avActualizar(c.id,c.datos.fecha,c.datos);
+  hideLoader(); saveDB();
+  addLog('audiovisual',`${currentUser.nombre} ${regenerar?'reasignó':'generó'} la programación de Audio y Visual — semana ${lunes}`,'success');
+  renderAVProg();
+  if(avisos.length) showAlertModal(`No hubo suficientes integrantes disponibles para: ${avisos.join(', ')}. Asígnalos a mano con "Editar".`,'Revisa la programación');
+  else showToast('✓ Programación generada','success');
+}
+
+function avCopiarSemana(){
+  const lunes=avSemana||avLunes(avHoy());
+  const list=avTurnosSemana(lunes);
+  if(!list.length){ showToast('No hay programación para copiar','error'); return; }
+  let txt=`*PROGRAMACIÓN AUDIO Y VISUAL*\nSemana ${formatDate(lunes)} – ${formatDate(avAddDays(lunes,6))}\n`;
+  list.forEach(t=>{
+    txt+=`\n*${avDiaNombre(t.fecha)} ${formatDate(t.fecha)} · ${avServNombre(t)}*${t.nombre?' ('+t.nombre+')':''}\n`;
+    txt+=`🎚️ Audio: ${avNombrePlano(t.audio)||'Sin asignar'}\n🖥️ Visual: ${avNombrePlano(t.visual)||'Sin asignar'}\n`;
+  });
+  txt+=`\nRecuerda marcar tu asistencia en la app el día de tu servicio. 🙏`;
+  const ok=()=>showToast('✓ Programación copiada. Pégala en WhatsApp','success');
+  if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(txt).then(ok).catch(()=>avCopiarFallback(txt,ok));
+  else avCopiarFallback(txt,ok);
+}
+function avCopiarFallback(txt,ok){
+  const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); ok(); }catch(e){ showAlertModal(txt,'Copia este texto'); }
+  ta.remove();
+}
+
+// ── modal de turno ──
+function avLlenarSelectsTurno(){
+  const fecha=document.getElementById('avTFecha').value||avHoy();
+  const opt=(sel,val)=>{
+    const s=document.getElementById(sel);
+    s.innerHTML='<option value="">— Sin asignar —</option>'+avEquipo().map(m=>`<option value="${m.id}">${avEsc(m.nombre+' '+m.apellido)}${avDisponible(m.id,fecha)?'':' (no disponible)'}</option>`).join('');
+    s.value=val||'';
+  };
+  opt('avTAudio',document.getElementById('avTAudio').value);
+  opt('avTVisual',document.getElementById('avTVisual').value);
+}
+function avAbrirTurno(id){
+  const t=id?avTurnos().find(x=>x.id===id):null;
+  editAvTurnoId=t?t.id:null;
+  document.getElementById('avTurnoTitulo').textContent=t?'Editar servicio':'Servicio especial / Campaña';
+  document.getElementById('avTServ').innerHTML=AV_SERVICIOS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')+`<option value="${AV_ESPECIAL}">Campaña / Especial (cualquier día)</option>`;
+  document.getElementById('avTServ').value=t?(avEsEstandar(t)?t.servicio:AV_ESPECIAL):AV_ESPECIAL;
+  document.getElementById('avTFecha').value=t?t.fecha:'';
+  document.getElementById('avTNombre').value=t?(t.nombre||''):'';
+  document.getElementById('avTAudio').innerHTML=''; document.getElementById('avTVisual').innerHTML='';
+  avLlenarSelectsTurno();
+  document.getElementById('avTAudio').value=t?(t.audio||''):'';
+  document.getElementById('avTVisual').value=t?(t.visual||''):'';
+  document.getElementById('avTDelBtn').style.display=t?'':'none';
+  openModal('avTurno');
+}
+function avSugerirTurno(){
+  const fecha=document.getElementById('avTFecha').value;
+  if(!fecha){ showToast('Primero selecciona la fecha','error'); return; }
+  const excl=new Set(editAvTurnoId?[editAvTurnoId]:[]);
+  const cnt=avConteos(avAddDays(fecha,-70),avAddDays(fecha,7),excl);
+  const ocupados={[fecha]:new Set()};
+  avTurnos().filter(t=>t.fecha===fecha&&t.id!==editAvTurnoId).forEach(t=>{ if(t.audio)ocupados[fecha].add(t.audio); if(t.visual)ocupados[fecha].add(t.visual); });
+  const {audio,visual}=avAsignar(fecha,avEquipoIds(),cnt,ocupados);
+  document.getElementById('avTAudio').value=audio;
+  document.getElementById('avTVisual').value=visual;
+  if(!audio||!visual) showToast('No hay suficientes integrantes disponibles','error');
+}
+async function avGuardarTurno(){
+  const fecha=document.getElementById('avTFecha').value;
+  const servicio=document.getElementById('avTServ').value;
+  const nombre=document.getElementById('avTNombre').value.trim();
+  const audio=document.getElementById('avTAudio').value;
+  const visual=document.getElementById('avTVisual').value;
+  if(!fecha){ showToast('Selecciona la fecha','error'); return; }
+  const std=AV_SERVICIOS.find(s=>s.id===servicio);
+  if(std&&avParse(fecha).getDay()!==std.dow){ showAlertModal(`El servicio "${std.name}" debe ser un ${DIA_NOMBRES[std.dow]}. Para otro día usa "Campaña / Especial".`,'Fecha no válida'); return; }
+  if(audio&&audio===visual){ showToast('Audio y visual deben ser personas distintas','error'); return; }
+  if(std&&avTurnos().some(t=>t.id!==editAvTurnoId&&t.fecha===fecha&&t.servicio===servicio)){ showToast('Ese servicio ya está programado en esa fecha','error'); return; }
+  const prev=editAvTurnoId?avTurnos().find(t=>t.id===editAvTurnoId):null;
+  const datos={fecha,servicio,nombre,audio,visual};
+  showLoader('Guardando servicio...');
+  if(prev){
+    await avActualizar(prev.id,fecha,datos);
+    // si cambia la fecha o la persona, la asistencia anterior ya no corresponde
+    for(const r of ['audio','visual']){
+      const ex=avAsisDe(prev,r);
+      if(ex&&(prev.fecha!==fecha||prev[r]!==datos[r])) await avBorrar(ex.id);
+    }
+    addLog('audiovisual',`${currentUser.nombre} editó el servicio AV ${avServNombre(datos)} — ${fecha}`,'info');
+  } else {
+    await avCrear('av_turno',fecha,datos);
+    addLog('audiovisual',`${currentUser.nombre} programó ${avServNombre(datos)}${nombre?' ('+nombre+')':''} — ${fecha}`,'success');
+  }
+  hideLoader(); saveDB(); closeModal('avTurno');
+  avSemana=avLunes(fecha); renderAVActual();
+  const bloq=[audio,visual].filter(id=>id&&!avDisponible(id,fecha));
+  showToast(bloq.length?`Guardado. Ojo: ${bloq.map(avNombrePlano).join(' y ')} no está disponible ese mes`:'✓ Servicio guardado',bloq.length?'error':'success');
+}
+function avBorrarTurno(){
+  const t=avTurnos().find(x=>x.id===editAvTurnoId); if(!t) return;
+  showConfirm(`¿Eliminar ${avServNombre(t)} del ${formatDate(t.fecha)}? También se borra su asistencia.`,async()=>{
+    showLoader('Eliminando...');
+    for(const e of avList('av_asis').filter(e=>e.datos.turno===t.id)) await avBorrar(e.id);
+    await avBorrar(t.id);
+    hideLoader(); saveDB(); closeModal('avTurno'); renderAVActual();
+    addLog('audiovisual',`${currentUser.nombre} eliminó el servicio AV ${avServNombre(t)} — ${t.fecha}`,'warn');
+    showToast('Servicio eliminado');
+  });
+}
+
+// ── DISPONIBILIDAD ──
+function avUltimaSantaCena(id,mes){
+  const fin=mes+'-31';
+  return DB.santa_cena.filter(s=>s.miembro===id&&s.fecha<=fin).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0]||null;
+}
+function renderAVDisp(){
+  const mes=avOpcionesMeses('avDispMes');
+  const bloq=avBloqueos(mes);
+  const eq=avEquipo();
+  const turnosMes=avTurnos().filter(t=>avMes(t.fecha)===mes);
+  document.getElementById('avDispList').innerHTML=eq.map(m=>{
+    const b=bloq[m.id];
+    const sc=avUltimaSantaCena(m.id,mes);
+    const scTxt=sc?`Santa Cena ${formatDate(sc.fecha)}: ${sc.asistio?'✓ tomó':'✗ no tomó'}`:'Sin registro de Santa Cena';
+    const nT=turnosMes.filter(t=>t.audio===m.id||t.visual===m.id).length;
+    return `<div class="av-disp-row ${b?'bloq':''}" data-id="${m.id}">
+      <div class="av-disp-name">${avEsc(m.nombre+' '+m.apellido)}
+        <span class="av-disp-hint">${scTxt} · ${nT} turno(s) en ${avMesLabel(mes)}${b&&nT?' — <strong style="color:var(--danger)">reasígnalos</strong>':''}</span></div>
+      <select class="av-disp-estado" onchange="this.closest('.av-disp-row').classList.toggle('bloq',this.value==='no');this.closest('.av-disp-row').querySelector('.av-disp-extra').style.display=this.value==='no'?'flex':'none'">
+        <option value="si" ${b?'':'selected'}>Disponible</option>
+        <option value="no" ${b?'selected':''}>No disponible</option>
+      </select>
+      <div class="av-disp-extra" style="display:${b?'flex':'none'};gap:8px;flex-wrap:wrap;">
+        <select class="av-disp-motivo">${AV_MOTIVOS.map(x=>`<option ${b&&b.motivo===x?'selected':''}>${x}</option>`).join('')}</select>
+        <input class="av-disp-nota" placeholder="Nota (opcional)" value="${avEsc(b?b.nota||'':'')}">
+      </div>
+    </div>`;
+  }).join('')||'<p class="av-empty">Primero configura el equipo en la pestaña "Equipo".</p>';
+}
+async function avGuardarDisp(){
+  const mes=document.getElementById('avDispMes').value;
+  const bloqueados={};
+  document.querySelectorAll('#avDispList .av-disp-row').forEach(row=>{
+    if(row.querySelector('.av-disp-estado').value!=='no') return;
+    bloqueados[row.dataset.id]={motivo:row.querySelector('.av-disp-motivo').value,nota:row.querySelector('.av-disp-nota').value.trim()};
+  });
+  const datos={mes,bloqueados};
+  showLoader('Guardando disponibilidad...');
+  const ex=avDispRec(mes);
+  if(ex) await avActualizar(ex.id,mes+'-01',datos); else await avCrear('av_disp',mes+'-01',datos);
+  hideLoader(); saveDB();
+  const n=Object.keys(bloqueados).length;
+  addLog('audiovisual',`${currentUser.nombre} actualizó la disponibilidad AV de ${avMesLabel(mes)} (${n} no disponible/s)`,'info');
+  renderAVDisp();
+  const afectados=avTurnos().filter(t=>avMes(t.fecha)===mes&&t.fecha>=avHoy()&&((t.audio&&bloqueados[t.audio])||(t.visual&&bloqueados[t.visual])));
+  if(afectados.length) showAlertModal(`Hay ${afectados.length} turno(s) próximos con integrantes no disponibles. Ve a Programación y usa "Reasignar semana" o "Editar".`,'Disponibilidad guardada');
+  else showToast('✓ Disponibilidad guardada','success');
+}
+
+// ── ASISTENCIA ──
+function avResumenMes(mes){
+  const list=avTurnos().filter(t=>avMes(t.fecha)===mes).sort(avSortTurnos);
+  const res={};
+  avEquipo().forEach(m=>res[m.id]={prog:0,si:0,no:0,pend:0});
+  list.forEach(t=>['audio','visual'].forEach(r=>{
+    if(!t[r]) return;
+    const x=res[t[r]]=res[t[r]]||{prog:0,si:0,no:0,pend:0};
+    const est=avEstado(t,r);
+    x.prog++;
+    if(est==='si') x.si++; else if(est==='no') x.no++; else x.pend++;
+  }));
+  return {list,res};
+}
+function renderAVAsis(){
+  const mes=avOpcionesMeses('avAsisMes');
+  const {list,res}=avResumenMes(mes);
+  document.getElementById('avAsisBody').innerHTML=Object.entries(res).sort((a,b)=>avNombrePlano(a[0]).localeCompare(avNombrePlano(b[0]))).map(([id,x])=>{
+    const eval_=x.si+x.no;
+    const pct=eval_?Math.round(x.si*100/eval_):null;
+    const col=pct===null?'var(--gray)':(pct>=90?'var(--success)':(pct>=70?'var(--warn)':'var(--danger)'));
+    return `<tr><td><strong>${avNombre(id)}</strong></td><td>${x.prog}</td><td>${x.si}</td><td>${x.no}</td><td>${x.pend}</td>
+      <td><strong style="color:${col}">${pct===null?'—':pct+'%'}</strong></td></tr>`;
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Sin integrantes</td></tr>';
+  document.getElementById('avAsisTurnos').innerHTML=list.map(t=>avTurnoCard(t)).join('')
+    ||'<div class="card" style="grid-column:1/-1"><p class="av-empty">No hay servicios programados en este mes.</p></div>';
+}
+function avExportAsis(){
+  const mes=document.getElementById('avAsisMes').value;
+  const {list}=avResumenMes(mes);
+  const lbl={si:'Asistió',no:'No asistió',pend:'Pendiente',fut:'Programado',none:'Sin asignar'};
+  const data=[];
+  list.forEach(t=>['audio','visual'].forEach(r=>data.push({'Fecha':t.fecha,'Día':avDiaNombre(t.fecha),'Servicio':avServNombre(t),'Nombre':t.nombre||'','Rol':r==='audio'?'Audio':'Visual','Servidor':avNombrePlano(t[r])||'Sin asignar','Estado':lbl[avEstado(t,r)]})));
+  if(!data.length){ showToast('No hay datos para exportar','error'); return; }
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Asistencia AV');
+  XLSX.writeFile(wb,`ICAEP_AudioVisual_Asistencia_${mes}.xlsx`);
+}
+
+// ── EQUIPO ──
+function renderAVEquipo(keepSel){
+  if(!keepSel||!avEquipoSel) avEquipoSel=new Set(avEquipoIds());
+  const cfg=avEquipoGuardado();
+  const q=avNorm(document.getElementById('avEquipoBuscar').value);
+  let nota='';
+  if(!cfg){
+    const faltan=AV_EQUIPO_INICIAL.filter(n=>{const t=avNorm(n).split(/\s+/);return !DB.miembros.some(x=>{const f=avNorm(x.nombre+' '+x.apellido).split(/\s+/);return t.every(w=>f.includes(w));});});
+    nota=`Equipo sugerido a partir de la lista inicial. Revisa y pulsa <strong>Guardar equipo</strong> para confirmarlo.${faltan.length?` No encontré en Miembros a: <strong>${faltan.map(avEsc).join(', ')}</strong>.`:''}`;
+  }
+  document.getElementById('avEquipoNota').innerHTML=`<p>${avEquipoSel.size} integrante(s) seleccionado(s). ${nota}</p>`;
+  const miembros=DB.miembros.filter(m=>m.activo!==false||avEquipoSel.has(m.id))
+    .filter(m=>!q||avNorm(m.nombre+' '+m.apellido).includes(q))
+    .sort((a,b)=>(avEquipoSel.has(b.id)-avEquipoSel.has(a.id))||(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido));
+  document.getElementById('avEquipoList').innerHTML=miembros.map(m=>`<label class="av-team-item ${avEquipoSel.has(m.id)?'on':''}">
+      <input type="checkbox" ${avEquipoSel.has(m.id)?'checked':''} onchange="avToggleEquipo('${m.id}',this.checked)">
+      <span>${avEsc(m.nombre+' '+m.apellido)}<br><span style="font-size:0.72rem;color:var(--gray);font-weight:400">${avEsc(m.ministerio)}</span></span>
+    </label>`).join('')||'<p class="av-empty">Sin resultados</p>';
+  document.getElementById('avEquipoUsuarios').innerHTML=[...avEquipoSel].map(id=>{
+    const u=DB.usuarios.find(x=>x.rol===AV_ROL&&x.ministerio===id);
+    return `<tr><td><strong>${avNombre(id)}</strong></td><td>${u?avEsc(u.email):'<span style="color:var(--gray)">Sin usuario</span>'}</td>
+      <td>${u?`<span class="badge badge-${u.activo!==false?'si':'no'}">${u.activo!==false?'Activo':'Inactivo'}</span>`:'<span class="badge badge-pend">Crear en Usuarios</span>'}</td></tr>`;
+  }).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:1.5rem">Sin integrantes</td></tr>';
+}
+function avToggleEquipo(id,on){ if(on) avEquipoSel.add(id); else avEquipoSel.delete(id); renderAVEquipo(true); }
+async function avGuardarEquipo(){
+  const datos={miembros:[...avEquipoSel]};
+  showLoader('Guardando equipo...');
+  const cfg=avEquipoGuardado();
+  if(cfg) await avActualizar(cfg.id,avHoy(),datos); else await avCrear('av_equipo',avHoy(),datos);
+  hideLoader(); saveDB();
+  addLog('audiovisual',`${currentUser.nombre} actualizó el equipo de Audio y Visual (${datos.miembros.length} integrantes)`,'info');
+  renderAVEquipo();
+  showToast('✓ Equipo guardado','success');
+}
+
+// ── INVENTARIO ──
+function avSetInvArea(area){
+  avInvArea=area;
+  document.querySelectorAll('#avInvAreaTabs .period-tab').forEach(b=>b.classList.toggle('active',b.dataset.area===area));
+  renderAVInv();
+}
+function avInventario(area){ return avList('av_inv').map(e=>({...e.datos,id:e.id})).filter(x=>!area||x.area===area); }
+function renderAVInv(){
+  const selE=document.getElementById('avInvEstado');
+  if(!selE.options.length) selE.innerHTML='<option value="">Todos los estados</option>'+AV_ESTADOS.map(e=>`<option>${e}</option>`).join('');
+  const todos=avInventario(avInvArea);
+  const q=avNorm(document.getElementById('avInvBuscar').value), est=selE.value;
+  const list=todos.filter(x=>(!est||x.estado===est)&&(!q||avNorm([x.nombre,x.marca,x.modelo,x.serie,x.ubicacion,x.notas].join(' ')).includes(q)))
+    .sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre)));
+  const unidades=todos.filter(x=>x.estado!=='De baja').reduce((s,x)=>s+(parseInt(x.cantidad)||1),0);
+  const fallas=todos.filter(x=>x.estado==='Dañado'||x.estado==='En reparación').length;
+  const buenos=todos.filter(x=>x.estado==='Bueno').length;
+  document.getElementById('avInvStats').innerHTML=`
+    <div class="stat-card"><div class="label">Equipos</div><div class="value">${todos.length}</div><div class="sub">${unidades} unidades en uso</div></div>
+    <div class="stat-card"><div class="label">En buen estado</div><div class="value">${buenos}</div></div>
+    <div class="stat-card"><div class="label">Con fallas</div><div class="value" style="color:${fallas?'#fca5a5':'inherit'}">${fallas}</div><div class="sub">dañados o en reparación</div></div>`;
+  const badge=e=>{const c={'Bueno':'si','Regular':'pend','Dañado':'no','En reparación':'no','De baja':'general'}[e]||'general';return `<span class="badge badge-${c}">${avEsc(e||'—')}</span>`;};
+  document.getElementById('avInvBody').innerHTML=list.map(x=>`<tr>
+    <td><strong>${avEsc(x.nombre)}</strong></td>
+    <td>${avEsc([x.marca,x.modelo].filter(Boolean).join(' ')||'—')}</td>
+    <td>${avEsc(x.serie||'—')}</td>
+    <td>${avEsc(x.cantidad||1)}</td>
+    <td>${badge(x.estado)}</td>
+    <td>${avEsc(x.ubicacion||'—')}</td>
+    <td style="max-width:220px;font-size:0.8rem;color:var(--gray)">${avEsc(x.notas||'')}</td>
+    <td><button class="btn btn-warn btn-sm" onclick="avAbrirInv('${x.id}')">Editar</button></td>
+  </tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">${todos.length?'Sin resultados':'Aún no hay equipos de '+(avInvArea==='audio'?'audio':'visual')+' registrados'}</td></tr>`;
+}
+function avAbrirInv(id){
+  const x=id?avInventario().find(i=>i.id===id):null;
+  editAvInvId=x?x.id:null;
+  document.getElementById('avInvTitulo').textContent=x?'Editar equipo':'Agregar equipo';
+  document.getElementById('avIEstado').innerHTML=AV_ESTADOS.map(e=>`<option>${e}</option>`).join('');
+  document.getElementById('avIArea').value=x?x.area:avInvArea;
+  document.getElementById('avINombre').value=x?x.nombre||'':'';
+  document.getElementById('avIMarca').value=x?x.marca||'':'';
+  document.getElementById('avIModelo').value=x?x.modelo||'':'';
+  document.getElementById('avISerie').value=x?x.serie||'':'';
+  document.getElementById('avICantidad').value=x?x.cantidad||1:1;
+  document.getElementById('avIEstado').value=x?x.estado||'Bueno':'Bueno';
+  document.getElementById('avIUbicacion').value=x?x.ubicacion||'':'';
+  document.getElementById('avINotas').value=x?x.notas||'':'';
+  document.getElementById('avIDelBtn').style.display=x?'':'none';
+  openModal('avInv');
+}
+async function avGuardarInv(){
+  const v=id=>document.getElementById(id).value.trim();
+  const datos={area:v('avIArea'),nombre:v('avINombre'),marca:v('avIMarca'),modelo:v('avIModelo'),serie:v('avISerie'),
+    cantidad:Math.max(1,parseInt(v('avICantidad'))||1),estado:v('avIEstado'),ubicacion:v('avIUbicacion'),notas:v('avINotas')};
+  if(!datos.nombre){ showToast('Escribe el nombre del equipo','error'); return; }
+  showLoader('Guardando equipo...');
+  if(editAvInvId){
+    const prev=DB.av.find(e=>e.id===editAvInvId);
+    await avActualizar(editAvInvId,prev?prev.fecha:avHoy(),datos);
+    addLog('audiovisual',`${currentUser.nombre} editó equipo de ${datos.area}: ${datos.nombre} (${datos.estado})`,'info');
+  } else {
+    await avCrear('av_inv',avHoy(),datos);
+    addLog('audiovisual',`${currentUser.nombre} agregó equipo de ${datos.area}: ${datos.nombre}`,'success');
+  }
+  hideLoader(); saveDB(); closeModal('avInv');
+  if(datos.area!==avInvArea) avSetInvArea(datos.area); else renderAVInv();
+  showToast('✓ Equipo guardado','success');
+}
+function avBorrarInv(){
+  const x=avInventario().find(i=>i.id===editAvInvId); if(!x) return;
+  showConfirm(`¿Eliminar "${x.nombre}" del inventario? Si el equipo solo salió de uso, mejor cambia su estado a "De baja".`,async()=>{
+    showLoader('Eliminando...');
+    await avBorrar(x.id);
+    hideLoader(); saveDB(); closeModal('avInv'); renderAVInv();
+    addLog('audiovisual',`${currentUser.nombre} eliminó del inventario: ${x.nombre}`,'warn');
+    showToast('Equipo eliminado');
+  });
+}
+function avExportInv(){
+  const data=avInventario().sort((a,b)=>a.area.localeCompare(b.area)||String(a.nombre).localeCompare(String(b.nombre)))
+    .map(x=>({'Área':x.area==='audio'?'Audio':'Visual','Equipo':x.nombre,'Marca':x.marca||'','Modelo':x.modelo||'','Serie':x.serie||'','Cantidad':x.cantidad||1,'Estado':x.estado||'','Ubicación':x.ubicacion||'','Notas':x.notas||''}));
+  if(!data.length){ showToast('No hay equipos para exportar','error'); return; }
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Inventario AV');
+  XLSX.writeFile(wb,'ICAEP_AudioVisual_Inventario.xlsx');
 }
 </script>
 </body>
