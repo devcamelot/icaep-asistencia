@@ -966,7 +966,7 @@ tr:hover td{background:#fafaf7;}
       <div id="avPane-equipo" class="av-pane">
         <div class="card">
           <div class="toolbar">
-            <input class="search-box" id="avEquipoBuscar" placeholder="Buscar miembro..." oninput="renderAVEquipo(true)" style="flex:1;max-width:300px;">
+            <input class="search-box" id="avEquipoBuscar" placeholder="Buscar en todos los miembros: nombre, cédula o ministerio" oninput="renderAVEquipo(true)" style="flex:1;max-width:380px;">
             <button class="btn btn-primary btn-sm" onclick="avGuardarEquipo()">Guardar equipo</button>
           </div>
           <div id="avEquipoNota" style="font-size:0.85rem;color:var(--gray);"></div>
@@ -4462,13 +4462,15 @@ function renderAVEquipo(keepSel){
     nota=`Equipo sugerido a partir de la lista inicial. Revisa y pulsa <strong>Guardar equipo</strong> para confirmarlo.${faltan.length?` No encontré en Miembros a: <strong>${faltan.map(avEsc).join(', ')}</strong>.`:''}`;
   }
   document.getElementById('avEquipoNota').innerHTML=`<p>${avEquipoSel.size} integrante(s) seleccionado(s). ${nota}</p>`;
-  const miembros=DB.miembros.filter(m=>m.activo!==false||avEquipoSel.has(m.id))
-    .filter(m=>!q||avNorm(m.nombre+' '+m.apellido).includes(q))
+  // Sin búsqueda se muestra el equipo actual; la búsqueda recorre todos los miembros
+  const miembros=DB.miembros
+    .filter(m=>q?avNorm([m.nombre,m.apellido,m.cedula,m.ministerio].join(' ')).includes(q):avEquipoSel.has(m.id))
     .sort((a,b)=>(avEquipoSel.has(b.id)-avEquipoSel.has(a.id))||(a.nombre+a.apellido).localeCompare(b.nombre+b.apellido));
-  document.getElementById('avEquipoList').innerHTML=miembros.map(m=>`<label class="av-team-item ${avEquipoSel.has(m.id)?'on':''}">
+  const vacio=q?`No hay miembros que coincidan con "${avEsc(document.getElementById('avEquipoBuscar').value)}".`:'El equipo está vacío. Busca arriba para agregar integrantes.';
+  document.getElementById('avEquipoList').innerHTML=(q?`<p style="grid-column:1/-1;font-size:0.8rem;color:var(--gray)">${miembros.length} resultado(s) de ${DB.miembros.length} miembros</p>`:'')+(miembros.map(m=>`<label class="av-team-item ${avEquipoSel.has(m.id)?'on':''}">
       <input type="checkbox" ${avEquipoSel.has(m.id)?'checked':''} onchange="avToggleEquipo('${m.id}',this.checked)">
-      <span>${avEsc(m.nombre+' '+m.apellido)}<br><span style="font-size:0.72rem;color:var(--gray);font-weight:400">${avEsc(m.ministerio)}</span></span>
-    </label>`).join('')||'<p class="av-empty">Sin resultados</p>';
+      <span>${avEsc(m.nombre+' '+m.apellido)}<br><span style="font-size:0.72rem;color:var(--gray);font-weight:400">${avEsc(m.ministerio)}${m.cedula?' · '+avEsc(m.cedula):''}${m.activo===false?' · inactivo':''}</span></span>
+    </label>`).join('')||`<p class="av-empty" style="grid-column:1/-1">${vacio}</p>`);
   document.getElementById('avEquipoUsuarios').innerHTML=[...avEquipoSel].map(id=>{
     const u=DB.usuarios.find(x=>x.rol===AV_ROL&&x.ministerio===id);
     return `<tr><td><strong>${avNombre(id)}</strong></td><td>${u?avEsc(u.email):'<span style="color:var(--gray)">Sin usuario</span>'}</td>
