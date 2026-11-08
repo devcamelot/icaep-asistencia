@@ -969,7 +969,6 @@ tr:hover td{background:#fafaf7;}
             <input class="search-box" id="avEquipoBuscar" placeholder="Buscar en todos los miembros: nombre, cédula o ministerio" oninput="renderAVEquipo(true)" style="flex:1;max-width:380px;">
             <button class="btn btn-primary btn-sm" onclick="avGuardarEquipo()">Guardar equipo</button>
           </div>
-          <div id="avEquipoNota" style="font-size:0.85rem;color:var(--gray);"></div>
           <div class="av-team-list" id="avEquipoList"></div>
           <h4 style="font-family:'Cinzel',serif;font-size:0.95rem;margin:1.5rem 0 0.6rem;">Acceso a la aplicación</h4>
           <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Cada integrante necesita un usuario con rol <strong>Servidor Audio y Visual</strong> (se crea en Usuarios) para ver sus turnos y marcar su asistencia.</p>
@@ -4454,14 +4453,7 @@ function avExportAsis(){
 // ── EQUIPO ──
 function renderAVEquipo(keepSel){
   if(!keepSel||!avEquipoSel) avEquipoSel=new Set(avEquipoIds());
-  const cfg=avEquipoGuardado();
   const q=avNorm(document.getElementById('avEquipoBuscar').value);
-  let nota='';
-  if(!cfg){
-    const faltan=AV_EQUIPO_INICIAL.filter(n=>{const t=avNorm(n).split(/\s+/);return !DB.miembros.some(x=>{const f=avNorm(x.nombre+' '+x.apellido).split(/\s+/);return t.every(w=>f.includes(w));});});
-    nota=`Equipo sugerido a partir de la lista inicial. Revisa y pulsa <strong>Guardar equipo</strong> para confirmarlo.${faltan.length?` No encontré en Miembros a: <strong>${faltan.map(avEsc).join(', ')}</strong>.`:''}`;
-  }
-  document.getElementById('avEquipoNota').innerHTML=`<p>${avEquipoSel.size} integrante(s) seleccionado(s). ${nota}</p>`;
   // Sin búsqueda se muestra el equipo actual; la búsqueda recorre todos los miembros
   const miembros=DB.miembros
     .filter(m=>q?avNorm([m.nombre,m.apellido,m.cedula,m.ministerio].join(' ')).includes(q):avEquipoSel.has(m.id))
